@@ -41,11 +41,11 @@ API 키는 서버 사이드에만 노출되며 클라이언트 번들에 포함�
 
 ## 테스트 체크리스트
 
-- [ ] `/projects` 접속 시 Notion DB에 입력한 프로젝트들이 카드로 표시되는지 확인
-- [ ] `/` 접속 시 최근 프로젝트 3개가 Notion 데이터로 표시되는지 확인
-- [ ] 잘못된 API 키로 접속 시 500 에러 대신 빈 목록이 표시되는지 확인
-- [ ] Notion DB에 새 프로젝트를 추가한 뒤 페이지 새로고침 시 목록에 반영되는지 확인
-- [ ] 브라우저 DevTools Network 탭에서 `NOTION_API_KEY`가 클라이언트 요청에 노출되지 않는지 확인
+- [ ] [Playwright MCP] `/projects` navigate → 프로젝트 카드 목록 렌더링 확인 및 스크린샷 (Notion DB 입력 데이터 표시 여부)
+- [ ] [Playwright MCP] `/` navigate → 최근 프로젝트 섹션 스크린샷 → 카드 3개 존재 및 실제 프로젝트명 표시 검증
+- [ ] [수동 + Playwright MCP] `.env.local` API 키를 무효 값으로 변경 후 서버 재시작 → `/projects` navigate → 빈 목록 표시 및 앱 크래시 없음 확인
+- [ ] [수동 + Playwright MCP] Notion DB 신규 항목 추가 → `/projects` navigate → 새 프로젝트 카드 목록 반영 확인
+- [ ] [Playwright MCP] `evaluate()` 실행 → 클라이언트 번들(`window.__NEXT_DATA__`)에 `NOTION_API_KEY` 문자열 미포함 검증
 
 ## 변경 사항 요약
 

@@ -39,13 +39,13 @@ Next.js App Router의 ISR 캐싱 전략을 적용하여 Notion API 호출 횟수
 
 ## 테스트 체크리스트
 
-- [ ] 프로덕션 URL에서 `/`, `/projects`, `/projects/[id]`, `/about` 모두 정상 접근 확인
-- [ ] Notion DB에 새 항목 추가 후 `revalidate` 시간(1시간) 이후 목록에 반영되는지 확인
-- [ ] 모바일 기기(또는 DevTools Device Toolbar)에서 네비게이션 및 카드 레이아웃 확인
-- [ ] SNS 공유 시 OG 이미지/제목/설명이 올바르게 표시되는지 확인 (Facebook Debugger 또는 Twitter Card Validator 사용)
-- [ ] 다크 모드에서 모든 페이지의 색상 대비가 올바른지 확인
-- [ ] Vercel 배포 로그에서 빌드 오류 없이 성공하는지 확인
-- [ ] 브라우저 DevTools에서 `NOTION_API_KEY`가 클라이언트 번들 또는 네트워크 응답에 포함되지 않는지 확인
+- [ ] [Playwright MCP] 프로덕션 URL에서 `/`, `/projects`, `/projects/[id]`, `/about` 순서로 navigate → 각 페이지 정상 렌더링 스크린샷
+- [ ] [수동] Notion DB 신규 항목 추가 → 1시간(`revalidate: 3600`) 경과 후 `/projects` navigate → ISR 캐시 갱신 및 목록 반영 확인
+- [ ] [Playwright MCP] 모바일(375px) / 태블릿(768px) / 데스크톱(1280px) 뷰포트별 전체 페이지 navigate → 레이아웃 스크린샷 비교
+- [ ] [Playwright MCP] 상세 페이지 navigate → `evaluate()` 로 `<meta property="og:title">`, `<meta property="og:description">` 태그값 검증
+- [ ] [Playwright MCP] 다크 모드 CSS 클래스(`dark`) 주입 후 전체 페이지 순회 → 색상 대비 스크린샷 확인
+- [ ] [수동] Vercel 배포 로그에서 빌드 오류 없이 성공하는지 확인
+- [ ] [Playwright MCP] 프로덕션 URL에서 `evaluate()` 실행 → 클라이언트 번들(`window.__NEXT_DATA__`)에 `NOTION_API_KEY` 문자열 미포함 검증
 
 ## 변경 사항 요약
 

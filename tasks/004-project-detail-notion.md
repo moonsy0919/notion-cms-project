@@ -38,13 +38,13 @@ Notion 페이지 본문 블록을 React 컴포넌트로 변환하는 `BlockRende
 
 ## 테스트 체크리스트
 
-- [ ] `/projects`에서 카드 클릭 시 해당 상세 페이지로 이동하는지 확인
-- [ ] 상세 페이지에 Notion DB의 실제 프로젝트 제목, 기간, 기술 스택이 올바르게 표시되는지 확인
-- [ ] Notion 본문의 제목, 단락, 목록, 코드 블록이 올바르게 렌더링되는지 확인
-- [ ] GitHub/Demo 버튼이 Notion DB에 입력한 URL로 연결되는지 확인
-- [ ] 잘못된 ID(`/projects/invalid-id`)로 접근 시 404 페이지가 표시되는지 확인
-- [ ] 브라우저 탭 타이틀이 실제 프로젝트명으로 표시되는지 확인
-- [ ] 다크 모드에서 본문 텍스트의 색상 대비가 정상인지 확인
+- [ ] [Playwright MCP] `/projects` navigate → 첫 번째 카드 클릭 → URL이 `/projects/[id]` 형식으로 변경되는지 확인
+- [ ] [Playwright MCP] 상세 페이지 navigate → `get_visible_text()` 로 제목·기간·기술 스택 배지가 Notion DB 데이터와 일치하는지 검증
+- [ ] [Playwright MCP] 상세 페이지 navigate → `get_visible_html()` 로 `heading`, `paragraph`, `ul/ol`, `code` 블록 렌더링 확인
+- [ ] [Playwright MCP] 상세 페이지 GitHub/Demo 버튼의 `href` 속성값이 Notion DB 입력 URL과 일치하는지 검증
+- [ ] [Playwright MCP] `/projects/invalid-id` navigate → 404 페이지 표시 확인 및 스크린샷
+- [ ] [Playwright MCP] 상세 페이지 navigate → `evaluate(() => document.title)` 실행 → 실제 프로젝트명과 일치하는지 검증
+- [ ] [Playwright MCP] 다크 모드 CSS 클래스(`dark`) 주입 후 상세 페이지 스크린샷 → 본문 텍스트 색상 대비 시각 확인
 
 ## 변경 사항 요약
 

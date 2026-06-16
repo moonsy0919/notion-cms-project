@@ -37,14 +37,14 @@ Server Component(데이터 fetch) + Client Component(인터랙션) 분리 패턴
 
 ## 테스트 체크리스트
 
-- [ ] "Next.js" 필터 클릭 시 URL이 `?tech=Next.js`로 변경되고 해당 프로젝트만 표시되는지 확인
-- [ ] 검색창에 키워드 입력 시 URL이 `?q=키워드`로 변경되고 관련 프로젝트만 표시되는지 확인
-- [ ] 필터 + 검색 동시 적용 시 두 조건이 AND로 작동하는지 확인 (`?tech=Next.js&q=포트폴리오`)
-- [ ] 필터 결과가 없을 때 `EmptyState`가 표시되는지 확인
-- [ ] URL에 `?tech=React`를 직접 입력하여 해당 필터가 적용된 상태로 페이지가 로드되는지 확인
-- [ ] 브라우저 뒤로가기/앞으로가기 시 필터 상태가 올바르게 복원되는지 확인
-- [ ] "전체" 버튼 클릭 시 URL에서 `tech`, `q` 파라미터가 제거되고 전체 목록이 표시되는지 확인
-- [ ] 모바일 화면(375px)에서 필터 버튼이 가로 스크롤 또는 줄바꿈으로 올바르게 표시되는지 확인
+- [ ] [Playwright MCP] `/projects` navigate → "Next.js" 필터 버튼 클릭 → URL `?tech=Next.js` 변경 확인 및 필터된 카드 목록 스크린샷
+- [ ] [Playwright MCP] 검색바에 키워드 입력(300ms 대기) → URL `?q=키워드` 변경 확인 및 필터된 카드 목록 스크린샷
+- [ ] [Playwright MCP] "Next.js" 필터 클릭 후 검색어 입력 → URL `?tech=Next.js&q=포트폴리오` 확인 → 두 조건 AND 결과 스크린샷
+- [ ] [Playwright MCP] 결과 없는 조건으로 필터 적용 → `EmptyState` 컴포넌트 렌더링 확인 및 스크린샷
+- [ ] [Playwright MCP] `/projects?tech=React` 직접 navigate → URL 파라미터 기반 필터 상태 복원 확인
+- [ ] [Playwright MCP] 필터 적용 후 `go_back()` / `go_forward()` → 필터 상태 복원 확인
+- [ ] [Playwright MCP] "전체" 버튼 클릭 → URL에서 `tech`, `q` 파라미터 제거 확인 및 전체 목록 표시 스크린샷
+- [ ] [Playwright MCP] 모바일 뷰포트(375px) 설정 후 `/projects` navigate → 필터 버튼 레이아웃 스크린샷 (가로 스크롤 또는 줄바꿈 확인)
 
 ## 변경 사항 요약
 
