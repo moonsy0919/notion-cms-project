@@ -1,0 +1,2 @@
+- [프로젝트 컨텍스트](project-context.md) — Notion CMS 포트폴리오, @notionhq/client v5 API 변경사항 포함
+- [반복 빌드 에러 패턴](build-error-patterns.md) — lucide-react v1.x Github 아이콘 제거, databases.query → dataSources.query 변경
