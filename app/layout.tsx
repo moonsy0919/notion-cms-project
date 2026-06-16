@@ -18,8 +18,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "StarterKit",
-  description: "Next.js 모던 웹 스타터킷",
+  title: "문시현 | 포트폴리오",
+  description: "Notion CMS 기반 개인 포트폴리오 웹사이트",
 };
 
 export default function RootLayout({

@@ -1,121 +1,103 @@
-import { Layers, Zap, Palette, Terminal, Package } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, ExternalLink } from "lucide-react";
 import { FaGithub } from "react-icons/fa6";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Container } from "@/components/layout/Container";
-import { QuickStartDialog } from "@/components/shared/QuickStartDialog";
 
-const GITHUB_URL = "https://github.com/moonsy0919/claude-nextjs-starters";
-
-const features = [
-  {
-    icon: Zap,
-    title: "빠른 시작",
-    description:
-      "Next.js 15 App Router, TypeScript, Tailwind CSS v4가 사전 구성되어 즉시 개발을 시작할 수 있습니다.",
-  },
-  {
-    icon: Layers,
-    title: "체계적인 구조",
-    description:
-      "Atomic Design 기반으로 분류된 컴포넌트 계층으로 유지보수가 쉽고 확장 가능한 코드베이스를 제공합니다.",
-  },
-  {
-    icon: Palette,
-    title: "다크모드 지원",
-    description:
-      "next-themes와 shadcn/ui CSS 변수를 사용한 완벽한 Light/Dark 모드 지원으로 사용자 경험을 향상시킵니다.",
-  },
-];
-
-const techStack = [
-  "Next.js 15",
-  "TypeScript",
-  "Tailwind CSS v4",
-  "shadcn/ui",
-  "next-themes",
-  "Lucide Icons",
-  "Sonner",
-];
-
+/**
+ * 홈 페이지 — Hero 섹션 + 핵심/최근 프로젝트 요약
+ * 실제 데이터는 Notion API 연동 후 서버 컴포넌트로 fetch 예정
+ */
 export default function HomePage() {
   return (
     <div className="flex flex-col">
       {/* 히어로 섹션 */}
-      <section className="py-24 text-center">
+      <section className="py-24">
         <Container>
           <div className="mx-auto max-w-2xl">
             <Badge variant="secondary" className="mb-6">
-              <Package className="mr-1.5 h-3 w-3" />
-              프로덕션 레디 스타터킷
+              개발자 포트폴리오
             </Badge>
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-              모던 웹 개발을
+              안녕하세요,
               <br />
-              <span className="text-primary">빠르게 시작하세요</span>
+              <span className="text-primary">문시현</span>입니다.
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
-              Next.js 15 · TypeScript · Tailwind CSS v4 · shadcn/ui 로 구성된
+              Next.js와 TypeScript를 주로 사용하는 프론트엔드 개발자입니다.
               <br />
-              프로덕션 레디 스타터킷입니다.
+              Notion으로 관리되는 프로젝트들을 소개합니다.
             </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <QuickStartDialog>
-                <Button size="lg">
-                  <Terminal className="mr-2 h-4 w-4" />
-                  시작하기
-                </Button>
-              </QuickStartDialog>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <Button size="lg" asChild>
+                <Link href="/projects">
+                  프로젝트 보기
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
               <Button size="lg" variant="outline" asChild>
-                <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
-                  <FaGithub className="mr-2 h-4 w-4" />
-                  GitHub에서 보기
-                </a>
+                <Link href="/about">소개 보기</Link>
               </Button>
             </div>
           </div>
         </Container>
       </section>
 
-      {/* 기술 스택 배지 */}
-      <section className="border-t border-b py-6">
+      {/* 최근 프로젝트 섹션 — Notion API 연동 후 실제 데이터로 교체 예정 */}
+      <section className="border-t py-20">
         <Container>
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            <span className="mr-1 text-sm text-muted-foreground">기술 스택</span>
-            {techStack.map((tech) => (
-              <Badge key={tech} variant="outline">
-                {tech}
-              </Badge>
-            ))}
+          <div className="mb-10 flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-semibold tracking-tight">최근 프로젝트</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Notion에서 관리되는 최신 프로젝트들입니다.
+              </p>
+            </div>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/projects">
+                전체 보기
+                <ArrowRight className="ml-1 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
-        </Container>
-      </section>
 
-      {/* 주요 특징 섹션 */}
-      <section className="bg-muted/30 py-20">
-        <Container>
-          <div className="mb-10 text-center">
-            <h2 className="text-2xl font-semibold tracking-tight">주요 특징</h2>
-            <p className="mt-2 text-muted-foreground">
-              검증된 기술 스택으로 생산성 높은 개발 환경을 제공합니다.
-            </p>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-3">
-            {features.map((feature) => {
-              const Icon = feature.icon;
-              return (
-                <Card key={feature.title}>
-                  <CardHeader>
-                    <div className="mb-2 inline-flex rounded-lg bg-primary/10 p-2 text-primary">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <CardTitle className="text-base">{feature.title}</CardTitle>
-                    <CardDescription>{feature.description}</CardDescription>
-                  </CardHeader>
-                </Card>
-              );
-            })}
+          {/* 플레이스홀더 카드 — Notion API 연동 후 실제 데이터로 교체 */}
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="flex flex-col">
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-xs">
+                      완료
+                    </Badge>
+                  </div>
+                  <CardTitle className="text-base">프로젝트 {i}</CardTitle>
+                  <CardDescription>
+                    Notion API가 연동되면 실제 프로젝트 설명이 표시됩니다.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex flex-wrap gap-1">
+                  <Badge variant="secondary" className="text-xs">
+                    Next.js
+                  </Badge>
+                  <Badge variant="secondary" className="text-xs">
+                    TypeScript
+                  </Badge>
+                </CardContent>
+                <CardFooter className="mt-auto flex gap-2">
+                  <Button variant="outline" size="sm" disabled>
+                    <FaGithub className="mr-1.5 h-3.5 w-3.5" />
+                    GitHub
+                  </Button>
+                  <Button variant="outline" size="sm" disabled>
+                    <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
+                    Demo
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
           </div>
         </Container>
       </section>
