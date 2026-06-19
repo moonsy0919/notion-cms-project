@@ -1,16 +1,18 @@
 import Link from "next/link";
-import { ArrowRight, ExternalLink } from "lucide-react";
-import { FaGithub } from "react-icons/fa6";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Container } from "@/components/layout/Container";
+import { ProjectCard } from "@/components/projects/ProjectCard";
+import { dummyProjects } from "@/lib/dummy";
 
 /**
- * 홈 페이지 — Hero 섹션 + 핵심/최근 프로젝트 요약
- * 실제 데이터는 Notion API 연동 후 서버 컴포넌트로 fetch 예정
+ * 홈 페이지 — Hero 섹션 + 최근 프로젝트 3개
+ * TODO: Phase 3에서 dummyProjects → getProjects({ limit: 3 })으로 교체
  */
 export default function HomePage() {
+  const recentProjects = dummyProjects.slice(0, 3);
+
   return (
     <div className="flex flex-col">
       {/* 히어로 섹션 */}
@@ -45,7 +47,7 @@ export default function HomePage() {
         </Container>
       </section>
 
-      {/* 최근 프로젝트 섹션 — Notion API 연동 후 실제 데이터로 교체 예정 */}
+      {/* 최근 프로젝트 섹션 */}
       <section className="border-t py-20">
         <Container>
           <div className="mb-10 flex items-center justify-between">
@@ -63,40 +65,9 @@ export default function HomePage() {
             </Button>
           </div>
 
-          {/* 플레이스홀더 카드 — Notion API 연동 후 실제 데이터로 교체 */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="flex flex-col">
-                <CardHeader>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs">
-                      완료
-                    </Badge>
-                  </div>
-                  <CardTitle className="text-base">프로젝트 {i}</CardTitle>
-                  <CardDescription>
-                    Notion API가 연동되면 실제 프로젝트 설명이 표시됩니다.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="flex flex-wrap gap-1">
-                  <Badge variant="secondary" className="text-xs">
-                    Next.js
-                  </Badge>
-                  <Badge variant="secondary" className="text-xs">
-                    TypeScript
-                  </Badge>
-                </CardContent>
-                <CardFooter className="mt-auto flex gap-2">
-                  <Button variant="outline" size="sm" disabled>
-                    <FaGithub className="mr-1.5 h-3.5 w-3.5" />
-                    GitHub
-                  </Button>
-                  <Button variant="outline" size="sm" disabled>
-                    <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
-                    Demo
-                  </Button>
-                </CardFooter>
-              </Card>
+            {recentProjects.map((project) => (
+              <ProjectCard key={project.id} project={project} />
             ))}
           </div>
         </Container>
