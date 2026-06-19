@@ -47,52 +47,64 @@
 
 > 왜 이 순서인가? Phase 3 Notion 연동 전에 시각적 시스템을 확정해야 데이터를 붙였을 때 디자인 재작업 없이 바로 연결됩니다. 테마·레이아웃이 먼저 확정되면 Phase 3~4의 컴포넌트들이 이 시스템 위에서 자연스럽게 조립됩니다.
 
-- **Task 002-A: 글로벌 다크 테마 및 폰트 시스템 구축** - 대기
-  - `ThemeProvider` `defaultTheme="dark"` 변경 — 다크를 기본값으로 설정
-  - 기존 ThemeToggle 컴포넌트 및 라이트/다크 전환 기능 **유지**
-  - `globals.css` CSS 변수를 라이트/다크 양쪽 정의
+- **Task 002-A: 글로벌 다크 테마 및 폰트 시스템 구축** ✅ - 완료
+  - ✅ `ThemeProvider` `defaultTheme="dark"` 변경 — 다크를 기본값으로 설정
+  - ✅ 기존 ThemeToggle 컴포넌트 및 라이트/다크 전환 기능 **유지**
+  - ✅ `globals.css` CSS 변수를 라이트/다크 양쪽 정의
     - 라이트: `--background: #f8fafc`, `--accent: #0d9488`
     - 다크: `--background: #0b1120`, `--accent: #2dd4bf`, `--card: #111827`, `--border: #1e293b`
     - 다크 전용 코드 신택스 토큰: `--syntax-keyword`, `--syntax-string`, `--syntax-comment`, `--syntax-prop`
-  - `next/font`로 JetBrains Mono 로드 → `--font-mono` CSS 변수 등록
-  - 전체 라이트/다크 색상 대비 검증 (WCAG AA 기준)
+  - ✅ `next/font`로 JetBrains Mono 로드 → `--font-mono` CSS 변수 등록
+  - ✅ 전체 라이트/다크 색상 대비 검증 (WCAG AA 기준)
 
-- **Task 002-B: 네비게이션 개선** - 대기
-  - 로고 영역: `</>` 코드 아이콘 + 이름 조합으로 변경
-  - 네비게이션 항목 정리: 홈 / 프로젝트 / 소개
-  - 활성 링크 teal 언더라인 인디케이터 (`usePathname` 기반)
-  - 모바일 햄버거 메뉴 구현
-  - ThemeToggle 위치 유지
+- **Task 002-B: 네비게이션 개선** ✅ - 완료
+  - ✅ 로고 영역: `</>` 코드 아이콘 + 이름 조합으로 변경
+  - ✅ 네비게이션 항목 정리: 홈 / 프로젝트 / 소개
+  - ✅ 활성 링크 teal 언더라인 인디케이터 (`usePathname` 기반)
+  - ✅ 모바일 햄버거 메뉴 구현
+  - ✅ ThemeToggle 위치 유지
 
-- **Task 002-C: Hero 섹션 2컬럼 레이아웃 재구현** - 대기
-  - `components/home/HeroSection.tsx` 신규 — 좌우 2컬럼 레이아웃
-  - `components/home/ProfileAvatar.tsx` 신규 — Notion 프로필 사진 컴포넌트
-  - 좌측 (45%): `<Hello>` 태그 레이블, 이름 teal 하이라이트, `{역할}` 중괄호 스타일, 소셜 아이콘 행(GitHub·LinkedIn), CTA 버튼 1개("프로젝트 보기")
-  - 우측 (55%): ProfileAvatar(원형 96px, teal ring) + CodeEditorPanel(Task 002-D) 수직 배치
-  - ProfileAvatar Phase 2.5: GitHub 아바타 URL 플레이스홀더 사용 / Phase 3: 실제 Notion `avatar_url`로 교체
-  - 모바일: 우측 컬럼 숨김 (`hidden md:flex`)
+- **Task 002-C: Hero 섹션 2컬럼 레이아웃 재구현** ✅ - 완료
+  - ✅ `components/home/HeroSection.tsx` 신규 — 좌우 2컬럼 레이아웃
+  - ✅ `components/home/ProfileAvatar.tsx` 신규 — Notion 프로필 사진 컴포넌트
+  - ✅ 좌측 (45%): `<Hello>` 태그 레이블, 이름 teal 하이라이트, `{역할}` 중괄호 스타일, 소셜 아이콘 행(GitHub·LinkedIn), CTA 버튼 1개("프로젝트 보기")
+  - ✅ 우측 (55%): ProfileAvatar(원형 96px, teal ring) + CodeEditorPanel(Task 002-D) 수직 배치
+  - ✅ ProfileAvatar Phase 2.5: GitHub 아바타 URL 플레이스홀더 사용 / Phase 3: 실제 Notion `avatar_url`로 교체
+  - ✅ 모바일: 우측 컬럼 숨김 (`hidden md:flex`)
 
-- **Task 002-D: 코드 에디터 패널 컴포넌트 구현** - 대기
-  - `components/home/CodeEditorPanel.tsx` 신규
-  - 파일 탭 UI (`start.ts` / `skills.ts`), 라인 번호 + 코드 내용 2컬럼
-  - 기술 스택을 JS 객체 형태로 정적 표현 (`developer` 객체)
-  - 신택스 하이라이트: `<span>` 정적 컬러링 (외부 라이브러리 없음)
+- **Task 002-D: 코드 에디터 패널 컴포넌트 구현** ✅ - 완료
+  - ✅ `components/home/CodeEditorPanel.tsx` 신규
+  - ✅ 파일 탭 UI (`start.ts` / `skills.ts`), 라인 번호 + 코드 내용 2컬럼
+  - ✅ 기술 스택을 JS 객체 형태로 정적 표현 (`developer` 객체)
+  - ✅ 신택스 하이라이트: `<span>` 정적 컬러링 (외부 라이브러리 없음)
     - keyword → teal / string → amber / comment → muted / property → blue
-  - 커서 `|` 깜빡임 CSS 애니메이션 (선택)
+  - ✅ 커서 `|` 깜빡임 CSS 애니메이션 (`@keyframes cursor-blink`, `@layer utilities`)
+  - ✅ 코드 라인 글자 단위 타이핑 애니메이션
+    - `globals.css`에 `@keyframes clip-typing` 정의 (`clip-path: inset(0 100% 0 0) → inset(0 0% 0 0)`, 우→좌 마스크 해제)
+    - 모노스페이스 폰트 균등 자폭 특성 + `steps(N, end)` 조합으로 1글자씩 정확하게 타이핑 연출
+    - 라인별 `charCount()` × `CHAR_MS(30ms)` = 타이핑 소요 시간, 누적합으로 다음 줄 딜레이 계산
+    - `animation-fill-mode: both` 인라인 스타일로 직접 적용
+      - `backwards`: 딜레이 중 `from` 키프레임 적용 → 초기 마스킹(비가시) 보장
+      - `forwards`: 종료 후 `to` 키프레임 유지 → 타이핑 완료 상태 유지
+  - ✅ 탭 전환 시 애니메이션 재실행: `<tbody key={activeTab}>` DOM 재마운트로 리셋
 
-- **Task 002-E: About 홈 프리뷰 섹션** - 대기
-  - `components/home/AboutPreview.tsx` 신규
-  - `<About>` 태그 스타일 섹션 헤더
-  - 좌측: 짧은 자기소개 바이오 카드 (monospace, dark card)
-  - 우측: 프로필 사진 (`rotate-[-3deg]` 틸트, teal accent border)
-  - 하단: 기술 카테고리 태그 행 (Frontend / Backend / Tools)
+- **Task 002-E: About 홈 프리뷰 섹션** ✅ - 완료
+  - ✅ `components/home/AboutPreview.tsx` 신규
+  - ✅ `<About>` 태그 스타일 섹션 헤더
+  - ✅ 좌측: 짧은 자기소개 바이오 카드 (monospace, dark card)
+  - ✅ 우측: 프로필 사진 (`rotate-[-3deg]` 틸트, teal accent border)
+  - ✅ 하단: 기술 카테고리 태그 행 (Frontend / Backend / Tools)
 
-- **Task 002-F: 프로젝트 카드 다크 테마 + 스크롤 진입 애니메이션** - 대기
-  - `components/home/AnimatedProjectsSection.tsx` 신규 (`"use client"`)
-  - 카드 배경 dark variant, 호버 teal 테두리 강조, 섹션 헤더 `<Projects>` 태그 스타일 교체
-  - Intersection Observer 기반 스크롤 진입 감지 (`once: true`)
-  - 카드 스태거 애니메이션: opacity 0→1, translateY +40px→0, delay 0/150/300ms, duration 600ms ease-out
-  - `app/page.tsx`(Server Component) → `AnimatedProjectsSection`(Client Component)으로 데이터 props 전달
+- **Task 002-F: 프로젝트 카드 다크 테마 + 스크롤 진입 애니메이션** ✅ - 완료
+  - ✅ `components/home/AnimatedProjectsSection.tsx` 신규 (`"use client"`)
+  - ✅ 카드 배경 dark variant, 호버 teal 테두리 강조, 섹션 헤더 `<Projects>` 태그 스타일 교체
+  - ✅ Intersection Observer 기반 스크롤 진입 감지 (`once: true`)
+    - 관찰 대상: `<section>` 전체가 아닌 카드 `.grid` div — IO가 카드 자체가 뷰포트에 진입하는 시점에 발동
+    - `threshold: 0.15` — 카드의 15%가 보일 때 발동, 너무 이른 트리거 방지
+    - ⚠️ `<section>` 관찰 시 문제: 섹션 헤더가 폴드에 진입하는 순간(scrollY ≈ 57px) 즉시 발동 → 카드가 화면 밖에서 애니메이션 실행 후 종료
+  - ✅ 카드 스태거 애니메이션: opacity 0→1, translateY +40px→0, delay 0/150/300ms, duration 600ms ease-out
+  - ✅ `app/page.tsx`(Server Component) → `AnimatedProjectsSection`(Client Component)으로 데이터 props 전달
+  - ✅ `HeroSection`에 `min-h-screen` 적용 — 뷰포트를 가득 채워 Projects 섹션을 항상 fold 아래로 유지, IO 즉시 발동 방지
 
 ---
 
