@@ -27,19 +27,72 @@
 
 ---
 
-## Phase 2: 공통 모듈 구축
+## Phase 2: 공통 모듈 구축 ✅ 완료
 
 > 왜 이 순서인가? 여러 페이지에서 공유되는 컴포넌트와 더미 데이터를 먼저 확정해야 핵심·추가 기능 개발 시 중복 구현이 없습니다. 이 단계의 결과물(ProjectCard, ProjectFilters 등)은 Phase 3·4 전반에서 재사용됩니다.
 
-- **Task 002: 더미 데이터 및 공통 프로젝트 컴포넌트 구축** - 대기
+- **Task 002: 더미 데이터 및 공통 프로젝트 컴포넌트 구축** ✅ - 완료
   - See: `/tasks/002-dummy-data-components.md`
-  - 더미 프로젝트 5개 정의 (카테고리·기술 스택·상태·기간 다양하게 구성, `lib/dummy.ts`)
-  - `ProjectCard` 컴포넌트 구현 (기술 스택 배지, 카테고리, 상태, 기간 표시)
-  - `app/projects/page.tsx` 내 인라인 `ProjectCard` 코드 제거 후 공통 컴포넌트로 교체
-  - `app/page.tsx` 내 플레이스홀더 카드를 더미 데이터 기반 `ProjectCard`로 교체
-  - `ProjectFilters` 컴포넌트 구현 (기술 스택 필터 버튼 UI — 이 단계에서는 UI 형태만)
-  - `ProjectSearchBar` 컴포넌트 구현 (검색 입력 UI — 이 단계에서는 UI 형태만)
-  - 모든 컴포넌트 다크 모드 색상 대비 확인
+  - ✅ 더미 프로젝트 5개 정의 (카테고리·기술 스택·상태·기간 다양하게 구성, `lib/dummy.ts`)
+  - ✅ `ProjectCard` 컴포넌트 구현 (기술 스택 배지, 카테고리, 상태, 기간 표시)
+  - ✅ `app/projects/page.tsx` 내 인라인 `ProjectCard` 코드 제거 후 공통 컴포넌트로 교체
+  - ✅ `app/page.tsx` 내 플레이스홀더 카드를 더미 데이터 기반 `ProjectCard`로 교체
+  - ✅ `ProjectFilters` 컴포넌트 구현 (기술 스택 필터 버튼 UI — 이 단계에서는 UI 형태만)
+  - ✅ `ProjectSearchBar` 컴포넌트 구현 (검색 입력 UI — 이 단계에서는 UI 형태만)
+  - ✅ 모든 컴포넌트 다크 모드 색상 대비 확인
+
+---
+
+## Phase 2.5: 홈페이지 UI 리디자인 (코드 에디터 테마)
+
+> 왜 이 순서인가? Phase 3 Notion 연동 전에 시각적 시스템을 확정해야 데이터를 붙였을 때 디자인 재작업 없이 바로 연결됩니다. 테마·레이아웃이 먼저 확정되면 Phase 3~4의 컴포넌트들이 이 시스템 위에서 자연스럽게 조립됩니다.
+
+- **Task 002-A: 글로벌 다크 테마 및 폰트 시스템 구축** - 대기
+  - `ThemeProvider` `defaultTheme="dark"` 변경 — 다크를 기본값으로 설정
+  - 기존 ThemeToggle 컴포넌트 및 라이트/다크 전환 기능 **유지**
+  - `globals.css` CSS 변수를 라이트/다크 양쪽 정의
+    - 라이트: `--background: #f8fafc`, `--accent: #0d9488`
+    - 다크: `--background: #0b1120`, `--accent: #2dd4bf`, `--card: #111827`, `--border: #1e293b`
+    - 다크 전용 코드 신택스 토큰: `--syntax-keyword`, `--syntax-string`, `--syntax-comment`, `--syntax-prop`
+  - `next/font`로 JetBrains Mono 로드 → `--font-mono` CSS 변수 등록
+  - 전체 라이트/다크 색상 대비 검증 (WCAG AA 기준)
+
+- **Task 002-B: 네비게이션 개선** - 대기
+  - 로고 영역: `</>` 코드 아이콘 + 이름 조합으로 변경
+  - 네비게이션 항목 정리: 홈 / 프로젝트 / 소개
+  - 활성 링크 teal 언더라인 인디케이터 (`usePathname` 기반)
+  - 모바일 햄버거 메뉴 구현
+  - ThemeToggle 위치 유지
+
+- **Task 002-C: Hero 섹션 2컬럼 레이아웃 재구현** - 대기
+  - `components/home/HeroSection.tsx` 신규 — 좌우 2컬럼 레이아웃
+  - `components/home/ProfileAvatar.tsx` 신규 — Notion 프로필 사진 컴포넌트
+  - 좌측 (45%): `<Hello>` 태그 레이블, 이름 teal 하이라이트, `{역할}` 중괄호 스타일, 소셜 아이콘 행(GitHub·LinkedIn), CTA 버튼 1개("프로젝트 보기")
+  - 우측 (55%): ProfileAvatar(원형 96px, teal ring) + CodeEditorPanel(Task 002-D) 수직 배치
+  - ProfileAvatar Phase 2.5: GitHub 아바타 URL 플레이스홀더 사용 / Phase 3: 실제 Notion `avatar_url`로 교체
+  - 모바일: 우측 컬럼 숨김 (`hidden md:flex`)
+
+- **Task 002-D: 코드 에디터 패널 컴포넌트 구현** - 대기
+  - `components/home/CodeEditorPanel.tsx` 신규
+  - 파일 탭 UI (`start.ts` / `skills.ts`), 라인 번호 + 코드 내용 2컬럼
+  - 기술 스택을 JS 객체 형태로 정적 표현 (`developer` 객체)
+  - 신택스 하이라이트: `<span>` 정적 컬러링 (외부 라이브러리 없음)
+    - keyword → teal / string → amber / comment → muted / property → blue
+  - 커서 `|` 깜빡임 CSS 애니메이션 (선택)
+
+- **Task 002-E: About 홈 프리뷰 섹션** - 대기
+  - `components/home/AboutPreview.tsx` 신규
+  - `<About>` 태그 스타일 섹션 헤더
+  - 좌측: 짧은 자기소개 바이오 카드 (monospace, dark card)
+  - 우측: 프로필 사진 (`rotate-[-3deg]` 틸트, teal accent border)
+  - 하단: 기술 카테고리 태그 행 (Frontend / Backend / Tools)
+
+- **Task 002-F: 프로젝트 카드 다크 테마 + 스크롤 진입 애니메이션** - 대기
+  - `components/home/AnimatedProjectsSection.tsx` 신규 (`"use client"`)
+  - 카드 배경 dark variant, 호버 teal 테두리 강조, 섹션 헤더 `<Projects>` 태그 스타일 교체
+  - Intersection Observer 기반 스크롤 진입 감지 (`once: true`)
+  - 카드 스태거 애니메이션: opacity 0→1, translateY +40px→0, delay 0/150/300ms, duration 600ms ease-out
+  - `app/page.tsx`(Server Component) → `AnimatedProjectsSection`(Client Component)으로 데이터 props 전달
 
 ---
 
@@ -55,6 +108,7 @@
   - `getProjects` 함수에 `limit` 파라미터 추가 (홈 페이지 최근 3개 호출 — Notion API `page_size` 활용)
   - 프로젝트 목록 페이지 — `ProjectCard`·`ProjectFilters`·`ProjectSearchBar` 조립, 실제 데이터 연결
   - 홈 페이지 — 최근 프로젝트 카드 3개를 `getProjects({ limit: 3 })` 실제 호출로 연결
+  - `getOwnerProfile()` 함수 추가 (`lib/notion.ts`) — `notion.users.list()`로 `type: "person"` 유저의 `name`·`avatar_url` 반환, `ProfileAvatar` 컴포넌트에 실제 Notion 아바타 URL 전달
   - API 오류 시 빈 배열 반환 및 앱 크래시 방지
   - Playwright MCP를 활용한 목록 페이지 및 홈 페이지 실제 데이터 렌더링 E2E 테스트
 
@@ -133,3 +187,4 @@
 | `@notionhq/client` v5 API 변경 | v5에서 `databases.query`가 제거되고 `dataSources.query`로 변경됨. 현재 `lib/notion.ts` 코드는 정상이나 추후 메서드 혼용 주의 | `lib/notion.ts`의 API 호출 방식 유지 (`dataSources.query`). 공식 문서 변경 시 즉시 반영 |
 | 인라인 컴포넌트 중복 | Task 002 작업 시 `app/projects/page.tsx`의 기존 인라인 `ProjectCard` 코드를 제거하지 않으면 컴포넌트 충돌 발생 | Task 002 수락 기준에 인라인 코드 제거 항목 명시. 작업 완료 후 인라인 코드 잔존 여부 확인 필수 |
 | 환경변수 클라이언트 노출 | `NOTION_API_KEY`가 `NEXT_PUBLIC_` 접두사 없이 서버 사이드에서만 사용되어야 함. Vercel 배포 시 환경변수 설정 오류 가능 | Task 003·007에서 클라이언트 번들 포함 여부 DevTools 확인 및 Playwright MCP 검증 항목 포함 |
+| Notion `avatar_url` 만료 | `notion.users.list()`가 반환하는 `avatar_url`은 AWS S3 Pre-signed URL로 수 시간 후 만료됨 | Phase 5의 ISR `revalidate: 3600`으로 1시간마다 페이지 재생성 → URL 만료 전 갱신 보장 |
