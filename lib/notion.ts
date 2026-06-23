@@ -1,12 +1,13 @@
 /**
  * Notion API 클라이언트 및 데이터 접근 함수
- * @notionhq/client v5: databases.query → dataSources.query로 변경됨
+ * @notionhq/client v5: databases.query가 SDK에서 제거됨.
+ * dataSources.query는 새로운 "Data Sources" 기능 전용으로 일반 DB에 작동하지 않음.
+ * getProjects()는 REST API fetch로 직접 쿼리.
  */
 import { Client } from "@notionhq/client";
 import type {
   PageObjectResponse,
   PropertyFilter,
-  GroupFilterOperatorArray,
 } from "@notionhq/client/build/src/api-endpoints";
 import type { Project, ProjectFilterOptions } from "@/types/notion";
 
@@ -96,7 +97,7 @@ function parseProject(page: PageObjectResponse): Project {
 
 /**
  * 프로젝트 목록을 Notion DB에서 조회합니다.
- * @notionhq/client v5: dataSources.query 사용 (databases.query 제거됨)
+ * SDK v5에서 databases.query가 제거됐으므로 REST API를 직접 호출합니다.
  * @param options - 필터 및 검색 옵션
  * @returns Project 배열
  */
@@ -127,18 +128,40 @@ export async function getProjects(options: ProjectFilterOptions = {}): Promise<P
     });
   }
 
-  const notion = getNotionClient();
-  const response = await notion.dataSources.query({
-    data_source_id: getDataSourceId(),
-    filter: filters.length > 0
-      ? filters.length === 1
-        ? filters[0]
-        : { and: filters as GroupFilterOperatorArray }
-      : undefined,
-    sorts: [{ timestamp: "last_edited_time", direction: "descending" }],
-  });
+  const apiKey = process.env.NOTION_API_KEY;
+  if (!apiKey) throw new Error("NOTION_API_KEY 환경변수가 설정되지 않았습니다.");
 
-  return response.results
+  const body: Record<string, unknown> = {
+    sorts: [{ timestamp: "last_edited_time", direction: "descending" }],
+  };
+
+  if (filters.length === 1) {
+    body.filter = filters[0];
+  } else if (filters.length > 1) {
+    body.filter = { and: filters };
+  }
+
+  const res = await fetch(
+    `https://api.notion.com/v1/databases/${getDataSourceId()}/query`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28",
+      },
+      body: JSON.stringify(body),
+      next: { revalidate: 3600 },
+    }
+  );
+
+  if (!res.ok) {
+    console.error("Notion DB query 실패:", res.status, await res.text());
+    return [];
+  }
+
+  const data = await res.json();
+  return (data.results as PageObjectResponse[])
     .filter((page): page is PageObjectResponse => page.object === "page" && "properties" in page)
     .map(parseProject);
 }
