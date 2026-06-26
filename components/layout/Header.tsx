@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
+import { UpdateProjectsButton } from "@/components/shared/UpdateProjectsButton";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
@@ -60,8 +61,9 @@ export function Header() {
             </nav>
           </div>
 
-          {/* 우측: 테마 토글 + 모바일 햄버거 */}
+          {/* 우측: 업데이트 버튼(개발 전용) + 테마 토글 + 모바일 햄버거 */}
           <div className="flex items-center gap-2">
+            <UpdateProjectsButton />
             <ThemeToggle />
 
             {/* 모바일 햄버거 메뉴 */}
