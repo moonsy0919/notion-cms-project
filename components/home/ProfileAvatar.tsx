@@ -1,28 +1,10 @@
 import Image from "next/image";
+import { resolveAvatarSrc } from "@/lib/utils";
 
 interface ProfileAvatarProps {
-  /** Phase 3에서 Notion avatar_url로 교체 */
   src?: string;
   alt?: string;
   size?: number;
-}
-
-/** Notion avatar URL로 허용된 호스트 목록 */
-const ALLOWED_HOSTS = [
-  "avatars.githubusercontent.com",
-  "s3-us-west-2.amazonaws.com",
-  "lh3.googleusercontent.com",
-  "notion.so",
-];
-
-/** src가 next/image에서 허용된 호스트인지 확인 */
-function isAllowedHost(src: string): boolean {
-  try {
-    const { hostname } = new URL(src);
-    return ALLOWED_HOSTS.some((h) => hostname === h || hostname.endsWith(`.${h}`));
-  } catch {
-    return false;
-  }
 }
 
 /**
@@ -35,8 +17,7 @@ export function ProfileAvatar({
   alt = "프로필 사진",
   size = 96,
 }: ProfileAvatarProps) {
-  const fallback = "https://avatars.githubusercontent.com/moonsy0919";
-  const imgSrc = src && isAllowedHost(src) ? src : fallback;
+  const imgSrc = resolveAvatarSrc(src);
 
   return (
     <div

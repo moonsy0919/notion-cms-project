@@ -3,6 +3,7 @@ import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
+import { resolveAvatarSrc } from "@/lib/utils";
 
 /** 기술 카테고리 데이터 */
 const techCategories = [
@@ -25,7 +26,11 @@ const techCategories = [
  * 좌: 바이오 카드(monospace), 우: 프로필 사진(tilt + teal border)
  * 하단: 기술 카테고리 태그 행
  */
-export function AboutPreview() {
+interface AboutPreviewProps {
+  avatarUrl?: string;
+}
+
+export function AboutPreview({ avatarUrl }: AboutPreviewProps) {
   return (
     <section className="border-t py-20">
       <Container>
@@ -87,7 +92,7 @@ export function AboutPreview() {
           <div className="flex justify-center">
             <div className="rotate-[-3deg] rounded-xl border-2 border-accent overflow-hidden shadow-lg">
               <Image
-                src="https://avatars.githubusercontent.com/moonsy0919"
+                src={resolveAvatarSrc(avatarUrl)}
                 alt="문시현 프로필 사진"
                 width={240}
                 height={240}

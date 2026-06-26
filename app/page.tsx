@@ -14,7 +14,7 @@ export default async function HomePage() {
     <div className="flex flex-col">
       <HeroSection avatarUrl={profile?.avatarUrl ?? undefined} />
       <AnimatedProjectsSection projects={recentProjects} />
-      <AboutPreview />
+      <AboutPreview avatarUrl={profile?.avatarUrl ?? undefined} />
     </div>
   );
 }
