@@ -19,7 +19,7 @@ npm run fill-notion      # GitHub URL → Notion DB 자동 채우기 (로컬 전
 npm run fill-notion -- --url https://github.com/owner/repo  # 단일 URL 모드
 ```
 
-테스트 러너는 없습니다.
+
 
 ## 아키텍처 개요
 
@@ -121,7 +121,7 @@ useMediaQuery("(min-width: 768px)", { initializeWithValue: false });
 
 ---
 
-## 작업 완료 후 필수 체크리스트
+## 작업 완료 후 필수 체크리스트(필수) 중요!!!!
 
 작업(Task)을 완료한 후에는 반드시 다음 순서로 직접 실행하고 검증해야 합니다.
 
