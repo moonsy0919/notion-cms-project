@@ -8,8 +8,14 @@ import { Client } from "@notionhq/client";
 import type {
   PageObjectResponse,
   PropertyFilter,
+  BlockObjectResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 import type { Project, ProjectFilterOptions } from "@/types/notion";
+
+/** Notion 블록에 재귀 조회된 하위 블록을 포함한 타입 */
+export type BlockWithChildren = BlockObjectResponse & {
+  children?: BlockWithChildren[];
+};
 
 /**
  * Notion 클라이언트 lazy 싱글톤
@@ -173,29 +179,49 @@ export async function getProjects(options: ProjectFilterOptions = {}): Promise<P
  * @returns Project 객체 또는 null
  */
 export async function getProjectById(id: string): Promise<Project | null> {
-  const notion = getNotionClient();
-  const page = await notion.pages.retrieve({ page_id: id });
+  try {
+    const notion = getNotionClient();
+    const page = await notion.pages.retrieve({ page_id: id });
 
-  if (page.object !== "page" || !("properties" in page)) {
+    if (page.object !== "page" || !("properties" in page)) {
+      return null;
+    }
+
+    return parseProject(page as PageObjectResponse);
+  } catch {
     return null;
   }
-
-  return parseProject(page as PageObjectResponse);
 }
 
 /**
- * 프로젝트 Notion 페이지의 블록 콘텐츠를 조회합니다.
- * 상세 페이지 렌더링에 사용합니다.
- * @param pageId - Notion 페이지 ID
- * @returns 블록 배열
+ * 프로젝트 Notion 페이지의 블록 콘텐츠를 재귀적으로 조회합니다.
+ * has_children: true 블록에 대해 하위 블록을 재귀 페칭하고 children 필드에 병합합니다.
+ * Notion API rate limit(3 req/sec) 대응을 위해 재귀 호출 사이 350ms 딜레이를 적용합니다.
+ * @param pageId - Notion 페이지 ID 또는 블록 ID
+ * @returns 하위 블록이 병합된 블록 트리
  */
-export async function getProjectBlocks(pageId: string) {
+export async function getProjectBlocks(pageId: string): Promise<BlockWithChildren[]> {
   const notion = getNotionClient();
   const response = await notion.blocks.children.list({
     block_id: pageId,
     page_size: 100,
   });
-  return response.results;
+
+  const blocks = response.results.filter(
+    (b): b is BlockObjectResponse => "type" in b
+  );
+
+  const result: BlockWithChildren[] = [];
+  for (const block of blocks) {
+    if (block.has_children) {
+      await new Promise((resolve) => setTimeout(resolve, 350));
+      const children = await getProjectBlocks(block.id);
+      result.push({ ...block, children });
+    } else {
+      result.push(block);
+    }
+  }
+  return result;
 }
 
 /** Notion Integration 소유자 프로필 */

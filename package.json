@@ -11,9 +11,10 @@
     "fill-notion": "tsx --env-file=.env.local scripts/github-to-notion.ts"
   },
   "dependencies": {
-    "@hookform/resolvers": "^5.4.0",
     "@anthropic-ai/sdk": "^0.55.0",
+    "@hookform/resolvers": "^5.4.0",
     "@notionhq/client": "^5.22.0",
+    "@tailwindcss/typography": "^0.5.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.4.0",
@@ -33,13 +34,13 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "tsx": "^4.19.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.7",
     "tailwindcss": "^4",
+    "tsx": "^4.19.0",
     "typescript": "^5"
   }
 }
