@@ -53,25 +53,25 @@ export function AboutPreview() {
               {"  "}
               <span style={{ color: "var(--syntax-prop)" }}>name</span>
               {": "}
-              <span style={{ color: "var(--syntax-string)" }}>"문시현"</span>
+              <span style={{ color: "var(--syntax-string)" }}>{'"문시현"'}</span>
               {","}
               <br />
               {"  "}
               <span style={{ color: "var(--syntax-prop)" }}>role</span>
               {": "}
-              <span style={{ color: "var(--syntax-string)" }}>"Frontend Developer"</span>
+              <span style={{ color: "var(--syntax-string)" }}>{'"Frontend Developer"'}</span>
               {","}
               <br />
               {"  "}
               <span style={{ color: "var(--syntax-prop)" }}>location</span>
               {": "}
-              <span style={{ color: "var(--syntax-string)" }}>"인천, 대한민국"</span>
+              <span style={{ color: "var(--syntax-string)" }}>{'"인천, 대한민국"'}</span>
               {","}
               <br />
               {"  "}
               <span style={{ color: "var(--syntax-prop)" }}>passion</span>
               {": "}
-              <span style={{ color: "var(--syntax-string)" }}>"사용자 경험 & 성능"</span>
+              <span style={{ color: "var(--syntax-string)" }}>{'"사용자 경험 & 성능"'}</span>
               {","}
               <br />
               <span className="text-accent">{"}"}</span>
