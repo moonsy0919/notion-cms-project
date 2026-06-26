@@ -186,13 +186,25 @@
 
 > 왜 이 순서인가? 핵심 기능(Notion 연동 목록·상세)이 동작하는 상태에서 UX를 향상시키는 부가 기능을 추가합니다. 필터·검색이 없어도 포트폴리오 자체는 완성된 상태이므로 MVP 이후에 배치합니다. 반응형 최종 검증도 기능이 모두 갖춰진 이 시점에 수행해 검증 범위를 한 번에 확정합니다.
 
-- **Task 006: 개발용 프로젝트 업데이트 버튼 구현** - 대기
+- **Task 006: 개발용 프로젝트 업데이트 버튼 구현** ✅ - 완료
   - See: `/tasks/006-project-update-button.md`
-  - 헤더 우상단에 새로고침 아이콘 버튼 추가 (데스크톱 전용, 모바일 숨김)
-  - 클릭 시 `fill-notion` 스크립트 실행 → ISR 캐시 삭제 → 페이지 자동 새로고침
-  - `app/api/update-projects/route.ts` 신규 — POST, SSE 스트리밍, 개발 환경 전용(production 403)
-  - `components/shared/UpdateProjectsButton.tsx` 신규 — 실시간 로그 팝업, 완료 후 자동 새로고침
-  - `components/layout/Header.tsx` 수정 — ThemeToggle 왼쪽에 버튼 삽입
+  - ✅ 헤더 우상단에 새로고침 아이콘 버튼 추가 (데스크톱 전용 `hidden md:flex`, 모바일 숨김)
+  - ✅ 클릭 시 `fill-notion` 스크립트 실행 → ISR 캐시 삭제 → 페이지 자동 새로고침
+  - ✅ `app/api/update-projects/route.ts` 신규 — POST, SSE 스트리밍, 개발 환경 전용(production 403)
+      - `node_modules/.bin/tsx` 직접 경로 사용 (spawn PATH에 `node_modules/.bin` 미포함)
+      - `cancel()` 핸들러에서 `child.kill('SIGTERM')` — 연결 끊김 시 좀비 프로세스 방지
+  - ✅ `components/shared/UpdateProjectsButton.tsx` 신규 — 실시간 로그 팝업(최신 5줄), 완료 후 1초 딜레이 자동 새로고침
+      - Rules of Hooks 준수: 환경 검사 래퍼(`UpdateProjectsButton`) + 훅 내부 컴포넌트(`UpdateButton`) 2단계 분리
+  - ✅ `components/layout/Header.tsx` 수정 — ThemeToggle 왼쪽에 버튼 삽입
+  - ✅ E2E 검증 중 발견 버그 수정 — 아이콘(avatar) 오류:
+      - 원인: Notion `avatar_url`의 호스트 `s3-us-west-2.amazonaws.com`이 `next.config.ts`에 미등록
+        → `next/image` 예외로 페이지 전체 500 크래시
+      - 수정: `next.config.ts` 호스트 3개 추가, `ProfileAvatar.tsx` 허용 호스트 체크 + GitHub 아바타 폴백 추가
+  - ✅ E2E 검증 중 발견 버그 수정 — 버튼 클릭 후 프로젝트 카드 미갱신:
+      - 원인: Next.js 16 개발 환경에서 `getProjects()` fetch가 Data Cache에 저장되어
+        `revalidatePath` 호출에도 Notion 원본 대신 캐시 데이터가 반환됨
+      - 수정: `lib/notion.ts` `getProjects()` fetch에 개발/프로덕션 분기 추가
+        — 개발 환경 `cache: 'no-store'` (항상 최신), 프로덕션 `next: { revalidate: 3600 }` (ISR 유지)
 
 - **Task 007: 기술 스택 필터 및 검색 기능 완성** - 대기
   - See: `/tasks/007-filter-and-search.md`

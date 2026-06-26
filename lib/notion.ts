@@ -158,7 +158,11 @@ export async function getProjects(options: ProjectFilterOptions = {}): Promise<P
         "Notion-Version": "2022-06-28",
       },
       body: JSON.stringify(body),
-      next: { revalidate: 3600 },
+      // 개발 환경: 항상 최신 Notion 데이터 조회 (업데이트 버튼 새로고침 즉시 반영)
+      // 프로덕션: ISR 1시간 캐시 (revalidatePath로 수동 무효화 가능)
+      ...(process.env.NODE_ENV === "development"
+        ? { cache: "no-store" as const }
+        : { next: { revalidate: 3600 } }),
     }
   );
 
