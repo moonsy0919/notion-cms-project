@@ -6,13 +6,18 @@ import { Container } from "@/components/layout/Container";
 import { ProfileAvatar } from "@/components/home/ProfileAvatar";
 import { CodeEditorPanel } from "@/components/home/CodeEditorPanel";
 
+interface HeroSectionProps {
+  /** Notion getOwnerProfile()에서 전달받은 아바타 URL. 없으면 ProfileAvatar 기본값 사용 */
+  avatarUrl?: string;
+}
+
 /**
  * 홈 Hero 섹션 — 좌우 2컬럼 레이아웃
  * 좌측 45%: 소개 텍스트 + 소셜 링크 + CTA
  * 우측 55%: 프로필 아바타 + CodeEditorPanel(Task 002-D에서 구현)
  * 모바일: 우측 컬럼 숨김
  */
-export function HeroSection() {
+export function HeroSection({ avatarUrl }: HeroSectionProps) {
   return (
     <section className="min-h-screen flex items-center py-24">
       <Container>
@@ -77,7 +82,7 @@ export function HeroSection() {
 
           {/* 우측 55% — 모바일에서 숨김 */}
           <div className="hidden md:flex md:w-[55%] flex-col items-center gap-6">
-            <ProfileAvatar size={96} />
+            <ProfileAvatar size={96} src={avatarUrl} />
             <CodeEditorPanel />
           </div>
         </div>

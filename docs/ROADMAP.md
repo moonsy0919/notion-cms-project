@@ -155,17 +155,17 @@
 
 > 왜 이 순서인가? 이 사이트의 존재 이유는 Notion 연동 프로젝트 목록과 상세 페이지입니다. Phase 2에서 공통 컴포넌트(카드, 필터 UI)가 완성된 직후, 페이지 단위의 UI 조립과 Notion 연동을 한 번에 수행해 불필요한 더미 데이터 페이지 구현 단계를 생략하고 MVP를 조기에 달성합니다.
 
-- **Task 004: 프로젝트 목록 페이지 완성 (UI + Notion API 실제 연동)** - 대기
+- **Task 004: 프로젝트 목록 페이지 완성 (UI + Notion API 실제 연동)** ✅ - 완료
   - See: `/tasks/004-projects-list-notion.md`
-  - 전제: Phase 2.6 완료로 Notion DB·Integration·샘플 데이터가 준비된 상태
-  - `getProjects()` 함수는 이미 REST API fetch로 구현 완료 (`/v1/databases/{id}/query` 직접 호출, ISR `revalidate: 3600` 포함) — `dataSources.query` 미사용
-  - `types/notion.ts`의 `ProjectFilterOptions` 타입에 `limit?: number` 필드 추가
-  - `getProjects` 함수에 `limit` 파라미터 추가 (홈 페이지 최근 3개 호출 — Notion API `page_size` 활용)
-  - 프로젝트 목록 페이지 — `ProjectCard`·`ProjectFilters`·`ProjectSearchBar` 조립, 실제 데이터 연결
-  - 홈 페이지 — 최근 프로젝트 카드 3개를 `getProjects({ limit: 3 })` 실제 호출로 연결
-  - `getOwnerProfile()` 함수 추가 (`lib/notion.ts`) — `notion.users.list()`로 `type: "person"` 유저의 `name`·`avatar_url` 반환, `ProfileAvatar` 컴포넌트에 실제 Notion 아바타 URL 전달
-  - API 오류 시 빈 배열 반환 및 앱 크래시 방지
-  - Playwright MCP를 활용한 목록 페이지 및 홈 페이지 실제 데이터 렌더링 E2E 테스트
+  - ✅ 전제: Phase 2.6 완료로 Notion DB·Integration·샘플 데이터가 준비된 상태
+  - ✅ `getProjects()` 함수는 이미 REST API fetch로 구현 완료 (`/v1/databases/{id}/query` 직접 호출, ISR `revalidate: 3600` 포함) — `dataSources.query` 미사용
+  - ✅ `types/notion.ts`의 `ProjectFilterOptions` 타입에 `limit?: number` 필드 추가
+  - ✅ `getProjects` 함수에 `limit` 파라미터 추가 (홈 페이지 최근 3개 호출 — Notion API `page_size` 활용)
+  - ✅ 프로젝트 목록 페이지 — `ProjectCard`·`ProjectFilters`·`ProjectSearchBar` 조립, 실제 데이터 연결
+  - ✅ 홈 페이지 — 최근 프로젝트 카드 3개를 `getProjects({ limit: 3 })` 실제 호출로 연결
+  - ✅ `getOwnerProfile()` 함수 추가 (`lib/notion.ts`) — `notion.users.list()`로 `type: "person"` 유저의 `name`·`avatar_url` 반환, `ProfileAvatar` 컴포넌트에 실제 Notion 아바타 URL 전달
+  - ✅ API 오류 시 빈 배열 반환 및 앱 크래시 방지
+  - ✅ Playwright MCP를 활용한 목록 페이지 및 홈 페이지 실제 데이터 렌더링 E2E 테스트
 
 - **Task 005: 프로젝트 상세 페이지 완성 (BlockRenderer + Notion 블록 렌더링)** - 대기
   - See: `/tasks/005-project-detail-notion.md`

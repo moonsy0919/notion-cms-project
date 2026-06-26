@@ -102,7 +102,7 @@ function parseProject(page: PageObjectResponse): Project {
  * @returns Project 배열
  */
 export async function getProjects(options: ProjectFilterOptions = {}): Promise<Project[]> {
-  const { techStack, category, status } = options;
+  const { techStack, category, status, limit } = options;
   const filters: PropertyFilter[] = [];
 
   if (category) {
@@ -133,6 +133,7 @@ export async function getProjects(options: ProjectFilterOptions = {}): Promise<P
 
   const body: Record<string, unknown> = {
     sorts: [{ timestamp: "last_edited_time", direction: "descending" }],
+    ...(limit ? { page_size: limit } : {}),
   };
 
   if (filters.length === 1) {
@@ -195,4 +196,31 @@ export async function getProjectBlocks(pageId: string) {
     page_size: 100,
   });
   return response.results;
+}
+
+/** Notion Integration 소유자 프로필 */
+export interface OwnerProfile {
+  name: string;
+  avatarUrl: string | null;
+}
+
+/**
+ * Notion workspace의 person 유저 프로필을 조회합니다.
+ * ProfileAvatar 컴포넌트에 실제 아바타 URL 전달에 사용합니다.
+ * @returns 첫 번째 person 유저의 name과 avatar_url, 실패 시 null
+ */
+export async function getOwnerProfile(): Promise<OwnerProfile | null> {
+  try {
+    const notion = getNotionClient();
+    const response = await notion.users.list({});
+    const person = response.results.find((u) => u.type === "person");
+    if (!person) return null;
+    return {
+      name: person.name ?? "",
+      avatarUrl: person.avatar_url ?? null,
+    };
+  } catch (err) {
+    console.error("getOwnerProfile 실패:", err);
+    return null;
+  }
 }

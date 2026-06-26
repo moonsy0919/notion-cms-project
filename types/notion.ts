@@ -48,4 +48,6 @@ export interface ProjectFilterOptions {
   status?: ProjectStatus;
   /** 검색어 (title, description에서 검색) */
   query?: string;
+  /** 조회 개수 제한 (Notion API page_size) */
+  limit?: number;
 }

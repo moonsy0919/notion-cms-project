@@ -4,14 +4,11 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { ProjectCard } from "@/components/projects/ProjectCard";
 import { ProjectFilters } from "@/components/projects/ProjectFilters";
 import { ProjectSearchBar } from "@/components/projects/ProjectSearchBar";
-import { dummyProjects } from "@/lib/dummy";
+import { getProjects } from "@/lib/notion";
 
-/**
- * 프로젝트 목록 페이지 (서버 컴포넌트)
- * TODO: Phase 3에서 dummyProjects → getProjects()로 교체
- */
+/** 프로젝트 목록 페이지 (서버 컴포넌트) */
 export default async function ProjectsPage() {
-  const projects = dummyProjects;
+  const projects = await getProjects();
   const techList = Array.from(new Set(projects.flatMap((p) => p.techStack)));
 
   return (
@@ -31,7 +28,7 @@ export default async function ProjectsPage() {
         {projects.length === 0 ? (
           <EmptyState
             title="프로젝트가 없습니다"
-            description="Notion API를 연동하면 프로젝트 목록이 표시됩니다."
+            description="Notion DB에 프로젝트를 추가하면 목록이 표시됩니다."
           />
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
