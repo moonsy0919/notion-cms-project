@@ -127,21 +127,21 @@
   - ✅ `tsconfig.json` — `"exclude": ["scripts/**"]` 추가 (Vercel 빌드 격리)
   - ✅ `.env.local` — `ANTHROPIC_API_KEY` 항목 추가
 
-- **Task 003-B: GitHub 데이터 수집 모듈** - 대기
-  - `scripts/lib/github.ts` 신규 생성
-  - `parseGithubUrl()` — URL에서 owner/repo 추출
-  - `fetchGithubRepoData()` — 메타데이터·README·언어 분포·기여자 수·첫 커밋 날짜 병렬 수집 — `Authorization: Bearer ${GITHUB_TOKEN}` 헤더 포함하여 인증 요청 (인증 시 5,000 req/hour로 제한 완화)
+- **Task 003-B: GitHub 데이터 수집 모듈** ✅ - 완료
+  - ✅ `scripts/lib/github.ts` 신규 생성
+  - ✅ `parseGithubUrl()` — URL에서 owner/repo 추출
+  - ✅ `fetchGithubRepoData()` — 메타데이터·README·언어 분포·기여자 수·첫 커밋 날짜 병렬 수집 — `Authorization: Bearer ${GITHUB_TOKEN}` 헤더 포함하여 인증 요청 (인증 시 5,000 req/hour로 제한 완화)
 
-- **Task 003-C: Claude AI 분석 모듈** - 대기
-  - `scripts/lib/ai-analyzer.ts` 신규 생성
-  - `analyzeRepo()` — `claude-sonnet-4-6`로 포트폴리오 구조화 데이터 + Notion 블록 명세 생성
-  - JSON 스키마 강제 출력, 429 rate limit 지수 백오프
+- **Task 003-C: Claude AI 분석 모듈** ✅ - 완료
+  - ✅ `scripts/lib/ai-analyzer.ts` 신규 생성
+  - ✅ `analyzeRepo()` — `claude-sonnet-4-6`로 포트폴리오 구조화 데이터 + Notion 블록 명세 생성
+  - ✅ JSON 스키마 강제 출력, 429 rate limit 지수 백오프
 
-- **Task 003-D: Notion 업데이터 모듈** - 대기
-  - `scripts/lib/notion-updater.ts` 신규 생성
-  - `getPendingPages()` — Github URL 있음 + 핵심 속성 비어있는 페이지 탐지
-  - `updatePageProperties()` — Title·Description·Category·Tech Stack·Period·Status 업데이트
-  - `appendPageBlocks()` — 본문 블록 변환 및 추가 (100개 청킹)
+- **Task 003-D: Notion 업데이터 모듈** ✅ - 완료
+  - ✅ `scripts/lib/notion-updater.ts` 신규 생성
+  - ✅ `getPendingPages()` — Github URL 있음 + 핵심 속성 비어있는 페이지 탐지
+  - ✅ `updatePageProperties()` — Title·Description·Category·Tech Stack·Period·Status 업데이트
+  - ✅ `appendPageBlocks()` — 본문 블록 변환 및 추가 (100개 청킹)
 
 - **Task 003-E: 메인 CLI 오케스트레이터** - 대기
   - `scripts/github-to-notion.ts` 신규 생성
