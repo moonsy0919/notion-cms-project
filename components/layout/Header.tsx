@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Menu } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Menu, LogOut, Pencil } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { UpdateProjectsButton } from "@/components/shared/UpdateProjectsButton";
+import { ProfileForm } from "@/components/admin/ProfileForm";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { useProfile } from "@/contexts/DeveloperProfileContext";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -26,7 +28,15 @@ function isActive(pathname: string, href: string) {
 /** 사이트 헤더 — 로고 + 네비게이션 + 테마 토글 */
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { profile } = useProfile();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/setup");
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur">
@@ -34,13 +44,30 @@ export function Header() {
         <div className="flex h-14 items-stretch justify-between">
           {/* 로고 + 데스크톱 네비게이션 */}
           <div className="flex items-stretch gap-4">
-            <Link
-              href="/"
-              className="flex items-center gap-1.5 pr-2 font-semibold text-foreground"
-            >
-              <span className="font-mono text-accent text-sm font-bold">&lt;/&gt;</span>
-              <span>문시현</span>
-            </Link>
+            {/* 로고: </> 아이콘은 홈 링크, 이름은 프로필 편집 Sheet trigger */}
+            <div className="flex items-center gap-1.5 pr-2 font-semibold text-foreground">
+              <Link href="/" className="font-mono text-accent text-sm font-bold">
+                &lt;/&gt;
+              </Link>
+              <Sheet open={profileOpen} onOpenChange={setProfileOpen}>
+                <SheetTrigger asChild>
+                  <button className="group flex items-center gap-1 hover:text-accent transition-colors">
+                    <span>{profile.name || "개발자"}</span>
+                    <Pencil className="h-3 w-3 opacity-0 group-hover:opacity-60 transition-opacity" />
+                  </button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto">
+                  <SheetHeader className="mb-6">
+                    <SheetTitle>개발자 프로필 수정</SheetTitle>
+                  </SheetHeader>
+                  <ProfileForm
+                    initialProfile={profile}
+                    onSuccess={() => setProfileOpen(false)}
+                    onCancel={() => setProfileOpen(false)}
+                  />
+                </SheetContent>
+              </Sheet>
+            </div>
 
             {/* 데스크톱 네비게이션 — 활성 링크 teal 언더라인 */}
             <nav className="hidden md:flex items-stretch">
@@ -61,9 +88,19 @@ export function Header() {
             </nav>
           </div>
 
-          {/* 우측: 업데이트 버튼(개발 전용) + 테마 토글 + 모바일 햄버거 */}
+          {/* 우측: 업데이트 버튼 + 로그아웃 + 테마 토글 + 모바일 햄버거 */}
           <div className="flex items-center gap-2">
             <UpdateProjectsButton />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleLogout}
+              title="로그아웃"
+              className="hidden md:flex"
+            >
+              <LogOut className="h-4 w-4" />
+              <span className="sr-only">로그아웃</span>
+            </Button>
             <ThemeToggle />
 
             {/* 모바일 햄버거 메뉴 */}
@@ -77,7 +114,7 @@ export function Header() {
               <SheetContent side="right" className="w-60">
                 <div className="flex items-center gap-1.5 mb-6 pt-2 font-semibold">
                   <span className="font-mono text-accent text-sm font-bold">&lt;/&gt;</span>
-                  <span>문시현</span>
+                  <span>{profile.name || "개발자"}</span>
                 </div>
                 <nav className="flex flex-col gap-1">
                   {navItems.map((item) => (
@@ -95,6 +132,13 @@ export function Header() {
                       {item.label}
                     </Link>
                   ))}
+                  <button
+                    onClick={() => { setMobileOpen(false); handleLogout(); }}
+                    className="mt-2 flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    로그아웃
+                  </button>
                 </nav>
               </SheetContent>
             </Sheet>

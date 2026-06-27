@@ -6,24 +6,28 @@ import type { DeveloperProfile } from "@/types/profile";
 interface DeveloperProfileContextValue {
   profile: DeveloperProfile;
   setProfile: (profile: DeveloperProfile) => void;
+  /** Notion avatar_url — 서버에서 1회 주입, 쿠키 미저장 */
+  avatarUrl: string | null;
 }
 
 const DeveloperProfileContext = createContext<DeveloperProfileContextValue | null>(null);
 
 interface DeveloperProfileProviderProps {
   initialProfile: DeveloperProfile;
+  avatarUrl?: string | null;
   children: React.ReactNode;
 }
 
 /** 개발자 프로필 전역 상태 Provider — (main)/layout.tsx에서 주입 */
 export function DeveloperProfileProvider({
   initialProfile,
+  avatarUrl = null,
   children,
 }: DeveloperProfileProviderProps) {
   const [profile, setProfile] = useState<DeveloperProfile>(initialProfile);
 
   return (
-    <DeveloperProfileContext.Provider value={{ profile, setProfile }}>
+    <DeveloperProfileContext.Provider value={{ profile, setProfile, avatarUrl }}>
       {children}
     </DeveloperProfileContext.Provider>
   );

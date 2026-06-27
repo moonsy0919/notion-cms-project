@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { DEFAULT_PROFILE } from "@/types/profile";
 import type { DeveloperProfile } from "@/types/profile";
@@ -43,8 +44,8 @@ export async function POST(request: NextRequest) {
     },
   };
 
-  const cookieStore = await cookies();
-  cookieStore.set("developer-profile", JSON.stringify(profile), {
+  const res = NextResponse.json({ success: true });
+  res.cookies.set("developer-profile", JSON.stringify(profile), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
@@ -52,5 +53,5 @@ export async function POST(request: NextRequest) {
     path: "/",
   });
 
-  return Response.json({ success: true });
+  return res;
 }

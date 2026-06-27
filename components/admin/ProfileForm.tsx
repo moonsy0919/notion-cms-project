@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { X, Check, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useProfile } from "@/contexts/DeveloperProfileContext";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ProfileAvatar } from "@/components/home/ProfileAvatar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { DeveloperProfile } from "@/types/profile";
 
@@ -75,15 +75,19 @@ function TagInput({
 
 interface ProfileFormProps {
   initialProfile: DeveloperProfile;
+  /** 저장 성공 시 호출. 없으면 홈("/")으로 이동 */
+  onSuccess?: () => void;
+  /** 취소 버튼 클릭 시 호출. 없으면 취소 버튼 미표시 */
+  onCancel?: () => void;
 }
 
 /** 개발자 프로필 편집 폼 */
-export function ProfileForm({ initialProfile }: ProfileFormProps) {
-  const { setProfile } = useProfile();
+export function ProfileForm({ initialProfile, onSuccess, onCancel }: ProfileFormProps) {
+  const router = useRouter();
+  const { profile, setProfile, avatarUrl } = useProfile();
   const [formData, setFormData] = useState<DeveloperProfile>(initialProfile);
   const [saving, setSaving] = useState(false);
 
-  /** 단일 최상위 필드 업데이트 */
   const updateField = <K extends keyof DeveloperProfile>(
     key: K,
     value: DeveloperProfile[K]
@@ -91,7 +95,6 @@ export function ProfileForm({ initialProfile }: ProfileFormProps) {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
-  /** 기술 스택 카테고리 업데이트 */
   const updateSkill = (
     category: keyof DeveloperProfile["skills"],
     tags: string[]
@@ -118,6 +121,11 @@ export function ProfileForm({ initialProfile }: ProfileFormProps) {
       }
       setProfile(formData);
       toast.success("프로필이 저장되었습니다.");
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        router.push("/");
+      }
     } catch {
       toast.error("저장에 실패했습니다. 다시 시도해주세요.");
     } finally {
@@ -126,67 +134,76 @@ export function ProfileForm({ initialProfile }: ProfileFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
-      {/* 기본 정보 */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">기본 정보</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="name">이름 *</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => updateField("name", e.target.value)}
-                placeholder="홍길동"
-                required
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="role">역할 *</Label>
-              <Input
-                id="role"
-                value={formData.role}
-                onChange={(e) => updateField("role", e.target.value)}
-                placeholder="Frontend Developer"
-                required
-              />
-            </div>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="focus">주력 기술</Label>
-              <Input
-                id="focus"
-                value={formData.focus}
-                onChange={(e) => updateField("focus", e.target.value)}
-                placeholder="Next.js & TypeScript"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="location">위치</Label>
-              <Input
-                id="location"
-                value={formData.location}
-                onChange={(e) => updateField("location", e.target.value)}
-                placeholder="서울, 대한민국"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+    <form onSubmit={handleSubmit} className="flex flex-col">
+      {/* 아바타 + 현재 저장 정보 */}
+      <div className="flex flex-col items-center gap-2 pb-6">
+        <ProfileAvatar src={avatarUrl ?? undefined} size={80} />
+        <div className="text-center">
+          <p className="text-sm font-semibold">{profile.name || "이름 미설정"}</p>
+          <p className="text-xs text-muted-foreground">{profile.role || "역할 미설정"}</p>
+        </div>
+      </div>
 
-      {/* 기술 스택 */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">기술 스택</CardTitle>
-          <p className="text-xs text-muted-foreground mt-1">
-            Enter 또는 쉼표(,)로 항목 추가 · 배지 X로 삭제
+      {/* 기본 정보 섹션 */}
+      <div className="border-t pt-5 space-y-4">
+        <h3 className="text-sm font-semibold">기본 정보</h3>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="name">
+              이름{" "}
+              <span className="text-accent text-xs font-normal">필수</span>
+            </Label>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) => updateField("name", e.target.value)}
+              placeholder="홍길동"
+              required
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="role">
+              역할{" "}
+              <span className="text-accent text-xs font-normal">필수</span>
+            </Label>
+            <Input
+              id="role"
+              value={formData.role}
+              onChange={(e) => updateField("role", e.target.value)}
+              placeholder="Frontend Developer"
+              required
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="focus">주력 기술</Label>
+            <Input
+              id="focus"
+              value={formData.focus}
+              onChange={(e) => updateField("focus", e.target.value)}
+              placeholder="Next.js & TypeScript"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="location">위치</Label>
+            <Input
+              id="location"
+              value={formData.location}
+              onChange={(e) => updateField("location", e.target.value)}
+              placeholder="서울, 대한민국"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 기술 스택 섹션 */}
+      <div className="border-t mt-5 pt-5 space-y-4">
+        <div>
+          <h3 className="text-sm font-semibold">기술 스택</h3>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Enter 또는 쉼표(,)로 추가 · 배지 X로 삭제
           </p>
-        </CardHeader>
-        <CardContent className="space-y-4">
+        </div>
+        <div className="space-y-3">
           <div className="space-y-1.5">
             <Label>Frontend</Label>
             <TagInput
@@ -211,13 +228,37 @@ export function ProfileForm({ initialProfile }: ProfileFormProps) {
               placeholder="Git 입력 후 Enter..."
             />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <div className="flex justify-end">
-        <Button type="submit" disabled={saving}>
-          {saving ? "저장 중..." : "저장"}
-        </Button>
+      {/* 하단 액션바 */}
+      <div className={`border-t mt-6 pt-4 grid gap-3 ${onCancel ? "grid-cols-2" : "grid-cols-1"}`}>
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="h-11 w-full rounded-lg border border-border text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-all duration-150"
+          >
+            취소
+          </button>
+        )}
+        <button
+          type="submit"
+          disabled={saving}
+          className="h-11 w-full rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent/90 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-150 flex items-center justify-center gap-2"
+        >
+          {saving ? (
+            <>
+              <RefreshCw className="h-4 w-4 animate-spin" />
+              저장 중...
+            </>
+          ) : (
+            <>
+              <Check className="h-4 w-4" />
+              저장
+            </>
+          )}
+        </button>
       </div>
     </form>
   );

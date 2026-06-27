@@ -3,18 +3,26 @@ import type { Metadata } from "next";
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { ProfileForm } from "@/components/admin/ProfileForm";
-import { DEFAULT_PROFILE } from "@/types/profile";
 import type { DeveloperProfile } from "@/types/profile";
 
 export const metadata: Metadata = {
   title: "프로필 설정 | 관리자",
 };
 
+/** 폼 초기 빈 값 — 첫 온보딩 시 placeholder만 보이도록 */
+const EMPTY_PROFILE: DeveloperProfile = {
+  name: "",
+  role: "",
+  focus: "",
+  location: "",
+  skills: { frontend: [], backend: [], tools: [] },
+};
+
 /** 개발자 프로필 관리 페이지 (서버 컴포넌트) */
 export default async function AdminPage() {
   const cookieStore = await cookies();
   const raw = cookieStore.get("developer-profile")?.value;
-  let initialProfile: DeveloperProfile = DEFAULT_PROFILE;
+  let initialProfile: DeveloperProfile = EMPTY_PROFILE;
   if (raw) {
     try {
       initialProfile = JSON.parse(raw) as DeveloperProfile;

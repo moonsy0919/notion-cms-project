@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { DeveloperProfileProvider } from "@/contexts/DeveloperProfileContext";
+import { getOwnerProfile } from "@/lib/notion";
 import { DEFAULT_PROFILE } from "@/types/profile";
 import type { DeveloperProfile } from "@/types/profile";
 
@@ -22,8 +23,19 @@ export default async function MainLayout({
     }
   }
 
+  const apiKey = cookieStore.get("notion-api-key")?.value ?? "";
+  let avatarUrl: string | null = null;
+  if (apiKey) {
+    try {
+      const ownerProfile = await getOwnerProfile(apiKey);
+      avatarUrl = ownerProfile?.avatarUrl ?? null;
+    } catch {
+      // avatar 조회 실패 시 null 유지
+    }
+  }
+
   return (
-    <DeveloperProfileProvider initialProfile={initialProfile}>
+    <DeveloperProfileProvider initialProfile={initialProfile} avatarUrl={avatarUrl}>
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />
