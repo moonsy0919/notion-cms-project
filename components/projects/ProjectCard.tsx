@@ -51,7 +51,7 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
   } = project;
 
   return (
-    <Card className={cn("h-full", className)}>
+    <Card className={cn("h-full flex flex-col", className)}>
       <CardHeader>
         <div className="flex flex-wrap gap-1.5">
           {status && (
@@ -72,7 +72,7 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
         <CardDescription className="line-clamp-2">{description}</CardDescription>
       </CardHeader>
 
-      <CardContent className="flex flex-col gap-3">
+      <CardContent className="flex flex-col gap-3 flex-1">
         <p className="text-xs text-muted-foreground">
           {getPeriodLabel(periodStart, periodEnd)}
         </p>

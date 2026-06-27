@@ -110,6 +110,7 @@
   - ✅ `getProjects` 함수 — `query` 필터 파라미터 처리 추가 (JS 레벨 post-filter, title·description 대소문자 무관 검색)
   - ✅ 필터 결과 없을 때 `EmptyState` 표시, "전체 보기" 버튼으로 초기화 (`EmptyState.action`에 `href` 옵션 추가)
   - ✅ Playwright MCP를 활용한 필터·검색·URL 상태 관리 E2E 테스트
+  - **버그 수정**: 기술 스택 배지 수가 적은 카드에서 GitHub 버튼이 콘텐츠 직후에 위치해 카드 하단에서 떠오르는 문제 → `Card`에 `flex flex-col`, `CardContent`에 `flex-1` 추가로 Footer 항상 카드 최하단 고정
 
 - **Task 008: 소개(About) 페이지 완성 + 반응형 디자인 & UX 검증** - 대기
   - See: `/tasks/008-about-responsive.md`
