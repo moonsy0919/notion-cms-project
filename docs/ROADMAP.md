@@ -197,12 +197,14 @@
 - **Task 019-B: LinkedIn 아이콘 제거** ✅
   - `HeroSection`에서 LinkedIn 아이콘 및 `FaLinkedin` import 제거 — 불필요 소셜 링크 삭제
 
-- **Task 020: 메타데이터 완성 및 프로덕션 배포 검증** - 대기
-  - 전역 메타데이터 완성: title template `"%s | 문시현 포트폴리오"`, description, OG 이미지 기본값
-  - 각 페이지 `generateMetadata` 점검 및 정적 메타데이터 추가
-  - Lighthouse 목표: Performance 80점 이상, Accessibility 90점 이상
-  - Vercel 배포: 환경변수 등록 **불필요** (키는 UI 입력 후 쿠키 관리), 프로덕션 URL 확인
-  - Playwright MCP 프로덕션 E2E 검증:
+- **Task 020: 메타데이터 완성 및 프로덕션 배포 검증** - 진행중
+  - 전역 메타데이터 완성:
+    - ✅ title template 동적 이름 반영 — `app/layout.tsx`를 정적 `metadata`에서 async `generateMetadata`로 전환. `developer-profile` 쿠키의 `name` 필드를 읽어 `title.template: '%s | {name}'`, `title.default: '{name} | 포트폴리오'` 반환. 쿠키 미설정 시 "개발자" 기본값
+    - ✅ 각 페이지 `generateMetadata` 수정 — `app/(main)/about/page.tsx`의 `"Architecture | 문시현"` 하드코딩 제거(루트 템플릿 자동 조합), `app/(main)/projects/[id]/page.tsx`의 `"${project.title} | 문시현"` 및 404 fallback 하드코딩 동일 처리
+    - OG 이미지 기본값 설정 - 대기
+  - Lighthouse 목표: Performance 80점 이상, Accessibility 90점 이상 - 대기
+  - Vercel 배포: 환경변수 등록 **불필요** (키는 UI 입력 후 쿠키 관리), 프로덕션 URL 확인 - 대기
+  - Playwright MCP 프로덕션 E2E 검증 - 대기:
     - 첫 접속 → `/setup` 리다이렉트 확인
     - 키 입력 → 포트폴리오 로드, 실제 Notion 데이터 표시 확인
     - Notion에 GitHub URL 추가 → 새로고침 버튼 폴링 → 완료 후 카드 추가 확인
