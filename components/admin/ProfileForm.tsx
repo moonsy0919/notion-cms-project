@@ -120,6 +120,7 @@ export function ProfileForm({ initialProfile, onSuccess, onCancel }: ProfileForm
         return;
       }
       setProfile(formData);
+      router.refresh();
       toast.success("프로필이 저장되었습니다.");
       if (onSuccess) {
         onSuccess();
