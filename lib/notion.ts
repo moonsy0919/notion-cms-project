@@ -78,7 +78,7 @@ export async function getProjects(
   databaseId: string,
   options: ProjectFilterOptions = {}
 ): Promise<Project[]> {
-  const { techStack, category, status, limit } = options;
+  const { techStack, category, status, limit, query } = options;
   const filters: PropertyFilter[] = [];
 
   if (category) {
@@ -124,9 +124,17 @@ export async function getProjects(
   }
 
   const data = await res.json();
-  return (data.results as PageObjectResponse[])
+  const projects = (data.results as PageObjectResponse[])
     .filter((page): page is PageObjectResponse => page.object === "page" && "properties" in page)
     .map(parseProject);
+
+  if (!query) return projects;
+  const q = query.toLowerCase();
+  return projects.filter(
+    (p) =>
+      p.title.toLowerCase().includes(q) ||
+      p.description.toLowerCase().includes(q)
+  );
 }
 
 /**

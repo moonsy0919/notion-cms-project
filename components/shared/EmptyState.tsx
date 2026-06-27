@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import type { LucideIcon } from "lucide-react";
@@ -8,7 +9,9 @@ interface EmptyStateProps {
   description?: string;
   action?: {
     label: string;
-    onClick: () => void;
+    onClick?: () => void;
+    /** 서버 컴포넌트에서 onClick 대신 href로 전달 가능 */
+    href?: string;
   };
   className?: string;
 }
@@ -29,9 +32,15 @@ export function EmptyState({ icon: Icon, title, description, action, className }
         )}
       </div>
       {action && (
-        <Button onClick={action.onClick} size="sm">
-          {action.label}
-        </Button>
+        action.href ? (
+          <Link href={action.href}>
+            <Button size="sm">{action.label}</Button>
+          </Link>
+        ) : (
+          <Button onClick={action.onClick} size="sm">
+            {action.label}
+          </Button>
+        )
       )}
     </div>
   );
