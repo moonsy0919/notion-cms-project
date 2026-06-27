@@ -274,20 +274,20 @@
   - ✅ `/admin`에서 값 수정 → 홈·About 섹션 즉시 반영 확인 (클라이언트 사이드 네비게이션, 새로고침 없이)
   - ✅ `npm run build` 빌드 성공 + ESLint 오류 0개
 
-- **Task 012-A: lib/fill-notion/github.ts 신규** - 대기
+- **Task 012-A: lib/fill-notion/github.ts 신규** ✅ - 완료
   - `scripts/lib/github.ts` 로직 기반으로 신규 생성 (배포 번들 포함)
   - `githubFetch()` 내부 `process.env.GITHUB_TOKEN` 제거 → `token?: string` 파라미터로 교체
   - `fetchGithubRepoData(githubUrl: string, githubToken?: string)` 시그니처로 변경
   - 파일 하단 스모크 테스트 블록(`if (process.argv[2] === "--test")`) 제거
 
-- **Task 012-B: lib/fill-notion/ai-analyzer.ts 신규** - 대기
+- **Task 012-B: lib/fill-notion/ai-analyzer.ts 신규** ✅ - 완료
   - `scripts/lib/ai-analyzer.ts` 로직 기반으로 신규 생성
   - `analyzeRepo(data: GithubRepoData, anthropicApiKey: string)` 시그니처로 변경
     — `process.env.ANTHROPIC_API_KEY` 읽기 제거, 파라미터 키로 `new Anthropic({ apiKey })` 생성
   - `NotionBlockSpec`, `AnalyzedRepoData` 타입 export 유지
   - 파일 하단 스모크 테스트 블록 제거
 
-- **Task 012-C: lib/fill-notion/notion-updater.ts 신규** - 대기
+- **Task 012-C: lib/fill-notion/notion-updater.ts 신규** ✅ - 완료
   - `scripts/lib/notion-updater.ts` 로직 기반으로 신규 생성
   - 전역 싱글톤 `let _notion`, `getNotionClient()`, `getDbId()` 제거 → per-request `new Client({ auth: notionApiKey })`
   - `queryDatabase(notionApiKey, databaseId, body)` 시그니처로 변경
@@ -297,13 +297,13 @@
     - `appendPageBlocks(pageId, specs, notionApiKey: string): Promise<void>`
   - 파일 하단 스모크 테스트 블록 제거
 
-- **Task 012-D: scripts/github-to-notion.ts 수정 (로컬 CLI 어댑터 유지)** - 대기
+- **Task 012-D: scripts/github-to-notion.ts 수정 (로컬 CLI 어댑터 유지)** ✅ - 완료
   - `scripts/lib/*` 임포트를 `@/lib/fill-notion/*` 임포트로 교체
   - `main()` 상단에서 `process.env` 키를 읽어 각 함수 파라미터로 전달
   - 로컬 `npm run fill-notion` 명령어 이전과 동일하게 동작 확인
   - `tsconfig.json` 변경 불필요 — `scripts/**` exclude 유지, `lib/fill-notion/`은 이미 include 범위
 
-- **Task 013: lib/notion.ts 키 파라미터화** - 대기
+- **Task 013: lib/notion.ts 키 파라미터화** ✅ - 완료
   - 전역 싱글톤 제거: `let _notion`, `getNotionClient()`, `getDataSourceId()` 삭제
   - 4개 함수 시그니처 교체:
     - `getProjects(apiKey: string, databaseId: string, options?: ProjectFilterOptions)`
@@ -312,7 +312,7 @@
     - `getOwnerProfile(apiKey: string)` → 동일
   - `process.env.NOTION_API_KEY`, `process.env.NOTION_DATABASE_ID` 직접 읽기 전면 제거
 
-- **Task 014-A: app/api/auth/setup/route.ts 신규 (POST)** - 대기
+- **Task 014-A: app/api/auth/setup/route.ts 신규 (POST)** ✅ - 완료
   - 요청 body: `{ notionApiKey, notionDbId, anthropicApiKey, githubToken? }`
   - 1단계 검증 — Notion Key: `GET /v1/users` → 실패 시 400
   - 2단계 검증 — DB ID: `POST /v1/databases/{notionDbId}/query` (page_size: 1) → 실패 시 400
@@ -320,37 +320,44 @@
     - 쿠키명: `notion-api-key`, `notion-db-id`, `anthropic-api-key`, `github-token`
     - 옵션: `httpOnly: true`, `secure: NODE_ENV === 'production'`, `sameSite: 'lax'`, `maxAge: 2592000(30일)`
 
-- **Task 014-B: app/api/auth/logout/route.ts 신규 (POST)** - 대기
+- **Task 014-B: app/api/auth/logout/route.ts 신규 (POST)** ✅ - 완료
   - 쿠키 4개를 `maxAge: 0`으로 덮어써 즉시 만료 → 200 반환
 
-- **Task 014-C: middleware.ts 신규 (프로젝트 루트)** - 대기
+- **Task 014-C: middleware.ts 신규 (프로젝트 루트)** ✅ - 완료
   - `matcher`: `'/((?!_next/static|_next/image|favicon.ico).*)'`
   - 공개 경로(통과): `/setup`, `/api/auth/setup`, `/api/auth/logout`
-  - `notion-api-key` 쿠키 없음 + 보호 경로 → `redirect('/setup')`
-  - `notion-api-key` 쿠키 있음 + `/setup` → `redirect('/')`
+  - 2단계 쿠키 체크 (온보딩 순서 강제):
+    - 1단계: `notion-api-key` 없음 + 보호 경로 → `redirect('/setup')`
+    - 2단계: `notion-api-key` 있음 + `developer-profile` 없음 + `/admin` 이외 보호 경로 → `redirect('/admin')`
+  - 둘 다 있음 + `/setup` 또는 `/admin` 접근 → `redirect('/')`
   - Edge Runtime 호환 (쿠키 체크만, DB 연결 없음)
 
-- **Task 015: app/setup/page.tsx 신규** - 대기
+- **Task 015: app/setup/page.tsx 신규** ✅ - 완료
   - `"use client"` 클라이언트 컴포넌트 — 루트 레이아웃(Header·Footer 없음) 아래 전체화면 카드
   - 재사용: `Card`, `Input`, `Label`, `Button`, `Alert` (`components/ui/` 기존 컴포넌트)
   - 입력 필드: Notion API Key(`password`), DB ID(`text`), Anthropic API Key(`password`), GitHub Token(`password`, 선택)
-  - Submit → `POST /api/auth/setup` → 성공: `router.push('/')` / 실패: `toast.error(res.error)`
+  - Submit → `POST /api/auth/setup` → 성공: `router.push('/admin')` / 실패: `toast.error(res.error)`
   - 로딩 중 버튼 disabled + RefreshCw animate-spin
 
-- **Task 016-A: app/(main)/page.tsx 쿠키 연동** - 대기
+- **Task 015-A: components/admin/ProfileForm.tsx 수정 (온보딩 흐름 연결)** ✅ - 완료
+  - Task 011에서 구현된 `ProfileForm` 수정
+  - 저장 성공 후 toast 알림만 → toast 알림 + `router.push('/')` 추가
+  - `/setup` → `/admin` → `/` 온보딩 3단계 흐름 완성
+
+- **Task 016-A: app/(main)/page.tsx 쿠키 연동** ✅ - 완료
   - `cookies()`로 `notion-api-key`, `notion-db-id` 읽기
   - `getProjects(apiKey, dbId, { limit: 3 })` 및 `getOwnerProfile(apiKey)` 호출 교체
   - `cookies()` 호출로 Next.js 동적 렌더링 자동 전환 (ISR 비활성화)
 
-- **Task 016-B: app/(main)/projects/page.tsx 쿠키 연동** - 대기
+- **Task 016-B: app/(main)/projects/page.tsx 쿠키 연동** ✅ - 완료
   - 동일 패턴 — `getProjects(apiKey, dbId)` 호출 교체
 
-- **Task 016-C: app/(main)/projects/[id]/page.tsx 쿠키 연동** - 대기
+- **Task 016-C: app/(main)/projects/[id]/page.tsx 쿠키 연동** ✅ - 완료
   - `generateMetadata` + default export 양쪽 모두 쿠키 읽기 추가
   - `getProjectById(apiKey, id)`, `getProjectBlocks(apiKey, id)` 호출 교체
   - React `cache()`로 동일 요청 중복 제거
 
-- **Task 017-A: app/api/update-projects/route.ts 전면 재작성** - 대기
+- **Task 017-A: app/api/update-projects/route.ts 전면 재작성** ✅ - 완료
   - `export const maxDuration = 60` — Vercel Hobby 최대값
   - spawn, SSE ReadableStream, rm, NODE_ENV 체크 전면 제거
   - 폴링 방식 (JSON 응답, 1 call = 1 project):
@@ -362,19 +369,76 @@
   - Notion 대기 판별(`getPendingPages`): GitHub URL 있음 + Title·Description·Category·Status 중 하나 비어있음
     → 처리 완료 시 자동으로 pending 목록 제외 (Notion 자체가 상태 저장소)
 
-- **Task 017-B: components/shared/UpdateProjectsButton.tsx 폴링 루프 교체** - 대기
+- **Task 017-B: components/shared/UpdateProjectsButton.tsx 폴링 루프 교체** ✅ - 완료
   - `NODE_ENV !== "development"` 반환 체크 제거
   - SSE 스트림 읽기 로직 제거 (reader.read 루프, TextDecoder, buffer)
   - 폴링 루프 구현: `POST → 완료 여부 확인 → done: false이면 반복 → done: true이면 1초 후 reload()`
   - 진행 로그: "완료: {processed} (남은 {remaining}개)" 표시
   - 팝업 레이아웃·Status 타입·Icon 분기 구조 유지
 
-- **Task 018: Header 로그아웃 버튼 추가** - 대기
+- **Task 018: Header 로그아웃 버튼 추가** ✅ - 완료
   - 데스크톱 우측: `[UpdateProjectsButton] [LogoutButton] [ThemeToggle]` 배치
   - `LogoutButton`: `LogOut` 아이콘, `variant="ghost"`, `size="icon"` — `POST /api/auth/logout` → `router.push('/setup')`
   - 모바일 Sheet nav 하단 "로그아웃" 항목 추가
 
-- **Task 019: 메타데이터 완성 및 프로덕션 배포 검증** - 대기
+  **버그 수정 (Task 018 완료 후 발견)** ✅
+  - ✅ 로그아웃 시 `developer-profile` 쿠키 미삭제 버그 수정
+      - 원인: `app/api/auth/logout/route.ts`가 API 키 4개 쿠키만 만료, `developer-profile` 쿠키 누락
+      - 수정: `logout/route.ts`에 `developer-profile` 쿠키 만료 추가 (총 5개 일괄 만료)
+      - 영향: 로그아웃 후 API 키 재입력 시 `/admin` 온보딩 단계가 스킵되던 문제 해결
+  - ✅ `/admin` 프로필 폼 초기값 표시 및 저장 후 페이지 이동 버그 수정
+      - 원인 1: 첫 온보딩 시 `DEFAULT_PROFILE` 실제 값이 입력 필드 텍스트로 표시됨
+      - 수정 1: `app/(main)/admin/page.tsx`에서 쿠키 없을 때 빈 값(`EMPTY_PROFILE`) 사용
+      - 원인 2: `proxy.ts`가 `developer-profile` 미설정 상태에서 `POST /api/profile`을 `/admin`으로 307 리다이렉트 → Route Handler 미실행 → 쿠키 미저장 → `router.push("/")`가 다시 `/admin`으로 튕김
+      - 수정 2: `proxy.ts` 조건에 `&& !pathname.startsWith("/api/")` 예외 추가
+      - 수정 3: `app/api/profile/route.ts` POST에서 `cookieStore.set()` → `NextResponse.cookies.set()` 교체 (Set-Cookie 헤더 확실히 포함)
+
+- **Task 019: 헤더 인라인 프로필 편집 Sheet** ✅ - 완료
+
+  > 포트폴리오 사이트 헤더의 개발자 이름을 클릭하면 사이드 Sheet가 열리고,
+  > 현재 저장된 프로필을 확인·수정·저장할 수 있는 인라인 편집 기능.
+  > `/admin` 페이지 이동 없이 홈에서 바로 수정 가능.
+  > 저장 완료 시 Sheet 자동 닫힘 + Context 즉시 반영 (페이지 새로고침 없음).
+
+  **Task 019-A: `ProfileForm` 재사용 props 확장** (`components/admin/ProfileForm.tsx`) ✅
+  - ✅ `onSuccess?: () => void` prop 추가
+  - ✅ `onCancel?: () => void` prop 추가 — Sheet 취소 버튼 연결용
+  - ✅ `handleSubmit` 성공 분기: `onSuccess` 있으면 호출, 없으면 `router.push("/")` 유지
+  - ✅ `/admin` 온보딩 흐름 회귀 없음 보장
+
+  **Task 019-B: Header 로고 분리 + 프로필 편집 Sheet 추가** (`components/layout/Header.tsx`) ✅
+  - ✅ 로고 영역 분리: `</>` → 홈 Link, 이름 텍스트 → Sheet trigger 버튼
+  - ✅ 이름 hover 시 `Pencil` 아이콘(lucide) 페이드인 — 편집 힌트
+  - ✅ `profileOpen` state 추가, `useProfile()` 연결
+  - ✅ `<Sheet>` 추가: `w-full sm:max-w-lg`, `overflow-y-auto`
+  - ✅ 모바일 `mobileOpen` Sheet와 독립 state 관리
+
+  **Task 019-B UI 개편 (참조 이미지 기반)** (`components/admin/ProfileForm.tsx`) ✅
+  - ✅ `Card` / `CardHeader` / `CardContent` 전면 제거 → 섹션 구분선(`border-t`) 방식으로 경량화
+  - ✅ 상단 아바타 영역 추가:
+    - `DeveloperProfileContext`에 `avatarUrl: string | null` 추가 (쿠키 미저장, 런타임 전용)
+    - `app/(main)/layout.tsx`에서 `getOwnerProfile(apiKey)` 호출 → `avatarUrl`을 `DeveloperProfileProvider`에 주입
+    - `ProfileForm`에서 `useProfile()`로 `avatarUrl` 읽어 `ProfileAvatar` 컴포넌트에 전달 — Notion 실제 아바타 표시
+    - 이름·역할 subtitle (현재 저장값 표시, Context 기반)
+  - ✅ "기본 정보" 섹션: `border-t` 구분선 + 섹션 제목
+    - 이름·역할 필드에 `필수` accent 색상 마커 표시
+    - 2컬럼 그리드: 이름/역할, 주력 기술/위치
+  - ✅ "기술 스택" 섹션: `border-t` 구분선 + 섹션 제목 + hint 텍스트
+    - Frontend / Backend / Tools 태그 입력 수직 나열
+  - ✅ 하단 액션바: `border-t` 구분선 + `grid grid-cols-2` 균등 2분할 (순수 Tailwind `<button>`, shadcn Button 제거)
+    - 취소: `border border-border` + `text-muted-foreground` + `hover:bg-muted` + `h-11 rounded-lg`
+    - 저장: `bg-accent text-white` + `Check` 아이콘, 저장 중 `RefreshCw animate-spin` + `h-11 rounded-lg`
+    - `onCancel` 없을 때 `grid-cols-1` 단일 저장 버튼 — `/admin` 온보딩 흐름 호환
+  - ✅ Sheet에서 `onCancel={() => setProfileOpen(false)}` 전달 → 취소 버튼 활성화
+
+  **검증 항목** ✅
+  - ✅ 헤더 이름 클릭 → Sheet 오픈, Notion 아바타·현재 저장 프로필 폼에 표시
+  - ✅ 값 수정 후 저장 → Sheet 닫힘 + HeroSection·CodeEditorPanel 즉시 반영
+  - ✅ 취소 버튼 → Sheet 닫힘, 변경사항 미적용
+  - ✅ 취소·저장 버튼 중앙 정렬 확인
+  - ✅ lint 0개, 빌드 성공
+
+- **Task 020: 메타데이터 완성 및 프로덕션 배포 검증** - 대기
   - 전역 메타데이터 완성: title template `"%s | 문시현 포트폴리오"`, description, OG 이미지 기본값
   - 각 페이지 `generateMetadata` 점검 및 정적 메타데이터 추가
   - Lighthouse 목표: Performance 80점 이상, Accessibility 90점 이상
