@@ -225,18 +225,165 @@
 
 ---
 
-## Phase 5: 성능 최적화 및 배포
+## Phase 5: BYO Key 포트폴리오 + Vercel Hobby 배포
 
-> 왜 이 순서인가? 기능이 모두 확정된 후에야 캐싱·SEO 최적화가 의미 있습니다. 기능이 변경되면 최적화 결과가 무효화되므로 모든 기능 완결 후 마지막에 배치합니다.
+> **이 Phase는 기존 Phase 4.5(인증 게이트)와 Phase 5(성능 최적화 및 배포)를 대체합니다.**
+>
+> Phase 4.5의 JWT 인증 게이트 대신, 사용자가 자신의 API Key를 직접 입력하는
+> BYO Key(Bring Your Own Key) 구조로 전환합니다. Vercel Hobby 플랜의 60초 제한 안에서
+> AI 채우기 파이프라인을 실행하기 위해 SSE 스트리밍 → 1 call = 1 project 폴링 방식으로 전환합니다.
+> Notion 자체를 상태 저장소로 활용해 외부 인프라(Redis, KV) 없이 구현합니다.
+>
+> **배포 아키텍처 변경**: 환경변수 없는 Vercel Hobby 배포.
+> NOTION_API_KEY, NOTION_DATABASE_ID, ANTHROPIC_API_KEY는 모두 UI에서 입력 후 httpOnly 쿠키로 관리합니다.
 
-- **Task 009: 성능 최적화 및 Vercel 배포** - 대기
-  - See: `/tasks/009-performance-and-deployment.md`
-  - Notion API 응답 ISR 캐싱 적용 (`revalidate: 3600` 또는 `unstable_cache`)
-  - 전역 메타데이터 완성 (title template, description, OG 이미지)
-  - 각 페이지 `generateMetadata` 함수 완성
-  - Lighthouse 기준 Performance 80점 이상, Accessibility 90점 이상 목표
-  - Vercel 프로젝트 연결, 환경변수 등록 및 프로덕션 배포 검증
-  - Playwright MCP를 활용한 프로덕션 환경 전체 플로우 E2E 검증
+- **Task 011: 레이아웃 재편 + 개발자 프로필 인프라** ✅ - 완료
+
+  > 개발자 프로필(name, role, focus, location, skills)을 `/admin` 페이지에서 입력하면
+  > HeroSection·CodeEditorPanel·AboutPreview에 새로고침 없이 즉시 반영되는 구조.
+  > httpOnly 쿠키(`developer-profile`)로 저장, React Context로 전역 공유.
+
+  **레이아웃 재편**
+  - ✅ `app/layout.tsx` 수정 — Header, Footer import·JSX 제거. ThemeProvider·TooltipProvider·폰트·Toaster만 유지
+  - ✅ `types/profile.ts` 신규 — `DeveloperProfile` 인터페이스 + `DEFAULT_PROFILE` 상수 정의
+  - ✅ `contexts/DeveloperProfileContext.tsx` 신규 — `DeveloperProfileProvider` (Client) + `useProfile()` 훅
+  - ✅ `app/(main)/layout.tsx` 신규 — Server Component. `cookies()`로 `developer-profile` 쿠키 읽어 `DeveloperProfileProvider` 초기화 → `<Header />` + `<main>{children}</main>` + `<Footer />`
+
+  **페이지 파일 이동** (파일 내용 무변경, 경로만 변경)
+  - ✅ `app/page.tsx` → `app/(main)/page.tsx`
+  - ✅ `app/projects/page.tsx` → `app/(main)/projects/page.tsx`
+  - ✅ `app/projects/[id]/page.tsx` → `app/(main)/projects/[id]/page.tsx`
+  - ✅ `app/about/page.tsx` → `app/(main)/about/page.tsx` (프로필 쿠키 바인딩 포함)
+  - ✅ 원본 파일 4개 삭제
+  - ✅ `npm run build` 빌드 성공 + 브라우저 전체 페이지 정상 동작 확인
+
+  **프로필 Cookie API**
+  - ✅ `app/api/profile/route.ts` 신규 — POST(저장: `developer-profile` httpOnly 쿠키 설정) + GET(조회: 현재 프로필 반환)
+
+  **어드민 페이지 구현**
+  - ✅ `app/(main)/admin/page.tsx` 신규 — Server Component. `cookies()`로 초기 프로필 읽기 → `ProfileForm`에 전달
+  - ✅ `components/admin/ProfileForm.tsx` 신규 — Client Component. 입력 필드(name, role, focus, location, skills 3종), 태그 입력(쉼표 구분 + Badge chip), 저장 → `POST /api/profile` → `setProfile()` context 즉시 반영 → toast 알림
+
+  **컴포넌트 데이터 바인딩**
+  - ✅ `components/home/HeroSection.tsx` 수정 — `"use client"` 추가, `useProfile()`로 name·role 동적 바인딩
+  - ✅ `components/home/CodeEditorPanel.tsx` 수정 — `useProfile()`로 `start.ts`(name, role, focus)·`skills.ts`(frontend, backend, tools) 동적 생성, 프로필 변경 시 타이핑 애니메이션 재실행 보장
+  - ✅ `components/home/AboutPreview.tsx` 수정 — `"use client"` 추가, `useProfile()`로 name·role·location·skills 배지 동적 바인딩
+  - ✅ `app/(main)/about/page.tsx` 수정 — `cookies()`로 프로필 읽어 `techSkills` 하드코딩 → `profile.skills` 교체
+
+  **최종 QA**
+  - ✅ `/admin`에서 값 수정 → 홈·About 섹션 즉시 반영 확인 (클라이언트 사이드 네비게이션, 새로고침 없이)
+  - ✅ `npm run build` 빌드 성공 + ESLint 오류 0개
+
+- **Task 012-A: lib/fill-notion/github.ts 신규** - 대기
+  - `scripts/lib/github.ts` 로직 기반으로 신규 생성 (배포 번들 포함)
+  - `githubFetch()` 내부 `process.env.GITHUB_TOKEN` 제거 → `token?: string` 파라미터로 교체
+  - `fetchGithubRepoData(githubUrl: string, githubToken?: string)` 시그니처로 변경
+  - 파일 하단 스모크 테스트 블록(`if (process.argv[2] === "--test")`) 제거
+
+- **Task 012-B: lib/fill-notion/ai-analyzer.ts 신규** - 대기
+  - `scripts/lib/ai-analyzer.ts` 로직 기반으로 신규 생성
+  - `analyzeRepo(data: GithubRepoData, anthropicApiKey: string)` 시그니처로 변경
+    — `process.env.ANTHROPIC_API_KEY` 읽기 제거, 파라미터 키로 `new Anthropic({ apiKey })` 생성
+  - `NotionBlockSpec`, `AnalyzedRepoData` 타입 export 유지
+  - 파일 하단 스모크 테스트 블록 제거
+
+- **Task 012-C: lib/fill-notion/notion-updater.ts 신규** - 대기
+  - `scripts/lib/notion-updater.ts` 로직 기반으로 신규 생성
+  - 전역 싱글톤 `let _notion`, `getNotionClient()`, `getDbId()` 제거 → per-request `new Client({ auth: notionApiKey })`
+  - `queryDatabase(notionApiKey, databaseId, body)` 시그니처로 변경
+  - 공개 함수 시그니처 교체:
+    - `getPendingPages(notionApiKey: string, databaseId: string): Promise<PendingPage[]>`
+    - `updatePageProperties(pageId, data, notionApiKey: string): Promise<void>`
+    - `appendPageBlocks(pageId, specs, notionApiKey: string): Promise<void>`
+  - 파일 하단 스모크 테스트 블록 제거
+
+- **Task 012-D: scripts/github-to-notion.ts 수정 (로컬 CLI 어댑터 유지)** - 대기
+  - `scripts/lib/*` 임포트를 `@/lib/fill-notion/*` 임포트로 교체
+  - `main()` 상단에서 `process.env` 키를 읽어 각 함수 파라미터로 전달
+  - 로컬 `npm run fill-notion` 명령어 이전과 동일하게 동작 확인
+  - `tsconfig.json` 변경 불필요 — `scripts/**` exclude 유지, `lib/fill-notion/`은 이미 include 범위
+
+- **Task 013: lib/notion.ts 키 파라미터화** - 대기
+  - 전역 싱글톤 제거: `let _notion`, `getNotionClient()`, `getDataSourceId()` 삭제
+  - 4개 함수 시그니처 교체:
+    - `getProjects(apiKey: string, databaseId: string, options?: ProjectFilterOptions)`
+    - `getProjectById(apiKey: string, id: string)` → `new Client({ auth: apiKey })` per-request
+    - `getProjectBlocks(apiKey: string, pageId: string)` → 동일
+    - `getOwnerProfile(apiKey: string)` → 동일
+  - `process.env.NOTION_API_KEY`, `process.env.NOTION_DATABASE_ID` 직접 읽기 전면 제거
+
+- **Task 014-A: app/api/auth/setup/route.ts 신규 (POST)** - 대기
+  - 요청 body: `{ notionApiKey, notionDbId, anthropicApiKey, githubToken? }`
+  - 1단계 검증 — Notion Key: `GET /v1/users` → 실패 시 400
+  - 2단계 검증 — DB ID: `POST /v1/databases/{notionDbId}/query` (page_size: 1) → 실패 시 400
+  - 검증 성공 시 httpOnly 쿠키 4개 설정:
+    - 쿠키명: `notion-api-key`, `notion-db-id`, `anthropic-api-key`, `github-token`
+    - 옵션: `httpOnly: true`, `secure: NODE_ENV === 'production'`, `sameSite: 'lax'`, `maxAge: 2592000(30일)`
+
+- **Task 014-B: app/api/auth/logout/route.ts 신규 (POST)** - 대기
+  - 쿠키 4개를 `maxAge: 0`으로 덮어써 즉시 만료 → 200 반환
+
+- **Task 014-C: middleware.ts 신규 (프로젝트 루트)** - 대기
+  - `matcher`: `'/((?!_next/static|_next/image|favicon.ico).*)'`
+  - 공개 경로(통과): `/setup`, `/api/auth/setup`, `/api/auth/logout`
+  - `notion-api-key` 쿠키 없음 + 보호 경로 → `redirect('/setup')`
+  - `notion-api-key` 쿠키 있음 + `/setup` → `redirect('/')`
+  - Edge Runtime 호환 (쿠키 체크만, DB 연결 없음)
+
+- **Task 015: app/setup/page.tsx 신규** - 대기
+  - `"use client"` 클라이언트 컴포넌트 — 루트 레이아웃(Header·Footer 없음) 아래 전체화면 카드
+  - 재사용: `Card`, `Input`, `Label`, `Button`, `Alert` (`components/ui/` 기존 컴포넌트)
+  - 입력 필드: Notion API Key(`password`), DB ID(`text`), Anthropic API Key(`password`), GitHub Token(`password`, 선택)
+  - Submit → `POST /api/auth/setup` → 성공: `router.push('/')` / 실패: `toast.error(res.error)`
+  - 로딩 중 버튼 disabled + RefreshCw animate-spin
+
+- **Task 016-A: app/(main)/page.tsx 쿠키 연동** - 대기
+  - `cookies()`로 `notion-api-key`, `notion-db-id` 읽기
+  - `getProjects(apiKey, dbId, { limit: 3 })` 및 `getOwnerProfile(apiKey)` 호출 교체
+  - `cookies()` 호출로 Next.js 동적 렌더링 자동 전환 (ISR 비활성화)
+
+- **Task 016-B: app/(main)/projects/page.tsx 쿠키 연동** - 대기
+  - 동일 패턴 — `getProjects(apiKey, dbId)` 호출 교체
+
+- **Task 016-C: app/(main)/projects/[id]/page.tsx 쿠키 연동** - 대기
+  - `generateMetadata` + default export 양쪽 모두 쿠키 읽기 추가
+  - `getProjectById(apiKey, id)`, `getProjectBlocks(apiKey, id)` 호출 교체
+  - React `cache()`로 동일 요청 중복 제거
+
+- **Task 017-A: app/api/update-projects/route.ts 전면 재작성** - 대기
+  - `export const maxDuration = 60` — Vercel Hobby 최대값
+  - spawn, SSE ReadableStream, rm, NODE_ENV 체크 전면 제거
+  - 폴링 방식 (JSON 응답, 1 call = 1 project):
+    - `cookies()`로 4개 키 읽기 → 누락 시 401
+    - `getPendingPages(notionApiKey, dbId)` → 대기 없으면 `{ done: true, remaining: 0 }` 반환
+    - `pending[0]` 단일 처리: GitHub fetch → Claude 분석 → Notion 속성 업데이트 → 블록 추가
+    - `{ done: pending.length <= 1, processed: analyzed.title, remaining: pending.length - 1 }` 반환
+  - 1 call 예상 소요: 일반 ~14s, 최악 ~38s → 60s 안전
+  - Notion 대기 판별(`getPendingPages`): GitHub URL 있음 + Title·Description·Category·Status 중 하나 비어있음
+    → 처리 완료 시 자동으로 pending 목록 제외 (Notion 자체가 상태 저장소)
+
+- **Task 017-B: components/shared/UpdateProjectsButton.tsx 폴링 루프 교체** - 대기
+  - `NODE_ENV !== "development"` 반환 체크 제거
+  - SSE 스트림 읽기 로직 제거 (reader.read 루프, TextDecoder, buffer)
+  - 폴링 루프 구현: `POST → 완료 여부 확인 → done: false이면 반복 → done: true이면 1초 후 reload()`
+  - 진행 로그: "완료: {processed} (남은 {remaining}개)" 표시
+  - 팝업 레이아웃·Status 타입·Icon 분기 구조 유지
+
+- **Task 018: Header 로그아웃 버튼 추가** - 대기
+  - 데스크톱 우측: `[UpdateProjectsButton] [LogoutButton] [ThemeToggle]` 배치
+  - `LogoutButton`: `LogOut` 아이콘, `variant="ghost"`, `size="icon"` — `POST /api/auth/logout` → `router.push('/setup')`
+  - 모바일 Sheet nav 하단 "로그아웃" 항목 추가
+
+- **Task 019: 메타데이터 완성 및 프로덕션 배포 검증** - 대기
+  - 전역 메타데이터 완성: title template `"%s | 문시현 포트폴리오"`, description, OG 이미지 기본값
+  - 각 페이지 `generateMetadata` 점검 및 정적 메타데이터 추가
+  - Lighthouse 목표: Performance 80점 이상, Accessibility 90점 이상
+  - Vercel 배포: 환경변수 등록 **불필요** (키는 UI 입력 후 쿠키 관리), 프로덕션 URL 확인
+  - Playwright MCP 프로덕션 E2E 검증:
+    - 첫 접속 → `/setup` 리다이렉트 확인
+    - 키 입력 → 포트폴리오 로드, 실제 Notion 데이터 표시 확인
+    - Notion에 GitHub URL 추가 → 새로고침 버튼 폴링 → 완료 후 카드 추가 확인
+    - 로그아웃 → `/setup` 이동, 직접 URL 접속 시 재리다이렉트 확인
 
 ---
 

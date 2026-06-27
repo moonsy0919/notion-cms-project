@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
@@ -5,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { ProfileAvatar } from "@/components/home/ProfileAvatar";
 import { CodeEditorPanel } from "@/components/home/CodeEditorPanel";
+import { useProfile } from "@/contexts/DeveloperProfileContext";
 
 interface HeroSectionProps {
   /** Notion getOwnerProfile()에서 전달받은 아바타 URL. 없으면 ProfileAvatar 기본값 사용 */
@@ -14,10 +17,12 @@ interface HeroSectionProps {
 /**
  * 홈 Hero 섹션 — 좌우 2컬럼 레이아웃
  * 좌측 45%: 소개 텍스트 + 소셜 링크 + CTA
- * 우측 55%: 프로필 아바타 + CodeEditorPanel(Task 002-D에서 구현)
+ * 우측 55%: 프로필 아바타 + CodeEditorPanel
  * 모바일: 우측 컬럼 숨김
  */
 export function HeroSection({ avatarUrl }: HeroSectionProps) {
+  const { profile } = useProfile();
+
   return (
     <section className="min-h-screen flex items-center py-24">
       <Container>
@@ -33,19 +38,18 @@ export function HeroSection({ avatarUrl }: HeroSectionProps) {
             <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-tight">
               안녕하세요,
               <br />
-              <span className="text-accent">문시현</span>입니다.
+              <span className="text-accent">{profile.name}</span>입니다.
             </h1>
 
             {/* {역할} — 중괄호 스타일 */}
             <p className="font-mono text-base">
               <span className="text-accent">{"{ "}</span>
-              <span className="text-foreground">Frontend Developer</span>
+              <span className="text-foreground">{profile.role}</span>
               <span className="text-accent">{" }"}</span>
             </p>
 
             {/* 한 줄 소개 */}
             <p className="text-muted-foreground text-base leading-relaxed">
-              Next.js와 TypeScript를 주로 사용하는 프론트엔드 개발자입니다.
               Notion으로 관리되는 프로젝트들을 소개합니다.
             </p>
 

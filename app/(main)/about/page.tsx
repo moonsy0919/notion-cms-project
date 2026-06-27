@@ -1,32 +1,45 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { DEFAULT_PROFILE } from "@/types/profile";
+import type { DeveloperProfile } from "@/types/profile";
 
 export const metadata: Metadata = {
   title: "소개 | 문시현",
   description: "개발자 문시현 소개 페이지",
 };
 
-/** 기술 스택 목록 */
-const techSkills = {
-  Frontend: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
-  Backend: ["Node.js", "PostgreSQL"],
-  Tools: ["Git", "Notion", "Figma", "Vercel"],
-};
-
 /**
  * 소개 페이지 (서버 컴포넌트)
  * 개발자 이력 및 기술 스택을 소개합니다.
  */
-export default function AboutPage() {
+export default async function AboutPage() {
+  const cookieStore = await cookies();
+  const raw = cookieStore.get("developer-profile")?.value;
+  let profile: DeveloperProfile = DEFAULT_PROFILE;
+  if (raw) {
+    try {
+      profile = JSON.parse(raw) as DeveloperProfile;
+    } catch {
+      // 파싱 실패 시 기본값 사용
+    }
+  }
+
+  const techSkills = {
+    Frontend: profile.skills.frontend,
+    Backend: profile.skills.backend,
+    Tools: profile.skills.tools,
+  };
+
   return (
     <div className="py-8">
       <Container>
         <PageHeader
           title="소개"
-          description="안녕하세요, 프론트엔드 개발자 문시현입니다."
+          description={`안녕하세요, ${profile.role} ${profile.name}입니다.`}
           className="mb-10"
         />
 
@@ -36,7 +49,7 @@ export default function AboutPage() {
             <h2 className="mb-4 text-xl font-semibold">About Me</h2>
             <div className="space-y-3 text-muted-foreground">
               <p>
-                Next.js와 TypeScript를 주로 사용하는 프론트엔드 개발자입니다.
+                {profile.focus}를 주로 사용하는 {profile.role}입니다.
                 사용자 경험과 코드 품질을 중요하게 생각하며, 꾸준히 성장하는 개발자를 목표로 합니다.
               </p>
               <p>

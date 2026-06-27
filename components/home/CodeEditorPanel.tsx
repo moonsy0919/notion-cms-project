@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useProfile } from "@/contexts/DeveloperProfileContext";
+import type { DeveloperProfile } from "@/types/profile";
 
 type Tab = "start.ts" | "skills.ts";
 type TokenType = "keyword" | "string" | "comment" | "prop" | "plain";
@@ -27,36 +29,63 @@ const cmt   = (text: string): Token => ({ text, type: "comment" });
 const prop  = (text: string): Token => ({ text, type: "prop" });
 const plain = (text: string): Token => ({ text, type: "plain" });
 
-const START_LINES: CodeLine[] = [
-  [cmt("// 포트폴리오를 방문해 주셔서")],
-  [cmt("// 감사합니다!")],
-  [],
-  [kw("const"), plain(" developer"), plain(" = {")],
-  [plain("  "), prop("name"),      plain(": "), str('"문시현"'),              plain(",")],
-  [plain("  "), prop("role"),      plain(": "), str('"Frontend Developer"'),  plain(",")],
-  [plain("  "), prop("focus"),     plain(": "), str('"Next.js & TypeScript"'), plain(",")],
-  [plain("  "), prop("available"), plain(": "), kw("true"),                   plain(",")],
-  [plain("};")],
-];
+/** start.ts 탭 코드 라인 생성 — 프로필 name·role·focus 주입 */
+function buildStartLines(profile: DeveloperProfile): CodeLine[] {
+  return [
+    [cmt("// 포트폴리오를 방문해 주셔서")],
+    [cmt("// 감사합니다!")],
+    [],
+    [kw("const"), plain(" developer"), plain(" = {")],
+    [plain("  "), prop("name"),      plain(": "), str(`"${profile.name}"`),   plain(",")],
+    [plain("  "), prop("role"),      plain(": "), str(`"${profile.role}"`),   plain(",")],
+    [plain("  "), prop("focus"),     plain(": "), str(`"${profile.focus}"`),  plain(",")],
+    [plain("  "), prop("available"), plain(": "), kw("true"),                  plain(",")],
+    [plain("};")],
+  ];
+}
 
-const SKILLS_LINES: CodeLine[] = [
-  [kw("const"), plain(" skills"), plain(" = {")],
-  [plain("  "), prop("frontend"), plain(": [")],
-  [plain("    "), str('"Next.js"'),  plain(", "), str('"TypeScript"'),  plain(",")],
-  [plain("    "), str('"React"'),    plain(", "), str('"Tailwind CSS"'), plain(",")],
-  [plain("  ],")],
-  [plain("  "), prop("backend"), plain(": ["), str('"Node.js"'), plain("],")],
-  [plain("  "), prop("tools"),   plain(": [")],
-  [plain("    "), str('"Git"'), plain(", "), str('"Notion"'), plain(", "), str('"Vercel"'), plain(",")],
-  [plain("  ],")],
-  [plain("};")],
-];
+/** 기술 카테고리 라인 생성 (2개 이하 → 인라인, 3개 이상 → 멀티라인) */
+function buildCategoryLines(name: string, items: string[]): CodeLine[] {
+  if (items.length === 0) {
+    return [[plain("  "), prop(name), plain(": [],")]];
+  }
+  if (items.length <= 2) {
+    const tokens: Token[] = [plain("  "), prop(name), plain(": [")];
+    items.forEach((item, i) => {
+      tokens.push(str(`"${item}"`));
+      if (i < items.length - 1) tokens.push(plain(", "));
+    });
+    tokens.push(plain("],"));
+    return [tokens];
+  }
+  // 3개 이상: 멀티라인, 2개씩 묶음
+  const result: CodeLine[] = [[plain("  "), prop(name), plain(": [")]];
+  for (let i = 0; i < items.length; i += 2) {
+    const pair = items.slice(i, i + 2);
+    const tokens: Token[] = [plain("    ")];
+    pair.forEach((item, j) => {
+      tokens.push(str(`"${item}"`));
+      if (j < pair.length - 1) tokens.push(plain(", "));
+    });
+    tokens.push(plain(","));
+    result.push(tokens);
+  }
+  result.push([plain("  ],")]);
+  return result;
+}
+
+/** skills.ts 탭 코드 라인 생성 — 프로필 skills 주입 */
+function buildSkillLines(profile: DeveloperProfile): CodeLine[] {
+  return [
+    [kw("const"), plain(" skills"), plain(" = {")],
+    ...buildCategoryLines("frontend", profile.skills.frontend),
+    ...buildCategoryLines("backend",  profile.skills.backend),
+    ...buildCategoryLines("tools",    profile.skills.tools),
+    [plain("};")],
+  ];
+}
 
 const TABS: Tab[] = ["start.ts", "skills.ts"];
-const CODE: Record<Tab, CodeLine[]> = {
-  "start.ts":  START_LINES,
-  "skills.ts": SKILLS_LINES,
-};
 
 /** 라인의 총 문자 수 반환. 빈 줄은 최소 1로 보정 (steps(0) 방지) */
 function charCount(line: CodeLine): number {
@@ -66,7 +95,14 @@ function charCount(line: CodeLine): number {
 
 /** 코드 에디터 패널 — 기술 스택을 JS 객체 형태로 표현 */
 export function CodeEditorPanel() {
+  const { profile } = useProfile();
   const [activeTab, setActiveTab] = useState<Tab>("start.ts");
+
+  const CODE: Record<Tab, CodeLine[]> = {
+    "start.ts":  buildStartLines(profile),
+    "skills.ts": buildSkillLines(profile),
+  };
+
   const lines = CODE[activeTab];
 
   /* 라인별 누적 딜레이 및 전체 타이핑 완료 시간 사전 계산 */
@@ -77,6 +113,17 @@ export function CodeEditorPanel() {
     accumulated += charCount(line) * CHAR_MS;
   }
   const totalDuration = accumulated;
+
+  /* 프로필 변경 시 타이핑 애니메이션 재실행을 위한 key */
+  const profileKey = [
+    profile.name,
+    profile.role,
+    profile.focus,
+    ...profile.skills.frontend,
+    ...profile.skills.backend,
+    ...profile.skills.tools,
+  ].join("|");
+  const contentKey = `${activeTab}-${profileKey}`;
 
   return (
     <div className="w-full rounded-lg border border-border bg-card overflow-hidden font-mono text-xs">
@@ -108,8 +155,8 @@ export function CodeEditorPanel() {
       {/* 코드 영역 — 라인 번호 + 코드 내용 2컬럼 */}
       <div className="p-4 overflow-x-auto">
         <table className="w-full border-collapse">
-          {/* key={activeTab}: 탭 전환 시 tbody 재마운트 → 타이핑 재시작 */}
-          <tbody key={activeTab}>
+          {/* contentKey: 탭 전환 또는 프로필 변경 시 tbody 재마운트 → 타이핑 재실행 */}
+          <tbody key={contentKey}>
             {lines.map((line, lineIdx) => {
               const n     = charCount(line);
               const delay = lineDelays[lineIdx];

@@ -1,25 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { resolveAvatarSrc } from "@/lib/utils";
-
-/** 기술 카테고리 데이터 */
-const techCategories = [
-  {
-    label: "Frontend",
-    items: ["Next.js", "TypeScript", "React", "Tailwind CSS"],
-  },
-  {
-    label: "Backend",
-    items: ["Node.js", "Prisma"],
-  },
-  {
-    label: "Tools",
-    items: ["Git", "Notion", "Vercel"],
-  },
-];
+import { useProfile } from "@/contexts/DeveloperProfileContext";
 
 /**
  * 홈 About 프리뷰 섹션
@@ -31,6 +18,14 @@ interface AboutPreviewProps {
 }
 
 export function AboutPreview({ avatarUrl }: AboutPreviewProps) {
+  const { profile } = useProfile();
+
+  const techCategories = [
+    { label: "Frontend", items: profile.skills.frontend },
+    { label: "Backend",  items: profile.skills.backend },
+    { label: "Tools",    items: profile.skills.tools },
+  ];
+
   return (
     <section className="border-t py-20">
       <Container>
@@ -58,42 +53,32 @@ export function AboutPreview({ avatarUrl }: AboutPreviewProps) {
               {"  "}
               <span style={{ color: "var(--syntax-prop)" }}>name</span>
               {": "}
-              <span style={{ color: "var(--syntax-string)" }}>{'"문시현"'}</span>
+              <span style={{ color: "var(--syntax-string)" }}>{`"${profile.name}"`}</span>
               {","}
               <br />
               {"  "}
               <span style={{ color: "var(--syntax-prop)" }}>role</span>
               {": "}
-              <span style={{ color: "var(--syntax-string)" }}>{'"Frontend Developer"'}</span>
+              <span style={{ color: "var(--syntax-string)" }}>{`"${profile.role}"`}</span>
               {","}
               <br />
               {"  "}
               <span style={{ color: "var(--syntax-prop)" }}>location</span>
               {": "}
-              <span style={{ color: "var(--syntax-string)" }}>{'"인천, 대한민국"'}</span>
+              <span style={{ color: "var(--syntax-string)" }}>{`"${profile.location}"`}</span>
               {","}
               <br />
               {"  "}
-              <span style={{ color: "var(--syntax-prop)" }}>passion</span>
-              {": "}
-              <span style={{ color: "var(--syntax-string)" }}>{'"사용자 경험 & 성능"'}</span>
-              {","}
-              <br />
               <span className="text-accent">{"}"}</span>
-            </p>
-            <p className="text-muted-foreground text-xs leading-relaxed pt-2">
-              {`// Next.js와 TypeScript를 주로 사용하며`}
-              <br />
-              {`// 깔끔한 코드와 좋은 DX를 추구합니다.`}
             </p>
           </div>
 
           {/* 우측: 프로필 사진 (rotate-[-3deg] 틸트, teal accent border) */}
           <div className="flex justify-center">
-            <div className="rotate-[-3deg] rounded-xl border-2 border-accent overflow-hidden shadow-lg">
+            <div className="-rotate-3 rounded-xl border-2 border-accent overflow-hidden shadow-lg">
               <Image
                 src={resolveAvatarSrc(avatarUrl)}
-                alt="문시현 프로필 사진"
+                alt={`${profile.name} 프로필 사진`}
                 width={240}
                 height={240}
                 className="object-cover"
