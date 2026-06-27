@@ -17,7 +17,12 @@ export default async function MainLayout({
   let initialProfile: DeveloperProfile = DEFAULT_PROFILE;
   if (raw) {
     try {
-      initialProfile = JSON.parse(raw) as DeveloperProfile;
+      const parsed = JSON.parse(raw) as Partial<DeveloperProfile>;
+      initialProfile = {
+        ...DEFAULT_PROFILE,
+        ...parsed,
+        skills: { ...DEFAULT_PROFILE.skills, ...(parsed.skills ?? {}) },
+      };
     } catch {
       // 쿠키 파싱 실패 시 기본값 사용
     }
