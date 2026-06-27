@@ -125,19 +125,6 @@ export default function ArchitecturePage() {
               </ul>
             </div>
 
-            <div className="space-y-2">
-              <h3 className="font-medium">개선하고 싶은 점</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  현재 Notion 블록 렌더러는 기본 타입만 지원합니다.
-                  이미지·토글·콜아웃 등 확장 블록을 추가하면 Notion 본문을 더 풍부하게 표현할 수 있습니다.
-                </li>
-                <li>
-                  AI 분석 결과를 사용자가 수정할 수 있는 인라인 편집 UI가 있으면
-                  자동화의 한계를 보완할 수 있습니다.
-                </li>
-              </ul>
-            </div>
           </section>
 
         </div>
