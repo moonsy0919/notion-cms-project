@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { EmptyState } from "@/components/shared/EmptyState";
@@ -8,7 +9,10 @@ import { getProjects } from "@/lib/notion";
 
 /** 프로젝트 목록 페이지 (서버 컴포넌트) */
 export default async function ProjectsPage() {
-  const projects = await getProjects();
+  const cookieStore = await cookies();
+  const apiKey = cookieStore.get("notion-api-key")?.value ?? "";
+  const dbId = cookieStore.get("notion-db-id")?.value ?? "";
+  const projects = await getProjects(apiKey, dbId);
   const techList = Array.from(new Set(projects.flatMap((p) => p.techStack)));
 
   return (

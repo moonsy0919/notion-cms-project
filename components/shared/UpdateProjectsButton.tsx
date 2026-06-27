@@ -7,57 +7,54 @@ import { cn } from "@/lib/utils";
 
 type Status = "idle" | "running" | "done" | "error";
 
-/** 개발 환경 전용 Notion 프로젝트 업데이트 버튼 — 프로덕션에서는 null 반환 */
+/** Notion 대기 프로젝트를 폴링 방식으로 순차 처리하는 버튼 */
 export function UpdateProjectsButton() {
-  if (process.env.NODE_ENV !== "development") return null;
   return <UpdateButton />;
 }
 
-/** fill-notion 실행, SSE 스트리밍 로그 표시, 완료 후 자동 새로고침 */
 function UpdateButton() {
   const [status, setStatus] = useState<Status>("idle");
   const [logs, setLogs] = useState<string[]>([]);
+
+  const addLog = (line: string) =>
+    setLogs((prev) => [...prev.slice(-4), line]);
 
   const handleUpdate = async () => {
     setStatus("running");
     setLogs([]);
 
     try {
-      const res = await fetch("/api/update-projects", { method: "POST" });
-      const reader = res.body?.getReader();
-      if (!reader) throw new Error("스트림 없음");
-
-      const decoder = new TextDecoder();
-      let buffer = "";
-
       while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+        const res = await fetch("/api/update-projects", { method: "POST" });
 
-        buffer += decoder.decode(value, { stream: true });
-        const parts = buffer.split("\n\n");
-        buffer = parts.pop() ?? "";
+        if (!res.ok) {
+          const data = await res.json() as { error?: string };
+          addLog(`오류: ${data.error ?? res.statusText}`);
+          setStatus("error");
+          return;
+        }
 
-        for (const part of parts) {
-          const line = part.trim();
-          if (!line.startsWith("data: ")) continue;
-          try {
-            const data = JSON.parse(line.slice(6));
-            if (data.type === "log") {
-              setLogs((prev) => [...prev.slice(-4), data.line]);
-            } else if (data.type === "done") {
-              setStatus(data.success ? "done" : "error");
-              if (data.success) setTimeout(() => window.location.reload(), 1000);
-            } else if (data.type === "error") {
-              setStatus("error");
-            }
-          } catch {
-            // malformed SSE 무시
-          }
+        const data = await res.json() as {
+          done: boolean;
+          processed?: string;
+          remaining?: number;
+        };
+
+        if (data.processed != null) {
+          addLog(
+            `완료: ${data.processed} (남은 ${data.remaining ?? 0}개)`
+          );
+        }
+
+        if (data.done) {
+          setStatus("done");
+          setTimeout(() => window.location.reload(), 1000);
+          return;
         }
       }
     } catch {
       setStatus("error");
+      addLog("네트워크 오류가 발생했습니다.");
     }
   };
 

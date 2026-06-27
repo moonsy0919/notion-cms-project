@@ -1,3 +1,5 @@
+import { cache } from "react";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ExternalLink, Calendar } from "lucide-react";
 import { FaGithub } from "react-icons/fa6";
@@ -9,6 +11,12 @@ import { Container } from "@/components/layout/Container";
 import { getProjectById, getProjectBlocks } from "@/lib/notion";
 import { BlocksRenderer } from "@/components/notion/BlockRenderer";
 import { formatDate } from "@/lib/date";
+
+/** 동일 요청 내 쿠키를 한 번만 읽도록 캐시 */
+const getApiKey = cache(async () => {
+  const cookieStore = await cookies();
+  return cookieStore.get("notion-api-key")?.value ?? "";
+});
 
 interface ProjectDetailPageProps {
   params: Promise<{ id: string }>;
@@ -33,7 +41,8 @@ export async function generateMetadata({
   params,
 }: ProjectDetailPageProps): Promise<Metadata> {
   const { id } = await params;
-  const project = await getProjectById(id);
+  const apiKey = await getApiKey();
+  const project = await getProjectById(apiKey, id);
   if (!project) {
     return { title: "프로젝트를 찾을 수 없습니다 | 문시현" };
   }
@@ -51,11 +60,12 @@ export default async function ProjectDetailPage({
   params,
 }: ProjectDetailPageProps) {
   const { id } = await params;
+  const apiKey = await getApiKey();
 
-  const project = await getProjectById(id);
+  const project = await getProjectById(apiKey, id);
   if (!project) notFound();
 
-  const blocks = await getProjectBlocks(id);
+  const blocks = await getProjectBlocks(apiKey, id);
 
   return (
     <div className="py-8">
