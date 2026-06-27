@@ -27,7 +27,7 @@ export function Footer() {
               href="/about"
               className="text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
-              소개
+              Architecture
             </Link>
           </nav>
         </div>

@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { label: "홈", href: "/" },
   { label: "프로젝트", href: "/projects" },
-  { label: "소개", href: "/about" },
+  { label: "Architecture", href: "/about" },
 ];
 
 /** 현재 경로가 네비게이션 항목과 일치하는지 판별 */

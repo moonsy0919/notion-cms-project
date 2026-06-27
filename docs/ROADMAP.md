@@ -112,12 +112,12 @@
   - ✅ Playwright MCP를 활용한 필터·검색·URL 상태 관리 E2E 테스트
   - **버그 수정**: 기술 스택 배지 수가 적은 카드에서 GitHub 버튼이 콘텐츠 직후에 위치해 카드 하단에서 떠오르는 문제 → `Card`에 `flex flex-col`, `CardContent`에 `flex-1` 추가로 Footer 항상 카드 최하단 고정
 
-- **Task 008: 소개(About) 페이지 완성 + 반응형 디자인 & UX 검증** - 대기
-  - See: `/tasks/008-about-responsive.md`
-  - 소개 페이지 — 정적 자기소개 텍스트 + 기술 스택 카드 최종본 완성
-  - 모바일(375px) / 태블릿(768px) / 데스크톱(1280px) 전체 페이지 반응형 레이아웃 점검 및 수정
-  - 라이트/다크 모드 전환하며 전체 페이지 색상 대비 확인
-  - 네비게이션 → 목록 → 상세 → 뒤로가기 사용자 플로우 모바일·데스크톱 각각 검증
+- **Task 008: Architecture 페이지 완성** ✅
+  - `/about` 라우트를 Architecture 페이지로 전면 교체
+  - Header 네비게이션 "소개" → "Architecture" 변경
+  - 시스템 시퀀스 다이어그램 구현 (Mermaid.js, 다크/라이트 테마 자동 적용)
+    - 흐름: API Key 입력 → 개발자 정보 입력 → Notion에 GitHub URL 추가 → 업데이트 버튼(폴링) → GitHub fetch → Claude 분석 → Notion DB 업데이트 → Next.js(Vercel) 렌더링
+  - 개발 회고 정적 콘텐츠 섹션 (프로젝트 동기 / 기술 선택 이유 / 배운 점 / 개선하고 싶은 점)
 
 ---
 
