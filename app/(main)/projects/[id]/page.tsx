@@ -44,10 +44,10 @@ export async function generateMetadata({
   const apiKey = await getApiKey();
   const project = await getProjectById(apiKey, id);
   if (!project) {
-    return { title: "프로젝트를 찾을 수 없습니다 | 문시현" };
+    return { title: "프로젝트를 찾을 수 없습니다" };
   }
   return {
-    title: `${project.title} | 문시현`,
+    title: project.title,
     description: project.description,
     openGraph: {
       title: project.title,

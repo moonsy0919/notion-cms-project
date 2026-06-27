@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { MermaidDiagram } from "@/components/architecture/MermaidDiagram";
 
 export const metadata: Metadata = {
-  title: "Architecture | 문시현",
+  title: "Architecture",
   description: "포트폴리오 시스템 아키텍처 및 개발 회고",
 };
 
