@@ -144,6 +144,7 @@
   - `DeveloperProfileContext.tsx` — `DeveloperProfileProvider`(Client) + `useProfile()` 훅
   - `/admin` 페이지 + `ProfileForm` — 프로필 입력 후 `POST /api/profile` → Context 즉시 반영
   - HeroSection·CodeEditorPanel·AboutPreview에 `useProfile()`로 동적 바인딩
+  - **버그 수정**: `developer-profile` 쿠키가 부분 구조(`skills` 누락 등)로 저장된 경우 `CodeEditorPanel`에서 `profile.skills.frontend` 접근 시 TypeError 크래시 → `JSON.parse(raw) as DeveloperProfile` 단순 캐스팅 대신 `DEFAULT_PROFILE`과 deep merge(`{ ...DEFAULT_PROFILE, ...parsed, skills: { ...DEFAULT_PROFILE.skills, ...(parsed.skills ?? {}) } }`)로 수정
 
 - **Task 012: lib/fill-notion/ 모듈 신규 (배포 번들 포함)** ✅
   - `scripts/lib/` 로직을 기반으로 `lib/fill-notion/` 신규 생성 — 환경변수 직접 읽기 제거, `apiKey` 등을 파라미터로 받는 방식으로 전환(BYO Key API Route에서 호출 가능)
@@ -275,3 +276,4 @@
 |:---|:---|:---|
 | Notion `avatar_url` 만료 | `notion.users.list()`가 반환하는 `avatar_url`은 AWS S3 Pre-signed URL로 수 시간 후 만료됨 | `(main)/layout.tsx`에서 매 요청마다 `getOwnerProfile()` 재호출 — 동적 렌더링으로 항상 최신 URL 반영 |
 | Notion API rate limit | `getProjectBlocks()` 재귀 호출 시 3 req/sec 제한 초과 가능 | 재귀 호출 사이 350ms 딜레이 적용 |
+| `developer-profile` 쿠키 구조 불일치 | 부분 저장·손상된 쿠키 파싱 시 `skills` 등 중첩 프로퍼티 누락으로 런타임 크래시 | `DEFAULT_PROFILE`과 deep merge로 파싱 — 중첩 프로퍼티도 항상 fallback 보장 |
