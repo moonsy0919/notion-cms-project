@@ -1,11 +1,11 @@
-import { parseGithubUrl, fetchGithubRepoData } from "./lib/github";
-import { analyzeRepo } from "./lib/ai-analyzer";
+import { parseGithubUrl, fetchGithubRepoData } from "@/lib/fill-notion/github";
+import { analyzeRepo } from "@/lib/fill-notion/ai-analyzer";
 import {
   getPendingPages,
   updatePageProperties,
   appendPageBlocks,
   type PendingPage,
-} from "./lib/notion-updater";
+} from "@/lib/fill-notion/notion-updater";
 
 /** CLI 인수에서 --url 값을 추출합니다 */
 function parseArgs(): { url: string | null } {
@@ -21,25 +21,28 @@ function parseArgs(): { url: string | null } {
 
 /** 단일 페이지 처리 파이프라인 — try-catch로 격리하여 부분 실패 허용 */
 async function processPage(
-  page: PendingPage
+  page: PendingPage,
+  notionApiKey: string,
+  anthropicApiKey: string,
+  githubToken?: string
 ): Promise<{ success: true } | { success: false; error: string }> {
   const { pageId, githubUrl } = page;
 
   try {
     console.log(`  [1/4] GitHub 데이터 수집 중: ${githubUrl}`);
-    const repoData = await fetchGithubRepoData(githubUrl);
+    const repoData = await fetchGithubRepoData(githubUrl, githubToken);
     console.log(`  [1/4] 완료: ${repoData.name}`);
 
     console.log(`  [2/4] Claude AI 분석 중...`);
-    const analyzed = await analyzeRepo(repoData);
+    const analyzed = await analyzeRepo(repoData, anthropicApiKey);
     console.log(`  [2/4] 완료: "${analyzed.title}"`);
 
     console.log(`  [3/4] Notion 속성 업데이트 중...`);
-    await updatePageProperties(pageId, analyzed);
+    await updatePageProperties(pageId, analyzed, notionApiKey);
     console.log(`  [3/4] 완료`);
 
     console.log(`  [4/4] Notion 블록 추가 중 (${analyzed.blocks.length}개)...`);
-    await appendPageBlocks(pageId, analyzed.blocks);
+    await appendPageBlocks(pageId, analyzed.blocks, notionApiKey);
     console.log(`  [4/4] 완료`);
 
     return { success: true };
@@ -50,6 +53,24 @@ async function processPage(
 
 /** 메인 오케스트레이터 */
 async function main(): Promise<void> {
+  const notionApiKey = process.env.NOTION_API_KEY;
+  const notionDbId = process.env.NOTION_DATABASE_ID;
+  const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
+  const githubToken = process.env.GITHUB_TOKEN;
+
+  if (!notionApiKey) {
+    console.error("[오류] NOTION_API_KEY 환경변수가 설정되지 않았습니다.");
+    process.exit(1);
+  }
+  if (!notionDbId) {
+    console.error("[오류] NOTION_DATABASE_ID 환경변수가 설정되지 않았습니다.");
+    process.exit(1);
+  }
+  if (!anthropicApiKey) {
+    console.error("[오류] ANTHROPIC_API_KEY 환경변수가 설정되지 않았습니다.");
+    process.exit(1);
+  }
+
   const { url: targetUrl } = parseArgs();
 
   // --url 플래그가 있으면 유효한 GitHub URL인지 선검증
@@ -63,7 +84,7 @@ async function main(): Promise<void> {
   }
 
   console.log("\n[Notion] 대기 중인 페이지 탐색 중...");
-  const allPending = await getPendingPages();
+  const allPending = await getPendingPages(notionApiKey, notionDbId);
 
   // 처리 대상 페이지 결정
   let targets: PendingPage[];
@@ -107,7 +128,7 @@ async function main(): Promise<void> {
     const page = targets[i];
     console.log(`[${i + 1}/${total}] 처리 시작: ${page.githubUrl}`);
 
-    const result = await processPage(page);
+    const result = await processPage(page, notionApiKey, anthropicApiKey, githubToken);
 
     if (result.success) {
       console.log(`[${i + 1}/${total}] ✅ 완료\n`);

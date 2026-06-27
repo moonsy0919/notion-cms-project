@@ -1,0 +1,216 @@
+import Anthropic from "@anthropic-ai/sdk";
+import type { GithubRepoData } from "./github";
+
+/** Notion 페이지 본문 블록 명세 */
+export interface NotionBlockSpec {
+  type:
+    | "paragraph"
+    | "heading_1"
+    | "heading_2"
+    | "heading_3"
+    | "bulleted_list_item"
+    | "numbered_list_item"
+    | "code"
+    | "quote"
+    | "divider";
+  text?: string;
+  language?: string;
+}
+
+/** Claude 분석 결과 — Notion DB 프로퍼티 + 페이지 본문 블록 */
+export interface AnalyzedRepoData {
+  title: string;
+  description: string;
+  category: "Personal" | "Team" | "Company";
+  techStack: string[];
+  periodStart: string | null;
+  periodEnd: string | null;
+  status: "진행중" | "완료" | "유지보수";
+  demoUrl: string | null;
+  blocks: NotionBlockSpec[];
+}
+
+/** tool_use 강제로 JSON 스키마 출력을 보장하는 Anthropic Tool 정의 */
+const ANALYSIS_TOOL: Anthropic.Tool = {
+  name: "submit_analysis",
+  description: "GitHub 레포지토리 분석 결과를 포트폴리오 Notion 데이터로 제출합니다.",
+  input_schema: {
+    type: "object",
+    properties: {
+      title: { type: "string", description: "포트폴리오 프로젝트 제목 (한국어 또는 영어)" },
+      description: { type: "string", description: "프로젝트 한 줄 요약 (한국어)" },
+      category: {
+        type: "string",
+        enum: ["Personal", "Team", "Company"],
+        description: "Personal: 개인 프로젝트, Team: 팀 협업, Company: 기업 업무",
+      },
+      techStack: {
+        type: "array",
+        items: { type: "string" },
+        description: "실제 사용 기술 스택 (Next.js, TypeScript 등 원래 명칭 사용)",
+      },
+      periodStart: {
+        anyOf: [{ type: "string" }, { type: "null" }],
+        description: "개발 시작일 YYYY-MM-DD 형식 (예: 2024-01-15), 알 수 없으면 null",
+      },
+      periodEnd: {
+        anyOf: [{ type: "string" }, { type: "null" }],
+        description: "개발 종료일 YYYY-MM-DD 형식, 진행 중이거나 알 수 없으면 null",
+      },
+      status: {
+        type: "string",
+        enum: ["진행중", "완료", "유지보수"],
+        description: "진행중: 활발히 커밋 중, 완료: 개발 종료, 유지보수: 배포 후 유지",
+      },
+      demoUrl: {
+        anyOf: [{ type: "string" }, { type: "null" }],
+        description: "README에서 발견한 라이브 데모 URL, 없으면 null",
+      },
+      blocks: {
+        type: "array",
+        description: "Notion 페이지 본문 블록 (프로젝트 개요 → 주요 기능 → 기술 선택 이유 → 성과 순서)",
+        items: {
+          type: "object",
+          properties: {
+            type: {
+              type: "string",
+              enum: [
+                "paragraph",
+                "heading_1",
+                "heading_2",
+                "heading_3",
+                "bulleted_list_item",
+                "numbered_list_item",
+                "code",
+                "quote",
+                "divider",
+              ],
+            },
+            text: { type: "string", description: "블록 내용 (divider 타입 제외)" },
+            language: { type: "string", description: "code 타입 전용 언어 (typescript, bash 등)" },
+          },
+          required: ["type"],
+          additionalProperties: false,
+        },
+      },
+    },
+    required: [
+      "title",
+      "description",
+      "category",
+      "techStack",
+      "periodStart",
+      "periodEnd",
+      "status",
+      "demoUrl",
+      "blocks",
+    ],
+    additionalProperties: false,
+  },
+};
+
+/**
+ * Anthropic 429 Rate Limit 에러 발생 시 지수 백오프로 재시도합니다.
+ */
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  maxRetries = 3,
+  baseDelayMs = 1000
+): Promise<T> {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      const isRateLimit = err instanceof Anthropic.RateLimitError;
+      const hasRetriesLeft = attempt < maxRetries;
+      if (isRateLimit && hasRetriesLeft) {
+        const delayMs = baseDelayMs * Math.pow(2, attempt);
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw new Error("withRetry: 예기치 못한 경로 도달");
+}
+
+/** Claude 응답 input의 필수 필드와 enum 값을 검증합니다 */
+function validateAnalyzedData(input: unknown): AnalyzedRepoData {
+  const d = input as Record<string, unknown>;
+  const validCategories = ["Personal", "Team", "Company"];
+  const validStatuses = ["진행중", "완료", "유지보수"];
+  if (typeof d.title !== "string" || !d.title) {
+    throw new Error("Claude 응답 검증 실패: title 누락");
+  }
+  if (!validCategories.includes(d.category as string)) {
+    throw new Error(`Claude 응답 검증 실패: 잘못된 category — ${d.category}`);
+  }
+  if (!validStatuses.includes(d.status as string)) {
+    throw new Error(`Claude 응답 검증 실패: 잘못된 status — ${d.status}`);
+  }
+  if (!Array.isArray(d.blocks)) {
+    throw new Error("Claude 응답 검증 실패: blocks가 배열이 아닙니다.");
+  }
+  return d as unknown as AnalyzedRepoData;
+}
+
+/** Claude API 분석 프롬프트를 빌드합니다 */
+function buildPrompt(data: GithubRepoData): string {
+  const readmeExcerpt = data.readme.slice(0, 4000);
+  const topLanguages = Object.entries(data.languages)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 5)
+    .map(([lang]) => lang);
+
+  return `다음 GitHub 레포지토리를 분석하여 포트폴리오 CMS(Notion) 데이터를 생성해주세요.
+
+## 레포지토리 정보
+- 이름: ${data.name}
+- 설명: ${data.description ?? "(없음)"}
+- 별점: ${data.stars}
+- 주요 언어: ${topLanguages.join(", ") || "(없음)"}
+- 기여자 수: ${data.contributorCount}
+- 첫 커밋 날짜: ${data.firstCommitDate ?? "(알 수 없음)"}
+
+## README (앞 4000자)
+${readmeExcerpt || "(README 없음)"}
+
+## 분석 지침
+- description과 blocks 본문은 반드시 한국어로 작성하세요
+- blocks는 포트폴리오 독자가 이해하기 쉽도록 구성하세요: 프로젝트 개요 → 주요 기능 → 기술 선택 이유 → 성과/회고
+- periodStart는 첫 커밋 날짜(${data.firstCommitDate ?? "미상"})를 기준으로 YYYY-MM-DD 형식(예: 2024-01-15)으로 추정하세요. 알 수 없으면 null을 사용하세요
+- status는 최근 커밋 활동과 README 내용을 종합하여 판단하세요`;
+}
+
+/** Claude API를 호출하고 tool_use input을 반환합니다 */
+async function callClaudeApi(client: Anthropic, prompt: string): Promise<unknown> {
+  const response = await withRetry(() =>
+    client.messages.create({
+      model: "claude-sonnet-4-6",
+      max_tokens: 4096,
+      tools: [ANALYSIS_TOOL],
+      tool_choice: { type: "tool", name: "submit_analysis" },
+      messages: [{ role: "user", content: prompt }],
+    })
+  );
+  const toolUse = response.content.find((b) => b.type === "tool_use");
+  if (!toolUse || toolUse.type !== "tool_use") {
+    throw new Error("Claude가 tool_use 응답을 반환하지 않았습니다.");
+  }
+  return toolUse.input;
+}
+
+/**
+ * GitHub 레포 데이터를 Claude로 분석하여 Notion 포트폴리오 구조화 데이터를 반환합니다.
+ * @param data - fetchGithubRepoData()가 반환한 GitHub 레포 데이터
+ * @param anthropicApiKey - Anthropic API 키
+ */
+export async function analyzeRepo(
+  data: GithubRepoData,
+  anthropicApiKey: string
+): Promise<AnalyzedRepoData> {
+  const client = new Anthropic({ apiKey: anthropicApiKey });
+  const prompt = buildPrompt(data);
+  const raw = await callClaudeApi(client, prompt);
+  return validateAnalyzedData(raw);
+}
