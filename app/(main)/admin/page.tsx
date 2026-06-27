@@ -4,6 +4,7 @@ import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { ProfileForm } from "@/components/admin/ProfileForm";
 import type { DeveloperProfile } from "@/types/profile";
+import { CircuitBackground } from "@/components/ui/circuit-background";
 
 export const metadata: Metadata = {
   title: "프로필 설정 | 관리자",
@@ -32,15 +33,17 @@ export default async function AdminPage() {
   }
 
   return (
-    <div className="py-8">
-      <Container>
-        <PageHeader
-          title="개발자 프로필 설정"
-          description="홈 화면과 소개 섹션에 표시될 정보를 입력하세요."
-          className="mb-8"
-        />
-        <ProfileForm initialProfile={initialProfile} />
-      </Container>
-    </div>
+    <CircuitBackground>
+      <div className="py-8">
+        <Container>
+          <PageHeader
+            title="개발자 프로필 설정"
+            description="홈 화면과 소개 섹션에 표시될 정보를 입력하세요."
+            className="mb-8"
+          />
+          <ProfileForm initialProfile={initialProfile} />
+        </Container>
+      </div>
+    </CircuitBackground>
   );
 }

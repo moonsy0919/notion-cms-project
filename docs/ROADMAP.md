@@ -197,13 +197,13 @@
 - **Task 019-B: LinkedIn 아이콘 제거** ✅
   - `HeroSection`에서 LinkedIn 아이콘 및 `FaLinkedin` import 제거 — 불필요 소셜 링크 삭제
 
-- **Task 019-C: 온보딩 페이지 회로기판 배경 UI 개선** - 대기
+- **Task 019-C: 온보딩 페이지 회로기판 배경 UI 개선** ✅
 
   > `/setup`(API 키 입력)·`/admin`(개발자 프로필 입력) 두 온보딩 페이지에 회로기판 테마 배경을 적용합니다.
   > 기존 폼 필드와 기능은 일절 변경하지 않으며, 배경 레이어만 교체합니다.
   > 참조: 순수 검정 배경 + 4개 모서리 PCB 칩 장식 + 회로 트레이스 선 구성
 
-  - **1단계: `components/ui/circuit-background.tsx` 신규 생성**
+  - ✅ **1단계: `components/ui/circuit-background.tsx` 신규 생성**
     - 배경: `bg-[#080808]` — 라이트/다크 모드 무관 항상 다크 적용
     - `children`을 감싸는 `relative min-h-screen` wrapper 컴포넌트
     - 4개 모서리에 `position: absolute` SVG 장식 배치 (`aria-hidden="true"` 처리)
@@ -216,22 +216,22 @@
       - 수직 트레이스: 절점에서 화면 안쪽으로 이어지는 선
     - top-left SVG를 기준으로 `transform: scaleX(-1)` · `scaleY(-1)` · `scale(-1)` 적용해 나머지 3개 코너 재사용
 
-  - **2단계: `app/setup/page.tsx` 수정**
+  - ✅ **2단계: `app/setup/page.tsx` 수정**
     - 기존 래퍼 `<div className="flex min-h-screen items-center justify-center bg-background px-4">` 를 `<CircuitBackground>` 내부로 이동
     - Card 컴포넌트 및 폼 필드 4개(Notion API Key · Notion DB ID · Anthropic API Key · GitHub Token) 변경 없음
     - 에러 Alert · 로딩 버튼 상태 변경 없음
 
-  - **3단계: `app/(main)/admin/page.tsx` 수정**
+  - ✅ **3단계: `app/(main)/admin/page.tsx` 수정**
     - 기존 최상단 래퍼 `<div className="py-8">` 를 `<CircuitBackground>` 로 교체
     - `Container` · `PageHeader` · `ProfileForm` 내용물 변경 없음
     - `(main)` 레이아웃의 Header · Footer 유지 — 회로 배경은 header 아래 콘텐츠 영역에만 적용
 
   - **검증 기준**
-    - `/setup` 전체 화면 검정 배경 + 4개 코너 회로 장식 표시
-    - `/admin` 콘텐츠 영역 검정 배경 + 코너 회로 장식 표시
-    - 라이트 모드 전환 시에도 두 페이지는 항상 다크 배경 유지
-    - 기존 폼 입력 · 제출 · 에러 표시 기능 회귀 없음
-    - 모바일 뷰포트(375px)에서 코너 장식 카드와 겹침 없음 확인
+    - ✅ `/setup` 전체 화면 검정 배경 + 4개 코너 회로 장식 표시
+    - ✅ `/admin` 콘텐츠 영역 검정 배경 + 코너 회로 장식 표시
+    - ✅ 라이트 모드 전환 시에도 두 페이지는 항상 다크 배경 유지
+    - ✅ 기존 폼 입력 · 제출 · 에러 표시 기능 회귀 없음
+    - ✅ 모바일 뷰포트(375px)에서 코너 장식 카드와 겹침 없음 확인
 
 - **Task 020: 메타데이터 완성 및 프로덕션 배포 검증** - 진행중
   - 전역 메타데이터 완성:

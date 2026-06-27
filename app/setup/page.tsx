@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { CircuitBackground } from "@/components/ui/circuit-background";
 
 interface FormState {
   notionApiKey: string;
@@ -65,7 +66,8 @@ export default function SetupPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <CircuitBackground>
+    <div className="flex min-h-screen items-center justify-center px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">
@@ -155,5 +157,6 @@ export default function SetupPage() {
         </CardContent>
       </Card>
     </div>
+    </CircuitBackground>
   );
 }
