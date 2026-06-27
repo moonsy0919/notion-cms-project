@@ -24,18 +24,33 @@ export default async function MainLayout({
   }
 
   const apiKey = cookieStore.get("notion-api-key")?.value ?? "";
+  const githubToken = cookieStore.get("github-token")?.value ?? "";
+
   let avatarUrl: string | null = null;
-  if (apiKey) {
-    try {
-      const ownerProfile = await getOwnerProfile(apiKey);
-      avatarUrl = ownerProfile?.avatarUrl ?? null;
-    } catch {
-      // avatar 조회 실패 시 null 유지
-    }
-  }
+  let githubUrl: string | null = null;
+
+  const [ownerProfile, githubUser] = await Promise.all([
+    apiKey
+      ? getOwnerProfile(apiKey).catch(() => null)
+      : Promise.resolve(null),
+    githubToken
+      ? fetch("https://api.github.com/user", {
+          headers: {
+            Authorization: `token ${githubToken}`,
+            Accept: "application/vnd.github+json",
+          },
+          cache: "no-store",
+        })
+          .then((r) => (r.ok ? (r.json() as Promise<{ html_url: string }>) : null))
+          .catch(() => null)
+      : Promise.resolve(null),
+  ]);
+
+  avatarUrl = ownerProfile?.avatarUrl ?? null;
+  githubUrl = githubUser?.html_url ?? null;
 
   return (
-    <DeveloperProfileProvider initialProfile={initialProfile} avatarUrl={avatarUrl}>
+    <DeveloperProfileProvider initialProfile={initialProfile} avatarUrl={avatarUrl} githubUrl={githubUrl}>
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />

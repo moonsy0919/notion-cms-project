@@ -21,7 +21,7 @@ interface HeroSectionProps {
  * 모바일: 우측 컬럼 숨김
  */
 export function HeroSection({ avatarUrl }: HeroSectionProps) {
-  const { profile } = useProfile();
+  const { profile, githubUrl } = useProfile();
 
   return (
     <section className="min-h-screen flex items-center py-24">
@@ -55,15 +55,17 @@ export function HeroSection({ avatarUrl }: HeroSectionProps) {
 
             {/* 소셜 아이콘 행 */}
             <div className="flex items-center gap-4">
-              <a
-                href="https://github.com/moonsy0919"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-accent transition-colors"
-                aria-label="GitHub"
-              >
-                <FaGithub className="h-5 w-5" />
-              </a>
+              {githubUrl && (
+                <a
+                  href={githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-accent transition-colors"
+                  aria-label="GitHub"
+                >
+                  <FaGithub className="h-5 w-5" />
+                </a>
+              )}
               <a
                 href="https://linkedin.com"
                 target="_blank"

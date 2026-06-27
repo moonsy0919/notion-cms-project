@@ -8,6 +8,8 @@ interface DeveloperProfileContextValue {
   setProfile: (profile: DeveloperProfile) => void;
   /** Notion avatar_url — 서버에서 1회 주입, 쿠키 미저장 */
   avatarUrl: string | null;
+  /** GitHub html_url — github-token으로 /user API 호출 후 주입 */
+  githubUrl: string | null;
 }
 
 const DeveloperProfileContext = createContext<DeveloperProfileContextValue | null>(null);
@@ -15,6 +17,7 @@ const DeveloperProfileContext = createContext<DeveloperProfileContextValue | nul
 interface DeveloperProfileProviderProps {
   initialProfile: DeveloperProfile;
   avatarUrl?: string | null;
+  githubUrl?: string | null;
   children: React.ReactNode;
 }
 
@@ -22,12 +25,13 @@ interface DeveloperProfileProviderProps {
 export function DeveloperProfileProvider({
   initialProfile,
   avatarUrl = null,
+  githubUrl = null,
   children,
 }: DeveloperProfileProviderProps) {
   const [profile, setProfile] = useState<DeveloperProfile>(initialProfile);
 
   return (
-    <DeveloperProfileContext.Provider value={{ profile, setProfile, avatarUrl }}>
+    <DeveloperProfileContext.Provider value={{ profile, setProfile, avatarUrl, githubUrl }}>
       {children}
     </DeveloperProfileContext.Provider>
   );
