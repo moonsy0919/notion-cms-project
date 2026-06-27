@@ -117,7 +117,8 @@
   - Header 네비게이션 "소개" → "Architecture" 변경
   - 시스템 시퀀스 다이어그램 구현 (Mermaid.js, 다크/라이트 테마 자동 적용)
     - 흐름: API Key 입력 → 개발자 정보 입력 → Notion에 GitHub URL 추가 → 업데이트 버튼(폴링) → GitHub fetch → Claude 분석 → Notion DB 업데이트 → Next.js(Vercel) 렌더링
-  - 개발 회고 정적 콘텐츠 섹션 (프로젝트 동기 / 기술 선택 이유 / 배운 점 / 개선하고 싶은 점)
+  - 개발 회고 정적 콘텐츠 섹션 (프로젝트 동기 / 기술 선택 이유 / 배운 점)
+  - **버그 수정**: 내비게이션 이탈 후 재방문 시 다이어그램 미표시 → `finally` 블록이 `innerHTML`에 삽입된 SVG를 `getElementById`로 재탐색해 제거하던 문제. Mermaid 임시 엘리먼트 정리 순서를 `render()` 직후 · `innerHTML` 설정 전으로 변경해 해결. `resolvedTheme` 미확정 시 렌더링 스킵으로 불필요한 초기 실행 방지
 
 ---
 
