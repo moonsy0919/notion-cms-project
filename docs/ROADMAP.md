@@ -190,6 +190,13 @@
   - 헤더 이름 클릭 → 사이드 Sheet 오픈, `/admin` 이동 없이 프로필 수정 가능
   - `ProfileForm`에 `onSuccess`·`onCancel` props 추가 — Sheet에서 저장 시 닫힘·Context 즉시 반영, `/admin` 온보딩 흐름은 회귀 없음 유지
   - `DeveloperProfileContext`에 `avatarUrl` 추가 — `(main)/layout.tsx`에서 `getOwnerProfile()` 호출 후 주입, Sheet 상단 Notion 아바타 표시
+  - **Task 019-A (보완): GitHub 프로필 URL 자동 취득** ✅ — `github-token` 쿠키 → `GET https://api.github.com/user` 병렬 호출 → `html_url`을 `githubUrl`로 Context에 주입. `HeroSection` 아이콘 하드코딩 제거, 토큰 미입력 시 아이콘 미노출
+
+- **Task 019-B: 소셜 링크 완성** - 대기
+  - `HeroSection` LinkedIn 아이콘 URL 하드코딩(`https://linkedin.com`) 제거
+  - `DeveloperProfile` 타입에 `linkedinUrl?: string` 추가
+  - `ProfileForm` "소셜 링크" 섹션 추가 — LinkedIn URL 입력 필드, 미입력 시 아이콘 미노출
+  - `(main)/layout.tsx` `GET https://api.github.com/user` 호출은 매 요청마다 발생 — GitHub API rate limit(인증 시 5,000 req/h)은 여유 있으나, Next.js `fetch` 캐시(`revalidate: 3600`) 적용 검토
 
 - **Task 020: 메타데이터 완성 및 프로덕션 배포 검증** - 대기
   - 전역 메타데이터 완성: title template `"%s | 문시현 포트폴리오"`, description, OG 이미지 기본값
