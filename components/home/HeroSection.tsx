@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { FaGithub, FaLinkedin } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { ProfileAvatar } from "@/components/home/ProfileAvatar";
@@ -66,15 +66,6 @@ export function HeroSection({ avatarUrl }: HeroSectionProps) {
                   <FaGithub className="h-5 w-5" />
                 </a>
               )}
-              <a
-                href="https://linkedin.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-accent transition-colors"
-                aria-label="LinkedIn"
-              >
-                <FaLinkedin className="h-5 w-5" />
-              </a>
             </div>
 
             {/* CTA 버튼 */}
