@@ -40,7 +40,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur">
-      <Container>
+      <Container className="max-w-none">
         <div className="flex h-14 items-stretch justify-between">
           {/* 로고 + 데스크톱 네비게이션 */}
           <div className="flex items-stretch gap-4">

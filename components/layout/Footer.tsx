@@ -10,7 +10,7 @@ export function Footer() {
 
   return (
     <footer className="border-t bg-background">
-      <Container>
+      <Container className="max-w-none">
         <div className="flex flex-col items-center justify-between gap-4 py-8 sm:flex-row">
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} {profile.name || "개발자"}. All rights reserved.
