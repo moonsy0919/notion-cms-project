@@ -74,7 +74,7 @@ export default function SetupPage() {
             <span className="font-mono text-primary">&lt;/&gt;</span> 포트폴리오 API KEY 설정
           </CardTitle>
           <CardDescription>
-            Notion과 AI 연동을 위한 API 키를 입력해주세요. 
+            Notion과 AI 연동을 위한 API 키를 입력해주세요.<br/>
             키는 브라우저에만 저장됩니다.
           </CardDescription>
         </CardHeader>
