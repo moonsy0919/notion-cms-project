@@ -13,7 +13,7 @@ const AVATAR_ALLOWED_HOSTS = [
   "notion.so",
 ];
 
-const AVATAR_FALLBACK = "https://avatars.githubusercontent.com/moonsy0919";
+const AVATAR_FALLBACK = "/github-placeholder.png";
 
 /**
  * Notion/GitHub avatar_url을 next/image 허용 src로 정규화합니다.
