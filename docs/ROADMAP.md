@@ -6,7 +6,7 @@
 
 ## 진행 상태 범례
 
-- 완료: 해당 항목 구현 완료
+- ✅ 완료: 해당 항목 구현 완료
 - 진행중: 현재 작업 중
 - 대기: 아직 시작 전
 
@@ -48,22 +48,22 @@
 
 - **Task 002-D: 코드 에디터 패널 컴포넌트 구현** ✅
   - `CodeEditorPanel.tsx` 신규 — 파일 탭, 라인 번호, 신택스 하이라이트(외부 라이브러리 없음)
-  - 타이핑 애니메이션: `clip-path: inset(0 100% 0 0 → 0 0% 0 0)` + `steps(N, end)` 조합으로 글자 단위 마스크 해제. `animation-fill-mode: both`로 딜레이 중 초기 마스킹(`backwards`)과 완료 상태 유지(`forwards`) 보장
+  - 타이핑 애니메이션: `clip-path: inset(0 100% 0 0 → 0 0% 0 0)` + `steps(N, end)`로 글자 단위 마스크 해제. `animation-fill-mode: both`로 딜레이 중 마스킹·완료 상태 유지 보장
   - 탭 전환 시 `<tbody key={activeTab}>` DOM 재마운트로 애니메이션 재실행
 
 - **Task 002-E: About 홈 프리뷰 섹션** ✅
   - `AboutPreview.tsx` 신규 — 바이오 카드, 프로필 사진, 기술 카테고리 태그 행
 
 - **Task 002-F: 프로젝트 카드 다크 테마 + 스크롤 진입 애니메이션** ✅
-  - `AnimatedProjectsSection.tsx` 신규 — Intersection Observer 기반 카드 스태거 애니메이션
-  - 관찰 대상은 `<section>` 전체가 아닌 카드 `.grid` div. `<section>` 관찰 시 헤더가 뷰포트 진입(scrollY ≈ 57px)과 동시에 발동돼 카드가 화면 밖에서 애니메이션 완료되는 문제가 있었음 (`threshold: 0.15` 적용)
-  - `HeroSection`에 `min-h-screen` 적용 — 프로젝트 섹션을 항상 fold 아래로 유지해 IO 즉시 발동 방지
+  - `AnimatedProjectsSection.tsx` 신규 — Intersection Observer 기반 카드 스태거 애니메이션 (`threshold: 0.15`)
+  - 관찰 대상을 `<section>` 대신 카드 `.grid` div로 설정 — 뷰포트 진입 즉시 발동 방지
+  - `HeroSection`에 `min-h-screen` 적용 — 프로젝트 섹션을 항상 fold 아래로 유지
 
 ---
 
 ## Phase 2.6: GitHub → Notion 자동화 스크립트 ✅ 완료
 
-> 왜 이 순서인가? Phase 3에서 프론트엔드가 실제 Notion 데이터를 렌더링하려면 Notion DB에 진짜 프로젝트 데이터가 먼저 있어야 합니다. 이 Phase에서 Notion DB 생성 → Integration 연결 → 스크립트로 데이터 채우기까지 Phase 3 시작 전에 모두 완료합니다. GitHub URL 하나만 입력하면 AI가 나머지 속성과 본문을 자동으로 채워주는 CLI 도구로, 배포되는 앱과 무관한 로컬 개발 보조 도구입니다.
+> 왜 이 순서인가? Phase 3에서 프론트엔드가 실제 Notion 데이터를 렌더링하려면 Notion DB에 진짜 프로젝트 데이터가 먼저 있어야 합니다. GitHub URL 하나만 입력하면 AI가 나머지 속성과 본문을 자동으로 채워주는 CLI 도구로, 배포되는 앱과 무관한 로컬 개발 보조 도구입니다.
 
 - **Task 003-0: Notion DB 및 Integration 설정** ✅
   - Notion DB 생성(PRD 스펙 컬럼), Integration API 키 발급 및 DB 연결, `.env.local` 등록
@@ -94,58 +94,44 @@
 
 ---
 
-## Phase 4: 추가 기능 구현
+## Phase 4: 추가 기능 구현 ✅ 완료
 
-> 왜 이 순서인가? 핵심 기능(Notion 연동 목록·상세)이 동작하는 상태에서 UX를 향상시키는 부가 기능을 추가합니다. 필터·검색이 없어도 포트폴리오 자체는 완성된 상태이므로 MVP 이후에 배치합니다. 반응형 최종 검증도 기능이 모두 갖춰진 이 시점에 수행해 검증 범위를 한 번에 확정합니다.
+> 왜 이 순서인가? 핵심 기능(Notion 연동 목록·상세)이 동작하는 상태에서 UX를 향상시키는 부가 기능을 추가합니다. 필터·검색이 없어도 포트폴리오 자체는 완성된 상태이므로 MVP 이후에 배치합니다.
 
 - **Task 006: 개발용 프로젝트 업데이트 버튼 구현** ✅ *(Phase 5에서 폴링 방식으로 전면 재작성됨 — Task 017 참고)*
-  - 헤더 우상단 새로고침 버튼 → SSE 스트리밍으로 `fill-notion` 실행 및 실시간 로그 팝업
-  - **버그 수정**: Notion `avatar_url` 호스트(`s3-us-west-2.amazonaws.com`)가 `next.config.ts` 미등록 → `next/image` 500 크래시 → 호스트 3개 추가, GitHub 아바타 폴백 처리
-  - **버그 수정**: 아바타 폴백 URL(`AVATAR_FALLBACK`)이 개인 GitHub 계정(`moonsy0919`)에 하드코딩 → `public/github-placeholder.png` 로컬 파일로 교체 (`lib/utils.ts` 상수 변경, 외부 계정 의존 제거)
-  - **버그 수정**: Next.js 16 개발 환경 Data Cache로 인해 `revalidatePath` 호출에도 Notion 원본 미반환 → `getProjects()` fetch에 개발/프로덕션 분기 추가(`cache: 'no-store'` / ISR)
+  - 헤더 우상단 새로고침 버튼 → SSE 스트리밍 방식으로 초기 구현
+  - `next.config.ts` 이미지 허용 호스트 추가, `public/github-placeholder.png` 아바타 폴백 로컬화, 개발 환경 `cache: 'no-store'` 분기 적용
 
 - **Task 007: 기술 스택 필터 및 검색 기능 완성** ✅
-  - ✅ `ProjectFilters` — URL 파라미터(`?tech=`) 기반 기술 스택 필터 상태 관리로 교체 — 서버 컴포넌트(`page.tsx`)에서 읽은 `searchParams.tech`를 `selectedTech` 초기값 prop으로 전달하여 새로고침 시 필터 상태 유지
-  - ✅ `ProjectSearchBar` — 300ms 디바운스 후 URL 쿼리(`?q=`) 업데이트로 교체 — `router.replace()` 사용 (`router.push()` 사용 시 검색마다 히스토리가 쌓여 뒤로가기 UX 저하)
-  - ✅ `app/projects/page.tsx` — `searchParams`를 `Promise<{ tech?: string; q?: string }>` 타입으로 선언하고 `await` 처리 (Next.js 16 필수 패턴)
-  - ✅ `getProjects` 함수 — `query` 필터 파라미터 처리 추가 (JS 레벨 post-filter, title·description 대소문자 무관 검색)
-  - ✅ 필터 결과 없을 때 `EmptyState` 표시, "전체 보기" 버튼으로 초기화 (`EmptyState.action`에 `href` 옵션 추가)
-  - ✅ Playwright MCP를 활용한 필터·검색·URL 상태 관리 E2E 테스트
-  - **버그 수정**: 기술 스택 배지 수가 적은 카드에서 GitHub 버튼이 콘텐츠 직후에 위치해 카드 하단에서 떠오르는 문제 → `Card`에 `flex flex-col`, `CardContent`에 `flex-1` 추가로 Footer 항상 카드 최하단 고정
+  - `ProjectFilters` — URL 파라미터(`?tech=`) 기반 필터, `searchParams.tech` prop으로 새로고침 시 상태 유지
+  - `ProjectSearchBar` — 300ms 디바운스 후 URL 쿼리(`?q=`) 업데이트, `router.replace()` 사용 (히스토리 누적 방지)
+  - `app/projects/page.tsx` — `searchParams`를 `Promise<{ tech?: string; q?: string }>` 타입으로 선언 + `await` (Next.js 16 필수)
+  - `getProjects()` — `query` 파라미터 JS 레벨 post-filter, title·description 대소문자 무관 검색
+  - 필터 결과 없을 때 `EmptyState` + "전체 보기" 버튼, Playwright E2E 검증
+  - **버그 수정**: 기술 스택 배지 수가 적은 카드에서 GitHub 버튼 떠오름 → `Card`에 `flex flex-col`, `CardContent`에 `flex-1`
 
 - **Task 008: Architecture 페이지 완성** ✅
-  - `/about` 라우트를 Architecture 페이지로 전면 교체
-  - Header 네비게이션 "소개" → "Architecture" 변경
+  - `/about` 라우트를 Architecture 페이지로 전면 교체, Header 네비게이션 "소개" → "Architecture" 변경
   - 시스템 시퀀스 다이어그램 구현 (Mermaid.js, 다크/라이트 테마 자동 적용)
-    - 흐름: API Key 입력 → 개발자 정보 입력 → Notion에 GitHub URL 추가 → 업데이트 버튼(폴링) → GitHub fetch → Claude 분석 → Notion DB 업데이트 → Next.js(Vercel) 렌더링
   - 개발 회고 정적 콘텐츠 섹션 (프로젝트 동기 / 기술 선택 이유 / 배운 점)
-  - **버그 수정**: 내비게이션 이탈 후 재방문 시 다이어그램 미표시 → `finally` 블록이 `innerHTML`에 삽입된 SVG를 `getElementById`로 재탐색해 제거하던 문제. Mermaid 임시 엘리먼트 정리 순서를 `render()` 직후 · `innerHTML` 설정 전으로 변경해 해결. `resolvedTheme` 미확정 시 렌더링 스킵으로 불필요한 초기 실행 방지
+  - **버그 수정**: 내비게이션 이탈 후 재방문 시 다이어그램 미표시 → Mermaid 임시 엘리먼트 정리 순서를 `render()` 직후·`innerHTML` 설정 전으로 변경, `resolvedTheme` 미확정 시 렌더링 스킵
 
 ---
 
 ## Phase 5: BYO Key 포트폴리오 + Vercel Hobby 배포
 
-> **이 Phase는 기존 Phase 4.5(인증 게이트)와 Phase 5(성능 최적화 및 배포)를 대체합니다.**
->
-> Phase 4.5의 JWT 인증 게이트 대신, 사용자가 자신의 API Key를 직접 입력하는
-> BYO Key(Bring Your Own Key) 구조로 전환합니다. Vercel Hobby 플랜의 60초 제한 안에서
-> AI 채우기 파이프라인을 실행하기 위해 SSE 스트리밍 → 1 call = 1 project 폴링 방식으로 전환합니다.
+> Phase 4.5의 JWT 인증 게이트 대신 BYO Key(Bring Your Own Key) 구조로 전환합니다.
+> Vercel Hobby 플랜 60초 제한 안에서 AI 채우기 파이프라인을 실행하기 위해 SSE → 폴링 방식으로 전환합니다.
 > Notion 자체를 상태 저장소로 활용해 외부 인프라(Redis, KV) 없이 구현합니다.
 >
-> **배포 아키텍처 변경**: 환경변수 없는 Vercel Hobby 배포.
-> NOTION_API_KEY, NOTION_DATABASE_ID, ANTHROPIC_API_KEY는 모두 UI에서 입력 후 httpOnly 쿠키로 관리합니다.
+> **배포 아키텍처**: 환경변수 없는 Vercel Hobby 배포. 모든 API 키는 UI 입력 후 httpOnly 쿠키로 관리합니다.
 
 - **Task 011: 레이아웃 재편 + 개발자 프로필 인프라** ✅
-
-  > 개발자 프로필(name, role, focus, location, skills)을 `/admin` 페이지에서 입력하면
-  > HeroSection·CodeEditorPanel·AboutPreview에 새로고침 없이 즉시 반영되는 구조.
-  > httpOnly 쿠키(`developer-profile`)로 저장, React Context로 전역 공유.
-
   - `app/(main)/layout.tsx` 라우트 그룹 도입 — `cookies()`로 `developer-profile` 쿠키 읽어 `DeveloperProfileProvider` 초기화, Header·Footer 포함
   - `DeveloperProfileContext.tsx` — `DeveloperProfileProvider`(Client) + `useProfile()` 훅
   - `/admin` 페이지 + `ProfileForm` — 프로필 입력 후 `POST /api/profile` → Context 즉시 반영
   - HeroSection·CodeEditorPanel·AboutPreview에 `useProfile()`로 동적 바인딩
-  - **버그 수정**: `developer-profile` 쿠키가 부분 구조(`skills` 누락 등)로 저장된 경우 `CodeEditorPanel`에서 `profile.skills.frontend` 접근 시 TypeError 크래시 → `JSON.parse(raw) as DeveloperProfile` 단순 캐스팅 대신 `DEFAULT_PROFILE`과 deep merge(`{ ...DEFAULT_PROFILE, ...parsed, skills: { ...DEFAULT_PROFILE.skills, ...(parsed.skills ?? {}) } }`)로 수정
+  - **버그 수정**: `developer-profile` 쿠키 부분 구조 파싱 시 `skills` 누락으로 TypeError → `DEFAULT_PROFILE`과 deep merge로 수정
 
 - **Task 012: lib/fill-notion/ 모듈 신규 (배포 번들 포함)** ✅
   - `scripts/lib/` 로직을 기반으로 `lib/fill-notion/` 신규 생성 — 환경변수 직접 읽기 제거, `apiKey` 등을 파라미터로 받는 방식으로 전환(BYO Key API Route에서 호출 가능)
@@ -188,87 +174,36 @@
 - **Task 018: Header 로그아웃 버튼 추가** ✅
   - 데스크톱 `[UpdateProjectsButton] [LogoutButton] [ThemeToggle]`, 모바일 Sheet nav 하단 로그아웃 항목
   - **버그 수정**: 로그아웃 후 `developer-profile` 쿠키 미삭제 → `/admin` 온보딩 스킵 문제 → `logout/route.ts`에서 5개 쿠키 일괄 만료로 해결
-  - **버그 수정**: `proxy.ts`가 `developer-profile` 미설정 상태에서 `POST /api/profile`을 `/admin`으로 307 리다이렉트 → Route Handler 미실행 → 쿠키 미저장 → `/` 이동이 `/admin`으로 튕김 → 조건에 `&& !pathname.startsWith("/api/")` 예외 추가, `NextResponse.cookies.set()`으로 Set-Cookie 헤더 포함 보장
+  - **버그 수정**: `proxy.ts`가 `developer-profile` 미설정 상태에서 `POST /api/profile`을 `/admin`으로 307 리다이렉트 → 조건에 `&& !pathname.startsWith("/api/")` 예외 추가
 
 - **Task 019: 헤더 인라인 프로필 편집 Sheet** ✅
   - 헤더 이름 클릭 → 사이드 Sheet 오픈, `/admin` 이동 없이 프로필 수정 가능
-  - `ProfileForm`에 `onSuccess`·`onCancel` props 추가 — Sheet에서 저장 시 닫힘·Context 즉시 반영, `/admin` 온보딩 흐름은 회귀 없음 유지
-  - `DeveloperProfileContext`에 `avatarUrl` 추가 — `(main)/layout.tsx`에서 `getOwnerProfile()` 호출 후 주입, Sheet 상단 Notion 아바타 표시
-  - **Task 019-A (보완): GitHub 프로필 URL 자동 취득** ✅ — `github-token` 쿠키 → `GET https://api.github.com/user` 병렬 호출 → `html_url`을 `githubUrl`로 Context에 주입. `HeroSection` 아이콘 하드코딩 제거, 토큰 미입력 시 아이콘 미노출
-
-- **Task 019-B: LinkedIn 아이콘 제거** ✅
-  - `HeroSection`에서 LinkedIn 아이콘 및 `FaLinkedin` import 제거 — 불필요 소셜 링크 삭제
+  - `ProfileForm`에 `onSuccess`·`onCancel` props 추가 — Sheet에서 저장 시 닫힘·Context 즉시 반영
+  - `DeveloperProfileContext`에 `avatarUrl` 추가 — `(main)/layout.tsx`에서 `getOwnerProfile()` 호출 후 주입
+  - **Task 019-A (보완): GitHub 프로필 URL 자동 취득** ✅ — `github-token` 쿠키 → `GET /user` 병렬 호출 → `html_url`을 `githubUrl`로 Context에 주입. 토큰 미입력 시 아이콘 미노출
+  - **Task 019-B: LinkedIn 아이콘 제거** ✅ — `HeroSection`에서 `FaLinkedin` import 및 아이콘 제거
 
 - **Task 019-C: 온보딩 페이지 회로기판 배경 UI 개선** ✅
-
-  > `/setup`(API 키 입력)·`/admin`(개발자 프로필 입력) 두 온보딩 페이지에 회로기판 테마 배경을 적용합니다.
-  > 기존 폼 필드와 기능은 일절 변경하지 않으며, 배경 레이어만 교체합니다.
-  > 참조: 순수 검정 배경 + 4개 모서리 PCB 칩 장식 + 회로 트레이스 선 구성
-
-  - ✅ **1단계: `components/ui/circuit-background.tsx` 신규 생성**
-    - 배경: `bg-[#080808]` — 라이트/다크 모드 무관 항상 다크 적용
-    - `children`을 감싸는 `relative min-h-screen` wrapper 컴포넌트
-    - 4개 모서리에 `position: absolute` SVG 장식 배치 (`aria-hidden="true"` 처리)
-    - 코너 SVG 구성 요소:
-      - 칩 사각형: `rx=4` 둥근 모서리, fill `#0f1117`, stroke `#1e2535`
-      - 칩 내부 dot matrix: 3행 × 8열 `2×2px` 사각형 격자, fill `#2a3040`
-      - 칩 측면 핀(pin) 라인: 칩 외곽에서 뻗는 짧은 수평 라인 2개
-      - 수평 트레이스: 칩에서 내부로 뻗는 1px 선, stroke `#1a2030`
-      - 절점 dot: 트레이스 꺾임 지점 `circle r=3`, fill `#2a3545`
-      - 수직 트레이스: 절점에서 화면 안쪽으로 이어지는 선
-    - top-left SVG를 기준으로 `transform: scaleX(-1)` · `scaleY(-1)` · `scale(-1)` 적용해 나머지 3개 코너 재사용
-
-  - ✅ **2단계: `app/setup/page.tsx` 수정**
-    - 기존 래퍼 `<div className="flex min-h-screen items-center justify-center bg-background px-4">` 를 `<CircuitBackground>` 내부로 이동
-    - Card 컴포넌트 및 폼 필드 4개(Notion API Key · Notion DB ID · Anthropic API Key · GitHub Token) 변경 없음
-    - 에러 Alert · 로딩 버튼 상태 변경 없음
-
-  - ✅ **3단계: `app/(main)/admin/page.tsx` 수정**
-    - 기존 최상단 래퍼 `<div className="py-8">` 를 `<CircuitBackground>` 로 교체
-    - `Container` · `PageHeader` · `ProfileForm` 내용물 변경 없음
-    - ⚠️ 이 시점에 `(main)` 레이아웃의 Header · Footer가 admin에 노출되는 문제가 발생 → Task 019-D에서 수정
-
-  - **검증 기준**
-    - ✅ `/setup` 전체 화면 검정 배경 + 4개 코너 회로 장식 표시
-    - ✅ `/admin` 콘텐츠 영역 검정 배경 + 코너 회로 장식 표시
-    - ✅ 라이트 모드 전환 시에도 두 페이지는 항상 다크 배경 유지
-    - ✅ 기존 폼 입력 · 제출 · 에러 표시 기능 회귀 없음
-    - ✅ 모바일 뷰포트(375px)에서 코너 장식 카드와 겹침 없음 확인
+  - `components/ui/circuit-background.tsx` 신규 — `bg-[#080808]` 항상 다크, `flex-1 flex flex-col` 높이 체인, 4코너 PCB 칩 SVG 장식 (`aria-hidden`, top-left 기준 scaleX/Y 반전으로 3개 재사용)
+  - `app/setup/page.tsx`, `app/(onboarding)/admin/page.tsx`에 `CircuitBackground` 적용
+  - ⚠️ `(main)` 레이아웃의 Header·Footer가 admin에 노출되는 문제 발생 → Task 019-D에서 수정
 
 - **Task 019-D: 온보딩 레이아웃 버그 수정** ✅
-
-  > Task 019-C에서 admin 페이지에 Header·Footer가 노출되는 문제와 CircuitBackground의
-  > `min-h-screen`이 Header+Footer 높이를 포함해 뷰포트를 초과하던 레이아웃 버그를 수정합니다.
-
-  - ✅ **`app/(onboarding)/` 라우트 그룹 신설**
-    - `app/(onboarding)/layout.tsx` — `DeveloperProfileProvider`만 wrap, Header·Footer 없음
-    - `app/(main)/admin/` → `app/(onboarding)/admin/` 이동 — `/admin` URL은 동일 유지
-    - `githubUrl=null` 고정 (온보딩 중 GitHub API 호출 불필요)
-    - `notion-api-key` 쿠키 존재 시 `getOwnerProfile()` 호출 → `avatarUrl` 취득, 없으면 `null` 폴백
-
-  - ✅ **`CircuitBackground` 높이 로직 수정 (`min-h-screen` → `flex-1`)**
-    - `relative min-h-screen` → `relative flex-1 flex flex-col` — 부모 컨테이너 크기를 채우도록 변경
-    - 내부 `relative z-10` → `relative z-10 flex-1 flex flex-col` — 높이 체인 전달
-    - `/setup`: body(flex-col 100vh) → CircuitBackground(flex-1=100vh) → 카드 수직 중앙 ✓
-    - `/admin`: body(flex-col 100vh) → CircuitBackground(flex-1=뷰포트 전체) ✓
-
-  - ✅ **`(main)/layout.tsx` main 태그 수정**
-    - `flex-1` → `flex-1 flex flex-col` — 포트폴리오 페이지에서 높이 전달 가능하도록 (기존 레이아웃 회귀 없음)
-
-  - ✅ **`setup/page.tsx` 내부 div 수정**
-    - `flex min-h-screen items-center` → `flex flex-1 items-center` — 중복 min-h-screen 제거
-
-  - ✅ **`/admin` 페이지 Notion 아바타 연동**
-    - 기존 `avatarUrl={null}` 고정 → `/setup`에서 저장된 `notion-api-key` 쿠키로 `getOwnerProfile()` 조건부 호출
-    - `/admin` 진입 시 ProfileForm 상단에 GitHub 기본 아이콘 대신 실제 Notion 프로필 사진 표시
-    - API 키 없거나 호출 실패 시 `null` 폴백(기본 아이콘) — 크래시 없음
+  - `app/(onboarding)/` 라우트 그룹 신설 — Header·Footer 제거, `DeveloperProfileProvider`만 wrap, `/admin` URL 유지
+  - `CircuitBackground` `min-h-screen` → `flex-1 flex flex-col` — Header+Footer 포함 레이아웃에서 뷰포트 초과 방지
+  - `(main)/layout.tsx` main 태그 `flex-1 flex flex-col` 추가, `setup/page.tsx` 내부 중복 `min-h-screen` 제거
+  - `/admin` 진입 시 `notion-api-key` 쿠키로 `getOwnerProfile()` 조건부 호출 → Notion 아바타 표시, 키 없으면 `null` 폴백
 
 - **Task 020: 메타데이터 완성 및 프로덕션 배포 검증** - 진행중
   - 전역 메타데이터 완성:
-    - ✅ title template 동적 이름 반영 — `app/layout.tsx`를 정적 `metadata`에서 async `generateMetadata`로 전환. `developer-profile` 쿠키의 `name` 필드를 읽어 `title.template: '%s | {name}'`, `title.default: '{name} | 포트폴리오'` 반환. 쿠키 미설정 시 "개발자" 기본값
-    - ✅ 각 페이지 `generateMetadata` 수정 — `app/(main)/about/page.tsx`의 `"Architecture | 문시현"` 하드코딩 제거(루트 템플릿 자동 조합), `app/(main)/projects/[id]/page.tsx`의 `"${project.title} | 문시현"` 및 404 fallback 하드코딩 동일 처리
-    - ✅ 버그 수정: 프로필 저장 후 타이틀 즉시 반영 — ProfileForm handleSubmit에서 router.refresh() 추가. generateMetadata가 서버 사이드 함수라 클라이언트 쿠키 변경에 반응하지 않아 refresh로 루트 레이아웃 재요청 강제
+    - ✅ title template 동적 이름 반영 — `app/layout.tsx`를 async `generateMetadata`로 전환. `developer-profile` 쿠키의 `name` 필드로 `title.template`·`title.default` 동적 생성, 쿠키 미설정 시 "개발자" 기본값
+    - ✅ 각 페이지 하드코딩 제거 — `"Architecture | 문시현"`, `"${project.title} | 문시현"` 등 루트 템플릿 자동 조합으로 교체
+    - ✅ 버그 수정: 프로필 저장 후 타이틀 즉시 반영 — `ProfileForm` handleSubmit에서 `router.refresh()` 추가
     - ✅ OG 이미지 기본값 설정
+      - `app/opengraph-image.tsx` 신규 — 다크 코드 에디터 테마, 정적 생성(CDN 캐시, `cookies()` 미사용)
+      - `app/setup/layout.tsx` 신규 — `/setup`은 `"use client"`라 `metadata` 직접 export 불가, layout에서 위임
+      - `proxy.ts` — `/opengraph-image`·`/robots.txt` PUBLIC_PATHS 추가 (크롤러 307 차단 방지)
+      - 루트 `app/layout.tsx` — `metadataBase` 설정, 각 페이지 `openGraph.images` 명시
   - ✅ Lighthouse 목표: Performance 96 / Accessibility 100 / Best Practices 100 / SEO 100 달성
   - Vercel 배포: 환경변수 등록 **불필요** (키는 UI 입력 후 쿠키 관리), 프로덕션 URL 확인 - 대기
   - Playwright MCP 프로덕션 E2E 검증 - 대기:
@@ -276,6 +211,41 @@
     - 키 입력 → 포트폴리오 로드, 실제 Notion 데이터 표시 확인
     - Notion에 GitHub URL 추가 → 새로고침 버튼 폴링 → 완료 후 카드 추가 확인
     - 로그아웃 → `/setup` 이동, 직접 URL 접속 시 재리다이렉트 확인
+
+---
+
+## Phase 6: 성능 개선 및 프로젝트 정리 ✅ 완료
+
+> 정적 분석(Lighthouse·번들 측정·코드 리뷰)으로 식별된 이슈를 우선순위 순으로 수정합니다.
+> BYO Key 구조상 `cookies()` 호출에 의한 전면 동적 렌더링은 의도된 설계이므로 수정 대상에서 제외합니다.
+
+- **Task 021-A: Geist 폰트 2개 제거** ✅
+  - `app/layout.tsx` — 미사용 `Geist`·`Geist_Mono` import·변수 선언 제거, html className에서 제거
+
+- **Task 021-B: `getOwnerProfile()` 이중 호출 제거** ✅
+  - `app/(main)/page.tsx` — 중복 `getOwnerProfile()` 호출 제거, `Promise.all` 단순화
+  - `HeroSection`·`AboutPreview` — `avatarUrl` prop 제거, `useProfile().avatarUrl` 직접 소비
+
+- **Task 021-C: `getProjectById()` 이중 호출 제거** ✅
+  - `app/(main)/projects/[id]/page.tsx` — `React.cache()`로 래핑한 `getCachedProject`로 교체
+  - `generateMetadata`·페이지 컴포넌트가 동일 캐시 함수 공유 → Notion API 1회 실행
+
+- **Task 021-D: `window.location.reload()` → `router.refresh()` 교체** ✅
+  - `UpdateProjectsButton` — 전체 페이지 재요청 → 서버 컴포넌트 데이터만 재요청
+  - **버그 수정**: `router.refresh()`가 클라이언트 상태 보존으로 `status: "done"` 영구 유지 → `setTimeout`으로 1초 후 `setStatus("idle")` 리셋
+
+- **Task 021-E: 블록 재귀 패칭 병렬화** ✅
+  - `lib/notion.ts` — 동일 depth `has_children` 형제 블록들을 단일 350ms 대기 후 `Promise.all` 병렬 패칭 (직렬 `350ms × N` 누적 제거)
+
+- **Task 021-F: `getProjectBlocks` 페이지네이션 지원** ✅
+  - `lib/notion.ts` — `fetchAllBlocks()` 헬퍼 추가, `has_more: true`인 동안 350ms 대기 후 `start_cursor`로 반복 요청 (100개 초과 블록 누락 방지)
+  - Playwright 검증: `page_size=5` 강제로 32개 블록 7회 분할 패칭 후 전체 렌더링 확인
+
+- **Task 022: 프로젝트 정리 및 문서화** ✅
+  - `public/robots.txt` 신규 — 크롤러 전체 허용, `proxy.ts` PUBLIC_PATHS 등록
+  - `app/setup/page.tsx` — `<div>` → `<main>` 랜드마크 교체 (Accessibility 100 기여)
+  - 미사용 파일 12개 제거 — `public/*.svg` 5개(스타터킷 기본 파일), 루트 개발 스크린샷 7개
+  - `README.md` 전면 업데이트 — Lighthouse 배지, 프로젝트 구조 보완, Vercel 배포 방법 교체
 
 ---
 
@@ -309,46 +279,3 @@
 | `developer-profile` 쿠키 구조 불일치 | 부분 저장·손상된 쿠키 파싱 시 `skills` 등 중첩 프로퍼티 누락으로 런타임 크래시 | `DEFAULT_PROFILE`과 deep merge로 파싱 — 중첩 프로퍼티도 항상 fallback 보장 |
 | `CircuitBackground` 뷰포트 초과 | `min-h-screen`(100vh)이 Header+Footer가 있는 레이아웃 안에서 사용되면 총 높이 초과 → 스크롤바 → 레이아웃 좌측 쏠림 | `flex-1 flex flex-col`로 교체 — 부모 컨테이너 남은 공간을 채우는 방식. `(onboarding)` 라우트 그룹 분리로 재발 방지 |
 | `router.refresh()` 클라이언트 상태 보존 | `window.location.reload()` 대비 클라이언트 컴포넌트 상태가 초기화되지 않음 → `status` 등 UI 상태 리셋 누락 시 팝업·버튼 상태 영구 잔류 | `router.refresh()` 사용 시 상태 리셋(`setStatus` 등)을 `setTimeout` 콜백에 명시적으로 추가 |
-
----
-
-## Phase 6: 성능 개선 ✅ 완료
-
-> **이 Phase는 정적 분석(Lighthouse·번들 측정·코드 리뷰)으로 식별된 이슈를 우선순위 순으로 수정합니다.**
->
-> BYO Key 구조상 `cookies()` 호출에 의한 전면 동적 렌더링은 의도된 설계이므로 수정 대상에서 제외합니다.
-> 불필요한 외부 API 중복 호출, 번들 크기, 렌더링 방식의 비효율을 제거하는 데 집중합니다.
-
-- **Task 021-A: Geist 폰트 2개 제거** ✅ 완료
-  - ✅ 원인: `app/layout.tsx`에서 `Geist`, `Geist_Mono`를 로드하지만 `globals.css`는 `--font-mono: var(--font-jetbrains-mono)` 만 참조. `--font-geist-sans`·`--font-geist-mono` 변수는 어디서도 사용되지 않음
-  - ✅ `app/layout.tsx` — `Geist`, `Geist_Mono` import·변수 선언 제거
-  - ✅ `html` 태그 className에서 `${geistSans.variable} ${geistMono.variable}` 제거
-
-- **Task 021-B: `getOwnerProfile()` 이중 호출 제거** ✅ 완료
-  - ✅ 원인: 홈 요청 1회에 `(main)/layout.tsx`와 `app/(main)/page.tsx` 양쪽에서 `getOwnerProfile()`을 독립 호출 → Notion API 2회 실행
-  - ✅ `HeroSection`·`AboutPreview`는 이미 `useProfile().avatarUrl`을 통해 Context에 접근 가능한 클라이언트 컴포넌트이므로 `page.tsx`의 중복 호출이 불필요
-  - ✅ `app/(main)/page.tsx` — `getOwnerProfile()` 호출 제거, `Promise.all` 단순화
-  - ✅ `components/home/HeroSection.tsx` — `avatarUrl` prop 제거, `useProfile().avatarUrl` 직접 소비
-  - ✅ `components/home/AboutPreview.tsx` — `avatarUrl` prop 제거, `useProfile().avatarUrl` 직접 소비
-
-- **Task 021-C: `getProjectById()` 이중 호출 제거** ✅ 완료
-  - ✅ 원인: 프로젝트 상세 페이지에서 `generateMetadata()`와 `ProjectDetailPage()` 각각 `getProjectById()` 호출 → 같은 요청에 Notion API 2회 실행
-  - ✅ 쿠키 읽기는 `React.cache()`로 이미 중복 제거됐지만 Notion API 호출 자체는 여전히 2회
-  - ✅ `app/(main)/projects/[id]/page.tsx` — `getProjectById`를 `React.cache()`로 래핑한 `getCachedProject` 함수로 교체. `generateMetadata`와 `ProjectDetailPage` 양쪽이 동일 캐시 함수 호출 → Notion API 1회만 실행
-
-- **Task 021-D: `window.location.reload()` → `router.refresh()` 교체** ✅ 완료
-  - ✅ 원인: `UpdateProjectsButton`에서 완료 후 `window.location.reload()` 호출 → JS 번들·폰트·이미지 전부 재요청
-  - ✅ `router.refresh()`는 서버 컴포넌트 데이터만 재요청하고 클라이언트 상태(번들, 이미지 등)는 유지
-  - ✅ `components/shared/UpdateProjectsButton.tsx` — `useRouter` 추가, `window.location.reload()` → `router.refresh()` 교체
-  - **버그 수정**: `router.refresh()`는 클라이언트 컴포넌트 상태를 보존하므로 `status`가 `"done"`으로 영구 유지 → "완료 — 새로고침 중" 팝업이 사라지지 않는 문제 발생 → `setTimeout` 콜백에 `setStatus("idle")` 추가로 1초 후 팝업 자동 소멸 (Playwright MutationObserver로 검증: ms 237 팝업 등장 → ms 1240 팝업 소멸)
-
-- **Task 021-E: 블록 재귀 패칭 병렬화** ✅ 완료
-  - ✅ 원인: `getProjectBlocks()`에서 `has_children: true` 블록을 만날 때마다 350ms 딜레이 후 직렬 재귀 호출. 동일 depth 형제 블록이 N개면 `350ms × N` 누적 지연
-  - ✅ 개선: 같은 depth의 `has_children` 블록들을 먼저 수집 → 단일 350ms 대기 → `Promise.all`로 일괄 패칭 (depth 간 순서는 유지)
-  - ✅ `lib/notion.ts` — `getProjectBlocks()` 내부 루프를 형제 병렬 처리 방식으로 변경
-
-- **Task 021-F: `getProjectBlocks` 페이지네이션 지원** ✅ 완료
-  - ✅ 원인: `blocks.children.list(page_size: 100)` 단일 호출로 100개 초과 블록이 조용히 잘림 — `has_more`·`next_cursor` 무시로 나머지 블록 누락
-  - ✅ 개선: 내부 헬퍼 `fetchAllBlocks()` 추가 — `has_more: true`인 동안 350ms 대기 후 `start_cursor`로 다음 페이지 반복 요청, 전체 블록 누락 없이 수집
-  - ✅ `lib/notion.ts` — `getProjectBlocks()` 단일 호출 3줄 → `fetchAllBlocks()` 호출로 교체, 이후 children 병렬 패칭 구조는 유지
-  - ✅ Playwright 검증: `page_size=5` 강제로 32개 블록 페이지를 7회 분할 패칭 후 전체 렌더링 확인 (page=7, has_more=false, total=32)
