@@ -71,10 +71,11 @@ export default function SetupPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">
-            <span className="font-mono text-primary">&lt;/&gt;</span> 포트폴리오 설정
+            <span className="font-mono text-primary">&lt;/&gt;</span> 포트폴리오 API KEY 설정
           </CardTitle>
           <CardDescription>
-            Notion과 AI 연동을 위한 API 키를 입력해주세요. 키는 브라우저에만 저장됩니다.
+            Notion과 AI 연동을 위한 API 키를 입력해주세요. 
+            키는 브라우저에만 저장됩니다.
           </CardDescription>
         </CardHeader>
         <CardContent>
