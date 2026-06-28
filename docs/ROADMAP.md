@@ -269,7 +269,7 @@
     - ✅ 각 페이지 `generateMetadata` 수정 — `app/(main)/about/page.tsx`의 `"Architecture | 문시현"` 하드코딩 제거(루트 템플릿 자동 조합), `app/(main)/projects/[id]/page.tsx`의 `"${project.title} | 문시현"` 및 404 fallback 하드코딩 동일 처리
     - ✅ 버그 수정: 프로필 저장 후 타이틀 즉시 반영 — ProfileForm handleSubmit에서 router.refresh() 추가. generateMetadata가 서버 사이드 함수라 클라이언트 쿠키 변경에 반응하지 않아 refresh로 루트 레이아웃 재요청 강제
     - ✅ OG 이미지 기본값 설정
-  - Lighthouse 목표: Performance 80점 이상, Accessibility 90점 이상 - 대기
+  - ✅ Lighthouse 목표: Performance 96 / Accessibility 100 / Best Practices 100 / SEO 100 달성
   - Vercel 배포: 환경변수 등록 **불필요** (키는 UI 입력 후 쿠키 관리), 프로덕션 URL 확인 - 대기
   - Playwright MCP 프로덕션 E2E 검증 - 대기:
     - 첫 접속 → `/setup` 리다이렉트 확인
