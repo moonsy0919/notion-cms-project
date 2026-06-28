@@ -24,8 +24,8 @@ export async function generateMetadata(): Promise<Metadata> {
       // 파싱 실패 시 기본값 사용
     }
   }
-  const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
+  const baseUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
     : "http://localhost:3000";
 
   return {
