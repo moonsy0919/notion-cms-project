@@ -268,7 +268,7 @@
     - ✅ title template 동적 이름 반영 — `app/layout.tsx`를 정적 `metadata`에서 async `generateMetadata`로 전환. `developer-profile` 쿠키의 `name` 필드를 읽어 `title.template: '%s | {name}'`, `title.default: '{name} | 포트폴리오'` 반환. 쿠키 미설정 시 "개발자" 기본값
     - ✅ 각 페이지 `generateMetadata` 수정 — `app/(main)/about/page.tsx`의 `"Architecture | 문시현"` 하드코딩 제거(루트 템플릿 자동 조합), `app/(main)/projects/[id]/page.tsx`의 `"${project.title} | 문시현"` 및 404 fallback 하드코딩 동일 처리
     - ✅ 버그 수정: 프로필 저장 후 타이틀 즉시 반영 — ProfileForm handleSubmit에서 router.refresh() 추가. generateMetadata가 서버 사이드 함수라 클라이언트 쿠키 변경에 반응하지 않아 refresh로 루트 레이아웃 재요청 강제
-    - OG 이미지 기본값 설정 - 대기
+    - ✅ OG 이미지 기본값 설정
   - Lighthouse 목표: Performance 80점 이상, Accessibility 90점 이상 - 대기
   - Vercel 배포: 환경변수 등록 **불필요** (키는 UI 입력 후 쿠키 관리), 프로덕션 URL 확인 - 대기
   - Playwright MCP 프로덕션 E2E 검증 - 대기:

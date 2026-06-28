@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/shared/PageHeader";
@@ -6,6 +7,16 @@ import { ProjectCard } from "@/components/projects/ProjectCard";
 import { ProjectFilters } from "@/components/projects/ProjectFilters";
 import { ProjectSearchBar } from "@/components/projects/ProjectSearchBar";
 import { getProjects } from "@/lib/notion";
+
+export const metadata: Metadata = {
+  title: "프로젝트",
+  description: "Notion CMS로 관리하는 개발 프로젝트 목록",
+  openGraph: {
+    title: "프로젝트",
+    description: "Notion CMS로 관리하는 개발 프로젝트 목록",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+  },
+};
 
 interface ProjectsPageProps {
   searchParams: Promise<{ tech?: string; q?: string }>;

@@ -24,12 +24,20 @@ export async function generateMetadata(): Promise<Metadata> {
       // 파싱 실패 시 기본값 사용
     }
   }
+  const baseUrl = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000";
+
   return {
+    metadataBase: new URL(baseUrl),
     title: {
       template: `%s | ${name}`,
       default: `${name} | 포트폴리오`,
     },
     description: "Notion CMS 기반 개인 포트폴리오 웹사이트",
+    openGraph: {
+      images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+    },
   };
 }
 

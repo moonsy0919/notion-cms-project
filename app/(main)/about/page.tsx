@@ -6,6 +6,11 @@ import { MermaidDiagram } from "@/components/architecture/MermaidDiagram";
 export const metadata: Metadata = {
   title: "Architecture",
   description: "포트폴리오 시스템 아키텍처 및 개발 회고",
+  openGraph: {
+    title: "Architecture",
+    description: "포트폴리오 시스템 아키텍처 및 개발 회고",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+  },
 };
 
 const SEQUENCE_DIAGRAM = `
