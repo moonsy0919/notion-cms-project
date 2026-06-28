@@ -195,6 +195,7 @@
   - `(main)/layout.tsx` main 태그 `flex-1 flex flex-col` 추가, `setup/page.tsx` 내부 중복 `min-h-screen` 제거
   - `/admin` 진입 시 `notion-api-key` 쿠키로 `getOwnerProfile()` 조건부 호출 → Notion 아바타 표시, 키 없으면 `null` 폴백
   - **버그 수정**: 오버스크롤 시 흰색 노출 — `<html>`에 `bg-[#080808]` 추가. `body`의 `bg-background`가 정상 스크롤 시 덮고, 오버스크롤 시 `html` 배경(`#080808`)이 노출되어 회로 배경과 시각적 연속성 유지
+  - **버그 수정**: admin 폼 영역에 circuit 선 비침 — `ProfileForm` 래퍼에 `bg-card` 불투명 div 추가. shadcn `Input`의 `bg-input`이 다크 모드에서 `oklch(1 0 0 / 15%)` 반투명값이라 SVG 선이 비쳐 보이는 문제. `setup` 페이지의 `<Card>` 패턴과 동일하게 해결
 
 - **Task 020: 메타데이터 완성 및 프로덕션 배포 검증** ✅
   - ✅ 전역 메타데이터 완성:
