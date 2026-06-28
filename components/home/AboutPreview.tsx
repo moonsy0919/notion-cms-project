@@ -101,7 +101,7 @@ export function AboutPreview() {
         <div className="mt-8">
           <Button variant="ghost" size="sm" asChild>
             <Link href="/about">
-              자세한 소개 보기
+              포트폴리오 웹 구조 보기
               <ArrowRight className="ml-1 h-4 w-4" />
             </Link>
           </Button>
