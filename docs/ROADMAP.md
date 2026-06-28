@@ -101,6 +101,7 @@
 - **Task 006: 개발용 프로젝트 업데이트 버튼 구현** ✅ *(Phase 5에서 폴링 방식으로 전면 재작성됨 — Task 017 참고)*
   - 헤더 우상단 새로고침 버튼 → SSE 스트리밍으로 `fill-notion` 실행 및 실시간 로그 팝업
   - **버그 수정**: Notion `avatar_url` 호스트(`s3-us-west-2.amazonaws.com`)가 `next.config.ts` 미등록 → `next/image` 500 크래시 → 호스트 3개 추가, GitHub 아바타 폴백 처리
+  - **버그 수정**: 아바타 폴백 URL(`AVATAR_FALLBACK`)이 개인 GitHub 계정(`moonsy0919`)에 하드코딩 → `public/github-placeholder.png` 로컬 파일로 교체 (`lib/utils.ts` 상수 변경, 외부 계정 의존 제거)
   - **버그 수정**: Next.js 16 개발 환경 Data Cache로 인해 `revalidatePath` 호출에도 Notion 원본 미반환 → `getProjects()` fetch에 개발/프로덕션 분기 추가(`cache: 'no-store'` / ISR)
 
 - **Task 007: 기술 스택 필터 및 검색 기능 완성** ✅
@@ -304,6 +305,50 @@
 | 리스크 | 내용 | 완화 전략 |
 |:---|:---|:---|
 | Notion `avatar_url` 만료 | `notion.users.list()`가 반환하는 `avatar_url`은 AWS S3 Pre-signed URL로 수 시간 후 만료됨 | `(main)/layout.tsx`에서 매 요청마다 `getOwnerProfile()` 재호출 — 동적 렌더링으로 항상 최신 URL 반영 |
-| Notion API rate limit | `getProjectBlocks()` 재귀 호출 시 3 req/sec 제한 초과 가능 | 재귀 호출 사이 350ms 딜레이 적용 |
+| Notion API rate limit | `getProjectBlocks()` 재귀 호출 시 3 req/sec 제한 초과 가능. 100개 초과 페이지네이션 요청도 동일 제한 적용 | 재귀 호출 사이 350ms 딜레이 적용. `fetchAllBlocks()` 페이지 전환 사이에도 350ms 딜레이 적용 (Task 021-F) |
 | `developer-profile` 쿠키 구조 불일치 | 부분 저장·손상된 쿠키 파싱 시 `skills` 등 중첩 프로퍼티 누락으로 런타임 크래시 | `DEFAULT_PROFILE`과 deep merge로 파싱 — 중첩 프로퍼티도 항상 fallback 보장 |
 | `CircuitBackground` 뷰포트 초과 | `min-h-screen`(100vh)이 Header+Footer가 있는 레이아웃 안에서 사용되면 총 높이 초과 → 스크롤바 → 레이아웃 좌측 쏠림 | `flex-1 flex flex-col`로 교체 — 부모 컨테이너 남은 공간을 채우는 방식. `(onboarding)` 라우트 그룹 분리로 재발 방지 |
+| `router.refresh()` 클라이언트 상태 보존 | `window.location.reload()` 대비 클라이언트 컴포넌트 상태가 초기화되지 않음 → `status` 등 UI 상태 리셋 누락 시 팝업·버튼 상태 영구 잔류 | `router.refresh()` 사용 시 상태 리셋(`setStatus` 등)을 `setTimeout` 콜백에 명시적으로 추가 |
+
+---
+
+## Phase 6: 성능 개선 ✅ 완료
+
+> **이 Phase는 정적 분석(Lighthouse·번들 측정·코드 리뷰)으로 식별된 이슈를 우선순위 순으로 수정합니다.**
+>
+> BYO Key 구조상 `cookies()` 호출에 의한 전면 동적 렌더링은 의도된 설계이므로 수정 대상에서 제외합니다.
+> 불필요한 외부 API 중복 호출, 번들 크기, 렌더링 방식의 비효율을 제거하는 데 집중합니다.
+
+- **Task 021-A: Geist 폰트 2개 제거** ✅ 완료
+  - ✅ 원인: `app/layout.tsx`에서 `Geist`, `Geist_Mono`를 로드하지만 `globals.css`는 `--font-mono: var(--font-jetbrains-mono)` 만 참조. `--font-geist-sans`·`--font-geist-mono` 변수는 어디서도 사용되지 않음
+  - ✅ `app/layout.tsx` — `Geist`, `Geist_Mono` import·변수 선언 제거
+  - ✅ `html` 태그 className에서 `${geistSans.variable} ${geistMono.variable}` 제거
+
+- **Task 021-B: `getOwnerProfile()` 이중 호출 제거** ✅ 완료
+  - ✅ 원인: 홈 요청 1회에 `(main)/layout.tsx`와 `app/(main)/page.tsx` 양쪽에서 `getOwnerProfile()`을 독립 호출 → Notion API 2회 실행
+  - ✅ `HeroSection`·`AboutPreview`는 이미 `useProfile().avatarUrl`을 통해 Context에 접근 가능한 클라이언트 컴포넌트이므로 `page.tsx`의 중복 호출이 불필요
+  - ✅ `app/(main)/page.tsx` — `getOwnerProfile()` 호출 제거, `Promise.all` 단순화
+  - ✅ `components/home/HeroSection.tsx` — `avatarUrl` prop 제거, `useProfile().avatarUrl` 직접 소비
+  - ✅ `components/home/AboutPreview.tsx` — `avatarUrl` prop 제거, `useProfile().avatarUrl` 직접 소비
+
+- **Task 021-C: `getProjectById()` 이중 호출 제거** ✅ 완료
+  - ✅ 원인: 프로젝트 상세 페이지에서 `generateMetadata()`와 `ProjectDetailPage()` 각각 `getProjectById()` 호출 → 같은 요청에 Notion API 2회 실행
+  - ✅ 쿠키 읽기는 `React.cache()`로 이미 중복 제거됐지만 Notion API 호출 자체는 여전히 2회
+  - ✅ `app/(main)/projects/[id]/page.tsx` — `getProjectById`를 `React.cache()`로 래핑한 `getCachedProject` 함수로 교체. `generateMetadata`와 `ProjectDetailPage` 양쪽이 동일 캐시 함수 호출 → Notion API 1회만 실행
+
+- **Task 021-D: `window.location.reload()` → `router.refresh()` 교체** ✅ 완료
+  - ✅ 원인: `UpdateProjectsButton`에서 완료 후 `window.location.reload()` 호출 → JS 번들·폰트·이미지 전부 재요청
+  - ✅ `router.refresh()`는 서버 컴포넌트 데이터만 재요청하고 클라이언트 상태(번들, 이미지 등)는 유지
+  - ✅ `components/shared/UpdateProjectsButton.tsx` — `useRouter` 추가, `window.location.reload()` → `router.refresh()` 교체
+  - **버그 수정**: `router.refresh()`는 클라이언트 컴포넌트 상태를 보존하므로 `status`가 `"done"`으로 영구 유지 → "완료 — 새로고침 중" 팝업이 사라지지 않는 문제 발생 → `setTimeout` 콜백에 `setStatus("idle")` 추가로 1초 후 팝업 자동 소멸 (Playwright MutationObserver로 검증: ms 237 팝업 등장 → ms 1240 팝업 소멸)
+
+- **Task 021-E: 블록 재귀 패칭 병렬화** ✅ 완료
+  - ✅ 원인: `getProjectBlocks()`에서 `has_children: true` 블록을 만날 때마다 350ms 딜레이 후 직렬 재귀 호출. 동일 depth 형제 블록이 N개면 `350ms × N` 누적 지연
+  - ✅ 개선: 같은 depth의 `has_children` 블록들을 먼저 수집 → 단일 350ms 대기 → `Promise.all`로 일괄 패칭 (depth 간 순서는 유지)
+  - ✅ `lib/notion.ts` — `getProjectBlocks()` 내부 루프를 형제 병렬 처리 방식으로 변경
+
+- **Task 021-F: `getProjectBlocks` 페이지네이션 지원** ✅ 완료
+  - ✅ 원인: `blocks.children.list(page_size: 100)` 단일 호출로 100개 초과 블록이 조용히 잘림 — `has_more`·`next_cursor` 무시로 나머지 블록 누락
+  - ✅ 개선: 내부 헬퍼 `fetchAllBlocks()` 추가 — `has_more: true`인 동안 350ms 대기 후 `start_cursor`로 다음 페이지 반복 요청, 전체 블록 누락 없이 수집
+  - ✅ `lib/notion.ts` — `getProjectBlocks()` 단일 호출 3줄 → `fetchAllBlocks()` 호출로 교체, 이후 children 병렬 패칭 구조는 유지
+  - ✅ Playwright 검증: `page_size=5` 강제로 32개 블록 페이지를 7회 분할 패칭 후 전체 렌더링 확인 (page=7, has_more=false, total=32)
