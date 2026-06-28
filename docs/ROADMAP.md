@@ -187,6 +187,7 @@
   - `components/ui/circuit-background.tsx` 신규 — `bg-[#080808]` 항상 다크, `flex-1 flex flex-col` 높이 체인, 4코너 PCB 칩 SVG 장식 (`aria-hidden`, top-left 기준 scaleX/Y 반전으로 3개 재사용)
   - `app/setup/page.tsx`, `app/(onboarding)/admin/page.tsx`에 `CircuitBackground` 적용
   - ⚠️ `(main)` 레이아웃의 Header·Footer가 admin에 노출되는 문제 발생 → Task 019-D에서 수정
+  - **보완**: 배경 전체 PCB 트레이스 패턴 추가 — `BackgroundCircuitSVG`(`viewBox 1440×900`, `preserveAspectRatio slice`) 16개 트레이스·37개 절점으로 화면 전체 커버. 13개 끝점에 teal(`#2a9d8f`) glow 순차 점멸 (`feGaussianBlur` + `@keyframes glowPulse`, 각 끝점 다른 `animation-delay`)
 
 - **Task 019-D: 온보딩 레이아웃 버그 수정** ✅
   - `app/(onboarding)/` 라우트 그룹 신설 — Header·Footer 제거, `DeveloperProfileProvider`만 wrap, `/admin` URL 유지
