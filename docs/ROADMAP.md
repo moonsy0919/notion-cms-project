@@ -42,6 +42,7 @@
 
 - **Task 002-B: 네비게이션 개선** ✅
   - `</>` 아이콘 + 이름 로고, 활성 링크 teal 언더라인(`usePathname` 기반), 모바일 햄버거 메뉴 구현
+  - **버그 수정**: 와이드 화면(1280px+)에서 헤더·푸터 양 사이드 빈 영역 — `Header`·`Footer`의 `Container`에 `className="max-w-none"` 추가로 너비 제한 해제. 페이지 본문 `Container`(`max-w-7xl`)는 유지
 
 - **Task 002-C: Hero 섹션 2컬럼 레이아웃 재구현** ✅
   - `HeroSection.tsx` 신규 — 좌(소개·CTA)·우(아바타+코드 에디터) 2컬럼, 모바일 우측 컬럼 숨김
