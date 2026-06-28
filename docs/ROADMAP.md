@@ -242,7 +242,8 @@
   - ✅ **`app/(onboarding)/` 라우트 그룹 신설**
     - `app/(onboarding)/layout.tsx` — `DeveloperProfileProvider`만 wrap, Header·Footer 없음
     - `app/(main)/admin/` → `app/(onboarding)/admin/` 이동 — `/admin` URL은 동일 유지
-    - 온보딩 컨텍스트: `avatarUrl=null`, `githubUrl=null` (온보딩 중 Notion API 호출 불필요)
+    - `githubUrl=null` 고정 (온보딩 중 GitHub API 호출 불필요)
+    - `notion-api-key` 쿠키 존재 시 `getOwnerProfile()` 호출 → `avatarUrl` 취득, 없으면 `null` 폴백
 
   - ✅ **`CircuitBackground` 높이 로직 수정 (`min-h-screen` → `flex-1`)**
     - `relative min-h-screen` → `relative flex-1 flex flex-col` — 부모 컨테이너 크기를 채우도록 변경
@@ -255,6 +256,11 @@
 
   - ✅ **`setup/page.tsx` 내부 div 수정**
     - `flex min-h-screen items-center` → `flex flex-1 items-center` — 중복 min-h-screen 제거
+
+  - ✅ **`/admin` 페이지 Notion 아바타 연동**
+    - 기존 `avatarUrl={null}` 고정 → `/setup`에서 저장된 `notion-api-key` 쿠키로 `getOwnerProfile()` 조건부 호출
+    - `/admin` 진입 시 ProfileForm 상단에 GitHub 기본 아이콘 대신 실제 Notion 프로필 사진 표시
+    - API 키 없거나 호출 실패 시 `null` 폴백(기본 아이콘) — 크래시 없음
 
 - **Task 020: 메타데이터 완성 및 프로덕션 배포 검증** - 진행중
   - 전역 메타데이터 완성:

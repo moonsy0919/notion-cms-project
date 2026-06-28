@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { DeveloperProfileProvider } from "@/contexts/DeveloperProfileContext";
+import { getOwnerProfile } from "@/lib/notion";
 import { DEFAULT_PROFILE } from "@/types/profile";
 import type { DeveloperProfile } from "@/types/profile";
 
@@ -11,6 +12,8 @@ export default async function OnboardingLayout({
 }) {
   const cookieStore = await cookies();
   const raw = cookieStore.get("developer-profile")?.value;
+  const apiKey = cookieStore.get("notion-api-key")?.value ?? "";
+
   let initialProfile: DeveloperProfile = DEFAULT_PROFILE;
   if (raw) {
     try {
@@ -25,10 +28,16 @@ export default async function OnboardingLayout({
     }
   }
 
+  // /setup에서 저장된 notion-api-key로 Notion 아바타 취득
+  const ownerProfile = apiKey
+    ? await getOwnerProfile(apiKey).catch(() => null)
+    : null;
+  const avatarUrl = ownerProfile?.avatarUrl ?? null;
+
   return (
     <DeveloperProfileProvider
       initialProfile={initialProfile}
-      avatarUrl={null}
+      avatarUrl={avatarUrl}
       githubUrl={null}
     >
       {children}
