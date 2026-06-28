@@ -4,6 +4,8 @@ Notion을 CMS로 활용하여 프로젝트 경험과 기술 역량을 보여주�
 GitHub URL 하나만 입력하면 Claude AI가 자동으로 분석해 Notion DB에 프로젝트 정보를 채워줍니다.
 API 키는 브라우저 UI에서 직접 입력하며, 서버 환경변수나 별도 인프라 없이 Vercel Hobby 플랜에 바로 배포할 수 있습니다.
 
+![Lighthouse Performance](https://img.shields.io/badge/Performance-96-brightgreen) ![Lighthouse Accessibility](https://img.shields.io/badge/Accessibility-100-brightgreen) ![Lighthouse Best Practices](https://img.shields.io/badge/Best%20Practices-100-brightgreen) ![Lighthouse SEO](https://img.shields.io/badge/SEO-100-brightgreen)
+
 ## 기술 스택
 
 - **Framework**: Next.js 16 (App Router), TypeScript
@@ -55,6 +57,9 @@ Notion DB에 GitHub URL을 추가한 뒤 헤더의 새로고침 버튼을 누르
 
 ```bash
 # .env.local에 NOTION_API_KEY, NOTION_DATABASE_ID, ANTHROPIC_API_KEY 설정 필요 (로컬 전용)
+# .env.local.example을 복사해 사용하세요
+cp .env.local.example .env.local
+
 npm run fill-notion                                          # 대기 중인 모든 페이지 처리
 npm run fill-notion -- --url https://github.com/owner/repo  # 단일 URL 모드
 ```
@@ -64,6 +69,7 @@ npm run fill-notion -- --url https://github.com/owner/repo  # 단일 URL 모드
 ```bash
 npm run dev      # 개발 서버 실행 (Turbopack, http://localhost:3000)
 npm run build    # 프로덕션 빌드
+npm start        # 프로덕션 서버 실행
 npm run lint     # ESLint 검사
 npm run check    # TypeScript 타입 오류 확인
 ```
@@ -73,6 +79,10 @@ npm run check    # TypeScript 타입 오류 확인
 ```
 app/
 ├── layout.tsx                  # 루트: ThemeProvider + body flex-col
+├── opengraph-image.tsx         # 정적 OG 이미지 (소셜 공유용, CDN 캐시)
+├── setup/
+│   ├── layout.tsx              # /setup 전용 OG 메타데이터
+│   └── page.tsx                # API 키 입력 온보딩 (첫 진입점)
 ├── (main)/                     # 포트폴리오 페이지 (Header + Footer 포함)
 │   ├── layout.tsx              # DeveloperProfileProvider, Notion 아바타 주입
 │   ├── page.tsx                # 홈 (Hero + 최근 프로젝트 + About 프리뷰)
@@ -82,8 +92,7 @@ app/
 │   └── about/page.tsx          # Architecture 페이지 (Mermaid 다이어그램)
 ├── (onboarding)/               # 온보딩 페이지 (Header·Footer 없음)
 │   ├── layout.tsx              # DeveloperProfileProvider만 제공
-│   └── admin/page.tsx          # 개발자 프로필 설정
-├── setup/page.tsx              # API 키 입력 (첫 진입점)
+│   └── admin/page.tsx          # 개발자 프로필 설정 (회로기판 배경 테마)
 └── api/
     ├── auth/setup/route.ts     # API 키 검증 + 쿠키 설정
     ├── auth/logout/route.ts    # 쿠키 일괄 만료
@@ -102,15 +111,19 @@ lib/
 └── ...
 scripts/                        # 로컬 전용 CLI (Vercel 빌드 제외)
 └── github-to-notion.ts
+public/
+└── robots.txt                  # 크롤러 접근 허용 설정
 ```
 
 ## Vercel 배포
 
 환경변수 설정 없이 바로 배포 가능합니다. API 키는 UI 온보딩에서 입력합니다.
 
-```bash
-vercel deploy
-```
+1. [vercel.com](https://vercel.com)에서 GitHub 저장소를 Import
+2. 빌드 설정은 Next.js 자동 감지 — 별도 수정 불필요
+3. **환경변수 등록 없이** 배포 클릭
+
+배포 후 발급된 URL에 접속하면 `/setup` 온보딩 페이지로 이동합니다.
 
 ## 문서
 
