@@ -157,33 +157,72 @@ export async function getProjectById(apiKey: string, id: string): Promise<Projec
 
 /**
  * 프로젝트 Notion 페이지의 블록 콘텐츠를 재귀적으로 조회합니다.
- * Notion API rate limit(3 req/sec) 대응을 위해 재귀 호출 사이 350ms 딜레이를 적용합니다.
+ * 같은 depth의 has_children 블록들을 Promise.all로 병렬 패칭하고,
+ * depth 전환 시에만 350ms 딜레이를 1회 적용합니다.
+ * (기존: 블록마다 350ms × N 직렬 → 개선: depth당 350ms × 1)
  */
+/**
+ * 주어진 블록 ID의 하위 블록 전체를 페이지네이션으로 수집합니다.
+ * has_more가 true인 경우 350ms 대기 후 다음 페이지를 요청합니다.
+ */
+async function fetchAllBlocks(
+  notion: Client,
+  blockId: string
+): Promise<BlockObjectResponse[]> {
+  const all: BlockObjectResponse[] = [];
+  let cursor: string | undefined;
+
+  do {
+    const response = await notion.blocks.children.list({
+      block_id: blockId,
+      page_size: 100,
+      ...(cursor ? { start_cursor: cursor } : {}),
+    });
+
+    all.push(
+      ...response.results.filter((b): b is BlockObjectResponse => "type" in b)
+    );
+
+    if (response.has_more && response.next_cursor) {
+      cursor = response.next_cursor;
+      await new Promise((resolve) => setTimeout(resolve, 350));
+    } else {
+      cursor = undefined;
+    }
+  } while (cursor);
+
+  return all;
+}
+
 export async function getProjectBlocks(
   apiKey: string,
   pageId: string
 ): Promise<BlockWithChildren[]> {
   const notion = new Client({ auth: apiKey });
-  const response = await notion.blocks.children.list({
-    block_id: pageId,
-    page_size: 100,
-  });
+  const blocks = await fetchAllBlocks(notion, pageId);
 
-  const blocks = response.results.filter(
-    (b): b is BlockObjectResponse => "type" in b
+  const blocksWithChildren = blocks.filter((b) => b.has_children);
+
+  // 같은 depth에 children이 있는 블록이 하나라도 있으면 딜레이 1회만 적용
+  if (blocksWithChildren.length > 0) {
+    await new Promise((resolve) => setTimeout(resolve, 350));
+  }
+
+  // 같은 depth의 children을 병렬로 패칭
+  const childrenMap = new Map<string, BlockWithChildren[]>();
+  await Promise.all(
+    blocksWithChildren.map(async (block) => {
+      const children = await getProjectBlocks(apiKey, block.id);
+      childrenMap.set(block.id, children);
+    })
   );
 
-  const result: BlockWithChildren[] = [];
-  for (const block of blocks) {
-    if (block.has_children) {
-      await new Promise((resolve) => setTimeout(resolve, 350));
-      const children = await getProjectBlocks(apiKey, block.id);
-      result.push({ ...block, children });
-    } else {
-      result.push(block);
-    }
-  }
-  return result;
+  // 원래 순서 유지하며 children 병합
+  return blocks.map((block) =>
+    block.has_children
+      ? { ...block, children: childrenMap.get(block.id) ?? [] }
+      : block
+  );
 }
 
 /** Notion Integration 소유자 프로필 */
