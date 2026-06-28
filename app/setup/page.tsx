@@ -67,7 +67,7 @@ export default function SetupPage() {
 
   return (
     <CircuitBackground>
-    <div className="flex flex-1 items-center justify-center px-4">
+    <main className="flex flex-1 items-center justify-center px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">
@@ -156,7 +156,7 @@ export default function SetupPage() {
           </form>
         </CardContent>
       </Card>
-    </div>
+    </main>
     </CircuitBackground>
   );
 }
