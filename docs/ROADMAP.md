@@ -211,6 +211,7 @@
     - `/opengraph-image` 다크 코드 에디터 테마 이미지 정상 렌더링 확인
     - `/robots.txt` 크롤러 차단 없이 정상 응답 확인
     - 타이틀 `포트폴리오 시작하기 | 개발자` 정상 출력 확인
+  - **버그 수정**: Discord 등 SNS 공유 시 OG 이미지 로드 실패 — `metadataBase`를 `VERCEL_URL`(배포별 임시 URL)에서 `VERCEL_PROJECT_PRODUCTION_URL`(프로젝트 고정 도메인)로 교체. 도메인 변경(`notion-cms-project-delta-azure` → `notion-autofolio`) 후 `og:image`가 구 도메인을 가리켜 SNS 스크래퍼의 리다이렉트 미추종으로 이미지 미표시
 
 ---
 
