@@ -57,7 +57,7 @@ export default async function MainLayout({
   return (
     <DeveloperProfileProvider initialProfile={initialProfile} avatarUrl={avatarUrl} githubUrl={githubUrl}>
       <Header />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 flex flex-col">{children}</main>
       <Footer />
     </DeveloperProfileProvider>
   );

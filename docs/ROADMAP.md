@@ -225,7 +225,7 @@
   - ✅ **3단계: `app/(main)/admin/page.tsx` 수정**
     - 기존 최상단 래퍼 `<div className="py-8">` 를 `<CircuitBackground>` 로 교체
     - `Container` · `PageHeader` · `ProfileForm` 내용물 변경 없음
-    - `(main)` 레이아웃의 Header · Footer 유지 — 회로 배경은 header 아래 콘텐츠 영역에만 적용
+    - ⚠️ 이 시점에 `(main)` 레이아웃의 Header · Footer가 admin에 노출되는 문제가 발생 → Task 019-D에서 수정
 
   - **검증 기준**
     - ✅ `/setup` 전체 화면 검정 배경 + 4개 코너 회로 장식 표시
@@ -233,6 +233,28 @@
     - ✅ 라이트 모드 전환 시에도 두 페이지는 항상 다크 배경 유지
     - ✅ 기존 폼 입력 · 제출 · 에러 표시 기능 회귀 없음
     - ✅ 모바일 뷰포트(375px)에서 코너 장식 카드와 겹침 없음 확인
+
+- **Task 019-D: 온보딩 레이아웃 버그 수정** ✅
+
+  > Task 019-C에서 admin 페이지에 Header·Footer가 노출되는 문제와 CircuitBackground의
+  > `min-h-screen`이 Header+Footer 높이를 포함해 뷰포트를 초과하던 레이아웃 버그를 수정합니다.
+
+  - ✅ **`app/(onboarding)/` 라우트 그룹 신설**
+    - `app/(onboarding)/layout.tsx` — `DeveloperProfileProvider`만 wrap, Header·Footer 없음
+    - `app/(main)/admin/` → `app/(onboarding)/admin/` 이동 — `/admin` URL은 동일 유지
+    - 온보딩 컨텍스트: `avatarUrl=null`, `githubUrl=null` (온보딩 중 Notion API 호출 불필요)
+
+  - ✅ **`CircuitBackground` 높이 로직 수정 (`min-h-screen` → `flex-1`)**
+    - `relative min-h-screen` → `relative flex-1 flex flex-col` — 부모 컨테이너 크기를 채우도록 변경
+    - 내부 `relative z-10` → `relative z-10 flex-1 flex flex-col` — 높이 체인 전달
+    - `/setup`: body(flex-col 100vh) → CircuitBackground(flex-1=100vh) → 카드 수직 중앙 ✓
+    - `/admin`: body(flex-col 100vh) → CircuitBackground(flex-1=뷰포트 전체) ✓
+
+  - ✅ **`(main)/layout.tsx` main 태그 수정**
+    - `flex-1` → `flex-1 flex flex-col` — 포트폴리오 페이지에서 높이 전달 가능하도록 (기존 레이아웃 회귀 없음)
+
+  - ✅ **`setup/page.tsx` 내부 div 수정**
+    - `flex min-h-screen items-center` → `flex flex-1 items-center` — 중복 min-h-screen 제거
 
 - **Task 020: 메타데이터 완성 및 프로덕션 배포 검증** - 진행중
   - 전역 메타데이터 완성:
@@ -269,6 +291,7 @@
 - **Notion API 직접 fetch**: SDK v5에서 `databases.query`가 제거됨에 따라 `getProjects()`는 REST API를 `fetch`로 직접 호출(`/v1/databases/{id}/query`). `pages.retrieve`·`blocks.children.list`는 SDK Client 사용
 - **BYO Key 쿠키 관리**: NOTION_API_KEY, NOTION_DATABASE_ID, ANTHROPIC_API_KEY는 환경변수 대신 UI 입력 후 httpOnly 쿠키로 관리. 환경변수 없는 Vercel Hobby 배포 가능
 - **자동화 스크립트 분리**: `scripts/` 폴더의 GitHub → Notion 자동화 CLI는 배포 앱과 완전히 분리된 로컬 개발 도구. `tsconfig.json`의 `exclude`로 Vercel 빌드 범위에서 제외
+- **라우트 그룹 분리**: `(main)` — Header·Footer 포함, 포트폴리오 페이지 전용. `(onboarding)` — Header·Footer 없음, DeveloperProfileProvider만 제공, `/setup`·`/admin` 온보딩 페이지 전용. 루트 레이아웃은 ThemeProvider·body flex-col만 담당
 
 ## 리스크 및 기술 이슈
 
@@ -277,3 +300,4 @@
 | Notion `avatar_url` 만료 | `notion.users.list()`가 반환하는 `avatar_url`은 AWS S3 Pre-signed URL로 수 시간 후 만료됨 | `(main)/layout.tsx`에서 매 요청마다 `getOwnerProfile()` 재호출 — 동적 렌더링으로 항상 최신 URL 반영 |
 | Notion API rate limit | `getProjectBlocks()` 재귀 호출 시 3 req/sec 제한 초과 가능 | 재귀 호출 사이 350ms 딜레이 적용 |
 | `developer-profile` 쿠키 구조 불일치 | 부분 저장·손상된 쿠키 파싱 시 `skills` 등 중첩 프로퍼티 누락으로 런타임 크래시 | `DEFAULT_PROFILE`과 deep merge로 파싱 — 중첩 프로퍼티도 항상 fallback 보장 |
+| `CircuitBackground` 뷰포트 초과 | `min-h-screen`(100vh)이 Header+Footer가 있는 레이아웃 안에서 사용되면 총 높이 초과 → 스크롤바 → 레이아웃 좌측 쏠림 | `flex-1 flex flex-col`로 교체 — 부모 컨테이너 남은 공간을 채우는 방식. `(onboarding)` 라우트 그룹 분리로 재발 방지 |

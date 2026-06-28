@@ -56,13 +56,13 @@ function CornerSVG({ className, style }: { className?: string; style?: CSSProper
 /** 온보딩 페이지용 회로기판 테마 배경 wrapper — 라이트/다크 무관 항상 다크 적용 */
 export function CircuitBackground({ children }: { children: ReactNode }) {
   return (
-    <div className="relative min-h-screen bg-[#080808]">
+    <div className="relative flex-1 flex flex-col bg-[#080808]">
       <CornerSVG className="top-0 left-0" />
       <CornerSVG className="top-0 right-0" style={{ transform: "scaleX(-1)" }} />
       <CornerSVG className="bottom-0 left-0" style={{ transform: "scaleY(-1)" }} />
       <CornerSVG className="bottom-0 right-0" style={{ transform: "scale(-1)" }} />
 
-      <div className="relative z-10">{children}</div>
+      <div className="relative z-10 flex-1 flex flex-col">{children}</div>
     </div>
   );
 }

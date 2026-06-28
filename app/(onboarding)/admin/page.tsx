@@ -10,7 +10,6 @@ export const metadata: Metadata = {
   title: "프로필 설정 | 관리자",
 };
 
-/** 폼 초기 빈 값 — 첫 온보딩 시 placeholder만 보이도록 */
 const EMPTY_PROFILE: DeveloperProfile = {
   name: "",
   role: "",
