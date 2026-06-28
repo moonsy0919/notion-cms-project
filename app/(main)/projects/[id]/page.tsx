@@ -18,6 +18,9 @@ const getApiKey = cache(async () => {
   return cookieStore.get("notion-api-key")?.value ?? "";
 });
 
+/** 동일 요청 내 getProjectById를 한 번만 실행하도록 캐시 — generateMetadata·페이지 컴포넌트 공유 */
+const getCachedProject = cache(getProjectById);
+
 interface ProjectDetailPageProps {
   params: Promise<{ id: string }>;
 }
@@ -42,7 +45,7 @@ export async function generateMetadata({
 }: ProjectDetailPageProps): Promise<Metadata> {
   const { id } = await params;
   const apiKey = await getApiKey();
-  const project = await getProjectById(apiKey, id);
+  const project = await getCachedProject(apiKey, id);
   if (!project) {
     return { title: "프로젝트를 찾을 수 없습니다" };
   }
@@ -62,7 +65,7 @@ export default async function ProjectDetailPage({
   const { id } = await params;
   const apiKey = await getApiKey();
 
-  const project = await getProjectById(apiKey, id);
+  const project = await getCachedProject(apiKey, id);
   if (!project) notFound();
 
   const blocks = await getProjectBlocks(apiKey, id);

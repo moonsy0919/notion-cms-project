@@ -13,12 +13,8 @@ import { useProfile } from "@/contexts/DeveloperProfileContext";
  * 좌: 바이오 카드(monospace), 우: 프로필 사진(tilt + teal border)
  * 하단: 기술 카테고리 태그 행
  */
-interface AboutPreviewProps {
-  avatarUrl?: string;
-}
-
-export function AboutPreview({ avatarUrl }: AboutPreviewProps) {
-  const { profile } = useProfile();
+export function AboutPreview() {
+  const { profile, avatarUrl } = useProfile();
 
   const techCategories = [
     { label: "Frontend", items: profile.skills.frontend },

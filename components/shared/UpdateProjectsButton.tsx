@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { RefreshCw, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -13,6 +14,7 @@ export function UpdateProjectsButton() {
 }
 
 function UpdateButton() {
+  const router = useRouter();
   const [status, setStatus] = useState<Status>("idle");
   const [logs, setLogs] = useState<string[]>([]);
 
@@ -48,7 +50,10 @@ function UpdateButton() {
 
         if (data.done) {
           setStatus("done");
-          setTimeout(() => window.location.reload(), 1000);
+          setTimeout(() => {
+            router.refresh();
+            setStatus("idle");
+          }, 1000);
           return;
         }
       }
