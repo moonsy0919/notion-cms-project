@@ -194,6 +194,7 @@
   - `CircuitBackground` `min-h-screen` → `flex-1 flex flex-col` — Header+Footer 포함 레이아웃에서 뷰포트 초과 방지
   - `(main)/layout.tsx` main 태그 `flex-1 flex flex-col` 추가, `setup/page.tsx` 내부 중복 `min-h-screen` 제거
   - `/admin` 진입 시 `notion-api-key` 쿠키로 `getOwnerProfile()` 조건부 호출 → Notion 아바타 표시, 키 없으면 `null` 폴백
+  - **버그 수정**: 오버스크롤 시 흰색 노출 — `<html>`에 `bg-[#080808]` 추가. `body`의 `bg-background`가 정상 스크롤 시 덮고, 오버스크롤 시 `html` 배경(`#080808`)이 노출되어 회로 배경과 시각적 연속성 유지
 
 - **Task 020: 메타데이터 완성 및 프로덕션 배포 검증** ✅
   - ✅ 전역 메타데이터 완성:
