@@ -27,7 +27,7 @@
 > 왜 이 순서인가? 여러 페이지에서 공유되는 컴포넌트와 더미 데이터를 먼저 확정해야 핵심·추가 기능 개발 시 중복 구현이 없습니다. 이 단계의 결과물(ProjectCard, ProjectFilters 등)은 Phase 3·4 전반에서 재사용됩니다.
 
 - **Task 002: 더미 데이터 및 공통 프로젝트 컴포넌트 구축** ✅
-  - 더미 프로젝트 5개(`lib/dummy.ts`), `ProjectCard`·`ProjectFilters`·`ProjectSearchBar` 구현
+  - 더미 프로젝트 5개(`lib/dummy.ts`), `ProjectCard`·`ProjectFilters`·`ProjectSearchBar` 구현 *(Phase 3 Notion 연동 완료 후 `lib/dummy.ts` 삭제)*
   - 기존 인라인 카드 코드를 공통 컴포넌트로 교체
 
 ---
