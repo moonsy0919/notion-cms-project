@@ -40,7 +40,9 @@ export default async function AdminPage() {
             description="홈 화면과 소개 섹션에 표시될 정보를 입력하세요."
             className="mb-8"
           />
-          <ProfileForm initialProfile={initialProfile} />
+          <div className="rounded-2xl border border-border/50 bg-card p-6 shadow-2xl">
+            <ProfileForm initialProfile={initialProfile} />
+          </div>
         </Container>
       </div>
     </CircuitBackground>

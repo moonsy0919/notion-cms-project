@@ -171,7 +171,7 @@ export function ProfileForm({ initialProfile, onSuccess, onCancel }: ProfileForm
               id="role"
               value={formData.role}
               onChange={(e) => updateField("role", e.target.value)}
-              placeholder="Frontend Developer"
+              placeholder="Developer"
               required
             />
           </div>
