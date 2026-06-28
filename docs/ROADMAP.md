@@ -118,7 +118,7 @@
 
 ---
 
-## Phase 5: BYO Key 포트폴리오 + Vercel Hobby 배포
+## Phase 5: BYO Key 포트폴리오 + Vercel Hobby 배포 ✅ 완료
 
 > Phase 4.5의 JWT 인증 게이트 대신 BYO Key(Bring Your Own Key) 구조로 전환합니다.
 > Vercel Hobby 플랜 60초 제한 안에서 AI 채우기 파이프라인을 실행하기 위해 SSE → 폴링 방식으로 전환합니다.
@@ -194,23 +194,19 @@
   - `(main)/layout.tsx` main 태그 `flex-1 flex flex-col` 추가, `setup/page.tsx` 내부 중복 `min-h-screen` 제거
   - `/admin` 진입 시 `notion-api-key` 쿠키로 `getOwnerProfile()` 조건부 호출 → Notion 아바타 표시, 키 없으면 `null` 폴백
 
-- **Task 020: 메타데이터 완성 및 프로덕션 배포 검증** - 진행중
-  - 전역 메타데이터 완성:
-    - ✅ title template 동적 이름 반영 — `app/layout.tsx`를 async `generateMetadata`로 전환. `developer-profile` 쿠키의 `name` 필드로 `title.template`·`title.default` 동적 생성, 쿠키 미설정 시 "개발자" 기본값
-    - ✅ 각 페이지 하드코딩 제거 — `"Architecture | 문시현"`, `"${project.title} | 문시현"` 등 루트 템플릿 자동 조합으로 교체
-    - ✅ 버그 수정: 프로필 저장 후 타이틀 즉시 반영 — `ProfileForm` handleSubmit에서 `router.refresh()` 추가
-    - ✅ OG 이미지 기본값 설정
-      - `app/opengraph-image.tsx` 신규 — 다크 코드 에디터 테마, 정적 생성(CDN 캐시, `cookies()` 미사용)
-      - `app/setup/layout.tsx` 신규 — `/setup`은 `"use client"`라 `metadata` 직접 export 불가, layout에서 위임
-      - `proxy.ts` — `/opengraph-image`·`/robots.txt` PUBLIC_PATHS 추가 (크롤러 307 차단 방지)
-      - 루트 `app/layout.tsx` — `metadataBase` 설정, 각 페이지 `openGraph.images` 명시
+- **Task 020: 메타데이터 완성 및 프로덕션 배포 검증** ✅
+  - ✅ 전역 메타데이터 완성:
+    - title template 동적 이름 반영 — `developer-profile` 쿠키의 `name` 필드로 `title.template`·`title.default` 동적 생성
+    - 각 페이지 하드코딩 제거 — 루트 템플릿 자동 조합으로 교체
+    - 버그 수정: 프로필 저장 후 타이틀 즉시 반영 — `ProfileForm` handleSubmit에서 `router.refresh()` 추가
+    - OG 이미지 기본값 설정 — `app/opengraph-image.tsx` 신규(CDN 캐시), `app/setup/layout.tsx` 신규, `metadataBase` 설정, PUBLIC_PATHS 등록
   - ✅ Lighthouse 목표: Performance 96 / Accessibility 100 / Best Practices 100 / SEO 100 달성
-  - Vercel 배포: 환경변수 등록 **불필요** (키는 UI 입력 후 쿠키 관리), 프로덕션 URL 확인 - 대기
-  - Playwright MCP 프로덕션 E2E 검증 - 대기:
-    - 첫 접속 → `/setup` 리다이렉트 확인
-    - 키 입력 → 포트폴리오 로드, 실제 Notion 데이터 표시 확인
-    - Notion에 GitHub URL 추가 → 새로고침 버튼 폴링 → 완료 후 카드 추가 확인
-    - 로그아웃 → `/setup` 이동, 직접 URL 접속 시 재리다이렉트 확인
+  - ✅ Vercel 배포 완료 — `https://notion-cms-project-delta-azure.vercel.app` (환경변수 등록 없이 배포)
+  - ✅ Playwright MCP 프로덕션 E2E 검증:
+    - `/` → `/setup` 리다이렉트, `/projects`·`/about` 직접 접근도 동일 리다이렉트 확인
+    - `/opengraph-image` 다크 코드 에디터 테마 이미지 정상 렌더링 확인
+    - `/robots.txt` 크롤러 차단 없이 정상 응답 확인
+    - 타이틀 `포트폴리오 시작하기 | 개발자` 정상 출력 확인
 
 ---
 
