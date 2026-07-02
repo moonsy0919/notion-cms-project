@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { getPendingPages } from "@/lib/fill-notion/notion-updater";
 import { fetchGithubRepoData } from "@/lib/fill-notion/github";
 import { analyzeRepo } from "@/lib/fill-notion/ai-analyzer";
-import { updatePageProperties, appendPageBlocks } from "@/lib/fill-notion/notion-updater";
+import { updatePageProperties, appendPageBlocks, appendUserFlowBlock } from "@/lib/fill-notion/notion-updater";
 
 export const maxDuration = 60;
 
@@ -33,6 +33,7 @@ export async function POST() {
 
     await updatePageProperties(page.pageId, analyzed, notionApiKey);
     await appendPageBlocks(page.pageId, analyzed.blocks, notionApiKey);
+    await appendUserFlowBlock(page.pageId, analyzed.userFlow, notionApiKey);
   } catch (err) {
     const message = err instanceof Error ? err.message : "알 수 없는 오류";
     return NextResponse.json({ error: message }, { status: 500 });

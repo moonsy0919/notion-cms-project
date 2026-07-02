@@ -55,7 +55,7 @@ export async function generateMetadata({
     openGraph: {
       title: project.title,
       description: project.description,
-      images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+      images: [{ url: `/api/project-flow/${project.id}`, width: 1200, height: 630 }],
     },
   };
 }
@@ -158,6 +158,19 @@ export default async function ProjectDetailPage({
                 </Button>
               )}
             </div>
+          </div>
+
+          {/* 사용자 흐름 이미지 */}
+          <div className="mb-8">
+            <p className="font-mono text-xs text-muted-foreground mb-3">
+              {"// 사용 흐름"}
+            </p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`/api/project-flow/${project.id}`}
+              alt={`${project.title} 사용 흐름`}
+              className="w-full rounded-xl border border-border"
+            />
           </div>
 
           {/* 구분선 */}
