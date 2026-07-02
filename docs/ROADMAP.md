@@ -336,6 +336,21 @@
 
 ---
 
+## Phase 12: Vercel 타임아웃 수정 ✅ 완료
+
+> Vercel Hobby 플랜 60초 제한 내에서 `/api/update-projects`가 안정적으로 동작하도록 수정합니다.
+> `lib/fill-notion/` 공유 모듈에 선택적 파라미터를 추가해 Vercel 배포와 로컬 CLI가 각각 최적값을 사용하도록 합니다.
+
+- **Task 030: GitHub 수집 토큰 예산 및 Claude max_tokens 파라미터화** ✅
+  - **원인**: `fetchSourceFiles`가 TOKEN_BUDGET=20,000으로 ~13개 파일을 순차 수집(~6s) + Claude 프롬프트 25,000자로 응답 생성(~40-50s) → 합계 ~55s로 60초 제한 초과
+  - ✅ `lib/fill-notion/github.ts` — `fetchSourceFiles`에 `tokenBudget = 20_000` 기본값 파라미터 추가, `fetchGithubRepoData`에 `options?: { tokenBudget?: number }` 추가
+  - ✅ `lib/fill-notion/ai-analyzer.ts` — `callClaudeApi`에 `maxTokens = 8_192` 기본값 파라미터 추가, `analyzeRepo`에 `options?: { maxTokens?: number }` 추가
+  - ✅ `app/api/update-projects/route.ts` — `tokenBudget: 5_000`, `maxTokens: 4_096` 주입 (Vercel 전용 축소값)
+  - `scripts/github-to-notion.ts` 미수정 — 기본값 유지(20,000 / 8,192), 로컬 CLI 품질 저하 없음
+  - **예상 개선**: GitHub API 호출 ~13회 → ~4회, 총 소요 시간 ~55s → ~25-30s
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |
