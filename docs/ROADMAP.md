@@ -320,6 +320,20 @@
 
 ---
 
+## Phase 11: Welcome 랜딩 페이지 ✅ 완료
+
+> `/setup` 진입 전에 모던한 애니메이션 랜딩 페이지를 추가합니다.
+> 포트폴리오 카드들이 반원호를 그리며 천천히 회전하고, 하단에 "시작하기" CTA 버튼을 배치합니다.
+>
+> **흐름 변경**: (미인증) → `/welcome` → `/setup` → `/admin` → `/`
+
+- **Task 029: Welcome 랜딩 페이지 구현** ✅
+  - ✅ `proxy.ts` — `/welcome` PUBLIC_PATHS 추가, 미인증 리다이렉트 대상 `/setup` → `/welcome` 변경, 인증 완료 시 `/welcome` → `/` 리다이렉트 추가
+  - ✅ `app/globals.css` — `@keyframes arc-spin` (60s 360° 회전) + `@media (prefers-reduced-motion)` 정지 추가
+  - ✅ `app/(onboarding)/welcome/page.tsx` 신규 — 7개 프로젝트 카드 반원호(radius 320px) 배치, 각도 -150°~90° (40° 간격), 각 카드 접선 방향 기울기. 브라우저 윈도우 스타일(accent 바 + dots) 카드. "시작하기" CTA → `/setup`
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |

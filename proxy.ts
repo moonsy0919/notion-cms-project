@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 /** 인증 없이 접근 가능한 경로 */
-const PUBLIC_PATHS = ["/setup", "/api/auth/setup", "/api/auth/logout", "/api/project-flow", "/opengraph-image", "/robots.txt"];
+const PUBLIC_PATHS = ["/welcome", "/setup", "/api/auth/setup", "/api/auth/logout", "/api/project-flow", "/opengraph-image", "/robots.txt"];
 
 export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -16,7 +16,7 @@ export function proxy(req: NextRequest) {
 
   // API Key 미설정 → /setup으로 리다이렉트 (공개 경로는 제외)
   if (!hasApiKey && !isPublic) {
-    return NextResponse.redirect(new URL("/setup", req.url));
+    return NextResponse.redirect(new URL("/welcome", req.url));
   }
 
   // API Key 있음 + 프로필 미설정 → /admin으로 리다이렉트
@@ -26,7 +26,7 @@ export function proxy(req: NextRequest) {
   }
 
   // 온보딩 완료 후 /setup 또는 /admin 직접 접근 → 홈으로 리다이렉트
-  if (hasApiKey && hasProfile && (pathname === "/setup" || pathname === "/admin")) {
+  if (hasApiKey && hasProfile && (pathname === "/welcome" || pathname === "/setup" || pathname === "/admin")) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
