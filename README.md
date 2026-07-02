@@ -19,7 +19,7 @@ API 키는 브라우저 UI에서 직접 입력하며, 서버 환경변수나 별
 
 - **Welcome 랜딩 페이지**: 9개 포트폴리오 카드 회전 애니메이션 시작 화면
 - **BYO Key 온보딩**: Notion·Anthropic·GitHub API 키를 UI에서 직접 입력, httpOnly 쿠키로 안전하게 저장
-- **GitHub → Notion 자동 채우기**: GitHub URL 입력 → Claude AI 분석 → Notion DB 속성·본문 자동 생성
+- **GitHub → Notion 자동 채우기**: GitHub URL 입력 → Claude AI 분석 → Notion DB 속성·본문 자동 생성, 단계별 실시간 진행 상황 바 (GitHub 수집 → Claude AI 분석 → Notion 저장) 및 완료된 프로젝트 목록 표시
 - **Notion 연동 프로젝트 목록**: 기술 스택 필터 + 키워드 검색, URL 파라미터 기반 상태 관리
 - **프로젝트 상세 페이지**: Notion 블록 재귀 렌더링 (heading·paragraph·list·code·quote 등 지원)
 - **개발자 프로필 설정**: 이름·역할·기술 스택을 입력하면 홈 화면에 즉시 반영
@@ -100,19 +100,20 @@ app/
 └── api/
     ├── auth/setup/route.ts     # API 키 검증 + 쿠키 설정
     ├── auth/logout/route.ts    # 쿠키 일괄 만료
-    ├── profile/route.ts        # 개발자 프로필 저장
-    └── update-projects/route.ts # Notion 프로젝트 AI 채우기 (폴링, 1 call = 1 project)
+    ├── profile/route.ts        # 개발자 프로필 조회(GET)·저장(POST)
+    └── update-projects/route.ts # 대기 수 조회(GET) + AI 채우기(POST, 폴링, 1 call = 1 project)
 
 proxy.ts                        # 온보딩 리다이렉트 (Next.js 16 middleware 컨벤션)
 contexts/
 └── DeveloperProfileContext.tsx # 개발자 프로필 전역 상태 (avatarUrl, githubUrl 포함)
 lib/
 ├── notion.ts                   # Notion API 함수 (per-request Client, apiKey 파라미터)
-├── fill-notion/                # AI 채우기 모듈 (배포 번들 포함)
-│   ├── github.ts
-│   ├── ai-analyzer.ts
-│   └── notion-updater.ts
-└── ...
+├── date.ts                     # 날짜 포맷 (date-fns + 한국어 로케일)
+├── utils.ts                    # cn() (clsx + tailwind-merge)
+└── fill-notion/                # AI 채우기 모듈 (배포 번들 포함)
+    ├── github.ts
+    ├── ai-analyzer.ts
+    └── notion-updater.ts
 scripts/                        # 로컬 전용 CLI (Vercel 빌드 제외)
 └── github-to-notion.ts
 public/
