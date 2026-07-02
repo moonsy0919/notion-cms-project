@@ -30,13 +30,13 @@ async function processPage(
   const { pageId, githubUrl } = page;
 
   try {
-    console.log(`  [1/4] GitHub 데이터 수집 중: ${githubUrl}`);
+    console.log(`  [1/5] GitHub 데이터 수집 중: ${githubUrl}`);
     const repoData = await fetchGithubRepoData(githubUrl, githubToken);
-    console.log(`  [1/4] 완료: ${repoData.name}`);
+    console.log(`  [1/5] 완료: ${repoData.name}`);
 
-    console.log(`  [2/4] Claude AI 분석 중...`);
+    console.log(`  [2/5] Claude AI 분석 중...`);
     const analyzed = await analyzeRepo(repoData, anthropicApiKey);
-    console.log(`  [2/4] 완료: "${analyzed.title}"`);
+    console.log(`  [2/5] 완료: "${analyzed.title}"`);
 
     console.log(`  [3/5] Notion 속성 업데이트 중...`);
     await updatePageProperties(pageId, analyzed, notionApiKey);

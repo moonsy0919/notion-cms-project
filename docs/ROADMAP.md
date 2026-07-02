@@ -316,6 +316,7 @@
 - **Task 028: 프로젝트 상세 페이지 — 흐름 이미지 표시** ✅
   - ✅ `app/(main)/projects/[id]/page.tsx` — 헤더와 구분선 사이에 `// 사용 흐름` 레이블 + 흐름 이미지 삽입
   - ✅ `generateMetadata` OG 이미지를 `/api/project-flow/${project.id}`로 교체 — SNS 공유 시 프로젝트별 이미지 표시
+  - **버그 수정**: `BlockRenderer` `case "code"` — `// __USER_FLOW__`로 시작하는 코드 블록을 `null` 반환으로 제외 — Notion 본문에 저장된 JSON 데이터가 페이지 콘텐츠에 그대로 노출되는 문제 수정
 
 ---
 
