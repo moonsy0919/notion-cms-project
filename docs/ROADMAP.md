@@ -291,6 +291,34 @@
 
 ---
 
+## Phase 10: 프로젝트 상세 페이지 — 소스 코드 기반 UI 흐름 이미지 자동 생성 ✅ 완료
+
+> AI 자동화 스크립트가 GitHub 소스 코드를 분석해 사용자 흐름 단계 데이터를 생성하고,
+> `next/og`의 `ImageResponse`로 프로젝트 고유의 UI 목업 이미지를 동적 생성합니다.
+> 프로젝트 상세 페이지에서 텍스트 본문과 함께 흐름 이미지를 표시합니다.
+
+- **Task 026: AI 분석기 — 프로젝트별 UI 흐름 데이터 생성** ✅
+  - ✅ `lib/fill-notion/ai-analyzer.ts` — `UiElement`, `UserFlowStep` 타입 추가
+  - ✅ `AnalyzedRepoData`에 `userFlow` 필드 추가
+  - ✅ `ANALYSIS_TOOL` 스키마에 `userFlow` 배열 추가 — 각 단계의 `uiElements`는 소스 코드에서 직접 추출 지침 포함
+  - ✅ `buildPrompt()`에 userFlow 생성 지침 추가 — 라우트 구조·컴포넌트 코드 분석 → 3~6단계로 표현
+  - ✅ `lib/fill-notion/notion-updater.ts` — `appendUserFlowBlock()` 신규 — `// __USER_FLOW__` 마커 JSON 코드 블록 append
+  - ✅ `scripts/github-to-notion.ts` — [5/5] 단계에 `appendUserFlowBlock()` 호출 추가
+  - ✅ `app/api/update-projects/route.ts` — `appendUserFlowBlock()` 호출 추가
+
+- **Task 027: `/api/project-flow/[id]` — UI 흐름 이미지 생성 API 신규** ✅
+  - ✅ `app/api/project-flow/[id]/route.tsx` 신규 — Notion 블록에서 `__USER_FLOW__` 마커 파싱 → `ImageResponse` 생성
+  - ✅ 단계 카드: teal 번호 뱃지 + 제목 + `uiElements` 렌더링(input/button/list/card/nav/heading)
+  - ✅ 최대 4단계 표시, 초과 시 `+N 단계 더` 표시
+  - ✅ API 키 없거나 데이터 없으면 fallback 이미지 반환
+  - ✅ `proxy.ts` PUBLIC_PATHS에 `/api/project-flow` 추가 — OG 크롤러 리다이렉트 방지
+
+- **Task 028: 프로젝트 상세 페이지 — 흐름 이미지 표시** ✅
+  - ✅ `app/(main)/projects/[id]/page.tsx` — 헤더와 구분선 사이에 `// 사용 흐름` 레이블 + 흐름 이미지 삽입
+  - ✅ `generateMetadata` OG 이미지를 `/api/project-flow/${project.id}`로 교체 — SNS 공유 시 프로젝트별 이미지 표시
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |
