@@ -162,6 +162,20 @@ function buildPrompt(data: GithubRepoData): string {
     .slice(0, 5)
     .map(([lang]) => lang);
 
+  const fileTreeSection = data.fileTree.length > 0
+    ? `\n## 프로젝트 파일 구조\n${data.fileTree.join("\n")}`
+    : "";
+
+  const sourceFilesSection = Object.keys(data.sourceFiles).length > 0
+    ? "\n## 소스 코드\n" +
+      Object.entries(data.sourceFiles)
+        .map(([path, content]) => {
+          const ext = path.split(".").pop() ?? "text";
+          return `### ${path}\n\`\`\`${ext}\n${content}\n\`\`\``;
+        })
+        .join("\n\n")
+    : "";
+
   return `다음 GitHub 레포지토리를 분석하여 포트폴리오 CMS(Notion) 데이터를 생성해주세요.
 
 ## 레포지토리 정보
@@ -174,10 +188,14 @@ function buildPrompt(data: GithubRepoData): string {
 
 ## README (앞 4000자)
 ${readmeExcerpt || "(README 없음)"}
+${fileTreeSection}
+${sourceFilesSection}
 
 ## 분석 지침
 - description과 blocks 본문은 반드시 한국어로 작성하세요
 - blocks는 포트폴리오 독자가 이해하기 쉽도록 구성하세요: 프로젝트 개요 → 주요 기능 → 기술 선택 이유 → 성과/회고
+- 파일 구조와 소스 코드(특히 package.json dependencies)를 참고해 정확한 기술 스택을 추출하세요
+- 소스 코드를 참고해 아키텍처 패턴과 실제 구현 방식을 blocks에 반영하세요
 - periodStart는 첫 커밋 날짜(${data.firstCommitDate ?? "미상"})를 기준으로 YYYY-MM-DD 형식(예: 2024-01-15)으로 추정하세요. 알 수 없으면 null을 사용하세요
 - status는 최근 커밋 활동과 README 내용을 종합하여 판단하세요`;
 }
@@ -187,7 +205,7 @@ async function callClaudeApi(client: Anthropic, prompt: string): Promise<unknown
   const response = await withRetry(() =>
     client.messages.create({
       model: "claude-sonnet-4-6",
-      max_tokens: 4096,
+      max_tokens: 8192,
       tools: [ANALYSIS_TOOL],
       tool_choice: { type: "tool", name: "submit_analysis" },
       messages: [{ role: "user", content: prompt }],

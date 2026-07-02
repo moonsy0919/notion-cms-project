@@ -10,6 +10,8 @@ export interface GithubRepoData {
   firstCommitDate: string | null;
   stars: number;
   defaultBranch: string;
+  fileTree: string[];
+  sourceFiles: Record<string, string>;
 }
 
 /**
@@ -69,6 +71,114 @@ async function fetchContributorCount(
 
   const data = await res.json();
   return Array.isArray(data) ? data.length : 0;
+}
+
+/** 노이즈 경로를 제외하고 파일 트리를 반환합니다 */
+async function fetchFileTree(
+  owner: string,
+  repo: string,
+  sha: string,
+  token?: string
+): Promise<string[]> {
+  const res = await githubFetch(
+    `/repos/${owner}/${repo}/git/trees/${sha}?recursive=1`,
+    token
+  );
+  if (!res.ok) return [];
+
+  const data = await res.json() as { tree: Array<{ path: string; type: string }> };
+
+  const EXCLUDED_PREFIXES = [
+    "node_modules/", ".git/", "dist/", "build/", ".next/",
+    "__pycache__/", ".cache/", "vendor/", "coverage/",
+  ];
+  const EXCLUDED_EXTENSIONS = new Set([
+    ".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico",
+    ".woff", ".woff2", ".ttf", ".eot", ".pdf", ".zip",
+    ".tar", ".gz", ".mp4", ".mp3", ".webp", ".bin", ".exe",
+  ]);
+  const EXCLUDED_FILENAMES = new Set([
+    "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "poetry.lock",
+  ]);
+
+  return data.tree
+    .filter((item) => item.type === "blob")
+    .map((item) => item.path)
+    .filter((path) => {
+      if (EXCLUDED_PREFIXES.some((prefix) => path.startsWith(prefix))) return false;
+      const base = path.split("/").pop() ?? "";
+      if (EXCLUDED_FILENAMES.has(base)) return false;
+      const dotIdx = base.lastIndexOf(".");
+      if (dotIdx !== -1 && EXCLUDED_EXTENSIONS.has(base.slice(dotIdx))) return false;
+      return true;
+    })
+    .slice(0, 200);
+}
+
+/** 파일 목록을 중요도 순으로 정렬합니다 */
+function sortByImportance(paths: string[]): string[] {
+  const PRIORITY_NAMES = new Set([
+    "package.json", "pyproject.toml", "go.mod", "Cargo.toml",
+    "tsconfig.json", "vite.config.ts", "vite.config.js",
+    "next.config.ts", "next.config.js", "next.config.mjs",
+    "index.ts", "index.js", "main.ts", "main.js", "main.py", "main.go",
+    "app.ts", "app.js",
+  ]);
+
+  const priority: string[] = [];
+  const sourceFiles: string[] = [];
+  const rest: string[] = [];
+
+  for (const p of paths) {
+    const base = p.split("/").pop() ?? "";
+    if (PRIORITY_NAMES.has(base)) {
+      priority.push(p);
+    } else if (/^(src|app|lib|components|pages|routes)\//i.test(p)) {
+      sourceFiles.push(p);
+    } else {
+      rest.push(p);
+    }
+  }
+
+  return [...priority, ...sourceFiles, ...rest];
+}
+
+/** 토큰 예산 내에서 중요도 순으로 소스 파일 내용을 수집합니다 */
+async function fetchSourceFiles(
+  owner: string,
+  repo: string,
+  fileTree: string[],
+  token?: string
+): Promise<Record<string, string>> {
+  const TOKEN_BUDGET = 20000;
+  const FILE_MAX_CHARS = 3000;
+  const sorted = sortByImportance(fileTree);
+  const result: Record<string, string> = {};
+  let totalChars = 0;
+
+  for (const path of sorted) {
+    if (totalChars >= TOKEN_BUDGET) break;
+
+    try {
+      const res = await githubFetch(
+        `/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`,
+        token
+      );
+      if (!res.ok) continue;
+
+      const data = await res.json() as { content?: string; encoding?: string };
+      if (data.encoding !== "base64" || !data.content) continue;
+
+      const decoded = Buffer.from(data.content.replace(/\n/g, ""), "base64").toString("utf-8");
+      const truncated = decoded.slice(0, FILE_MAX_CHARS);
+      result[path] = truncated;
+      totalChars += truncated.length;
+    } catch {
+      // 개별 파일 실패는 건너뜀
+    }
+  }
+
+  return result;
 }
 
 /** 첫 커밋 날짜를 ISO 8601 형식으로 반환합니다. 조회 실패 시 null 반환 */
@@ -131,6 +241,9 @@ export async function fetchGithubRepoData(
     fetchFirstCommitDate(owner, repo, defaultBranch, githubToken),
   ]);
 
+  const fileTree = await fetchFileTree(owner, repo, defaultBranch, githubToken);
+  const sourceFiles = await fetchSourceFiles(owner, repo, fileTree, githubToken);
+
   return {
     name: meta.name ?? repo,
     description: meta.description ?? null,
@@ -140,5 +253,7 @@ export async function fetchGithubRepoData(
     firstCommitDate,
     stars: meta.stargazers_count ?? 0,
     defaultBranch,
+    fileTree,
+    sourceFiles,
   };
 }
