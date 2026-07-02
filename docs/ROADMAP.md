@@ -262,6 +262,21 @@
 
 ---
 
+## Phase 8: 페이지 제거 ✅ 완료
+
+> `/setup/why`에 프로젝트 구조 설명이 추가되면서 `/about`(Architecture) 페이지의 존재 이유가 없어졌습니다.
+> 페이지 본체·전용 컴포넌트·네비게이션 링크·mermaid 패키지를 모두 제거합니다.
+
+- **Task 024: Architecture 페이지 완전 삭제** ✅
+  - ✅ `app/(main)/about/page.tsx` 및 `about/` 디렉토리 삭제
+  - ✅ `components/architecture/MermaidDiagram.tsx` 및 `architecture/` 디렉토리 삭제
+  - ✅ `components/layout/Header.tsx` — navItems에서 Architecture 항목 제거
+  - ✅ `components/layout/Footer.tsx` — Architecture 링크 제거
+  - ✅ `components/home/AboutPreview.tsx` — "포트폴리오 웹 구조 보기" CTA 버튼 제거
+  - ✅ `mermaid` 패키지 제거 (`npm uninstall mermaid`) — about 페이지 전용 의존성, 110개 패키지 정리
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |
