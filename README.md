@@ -21,7 +21,7 @@ API 키는 브라우저 UI에서 직접 입력하며, 서버 환경변수나 별
 - **BYO Key 온보딩**: Notion·Anthropic·GitHub API 키를 UI에서 직접 입력, httpOnly 쿠키로 안전하게 저장
 - **GitHub → Notion 자동 채우기**: GitHub URL 입력 → Claude AI 분석 → Notion DB 속성·본문 자동 생성
 - **Notion 연동 프로젝트 목록**: 기술 스택 필터 + 키워드 검색, URL 파라미터 기반 상태 관리
-- **프로젝트 상세 페이지 + UI 흐름 이미지**: Notion 블록 재귀 렌더링 + AI 생성 사용자 흐름 이미지
+- **프로젝트 상세 페이지**: Notion 블록 재귀 렌더링 (heading·paragraph·list·code·quote 등 지원)
 - **개발자 프로필 설정**: 이름·역할·기술 스택을 입력하면 홈 화면에 즉시 반영
 - **다크 모드 및 반응형 레이아웃**
 
@@ -91,7 +91,7 @@ app/
 │   ├── page.tsx                # 홈 (Hero + 최근 프로젝트 + About 프리뷰)
 │   └── projects/
 │       ├── page.tsx            # 프로젝트 목록 (필터 + 검색)
-│       └── [id]/page.tsx       # 프로젝트 상세 (Notion 블록 + UI 흐름 이미지)
+│       └── [id]/page.tsx       # 프로젝트 상세 (Notion 블록 재귀 렌더링)
 ├── (onboarding)/               # 온보딩 페이지 (Header·Footer 없음)
 │   ├── layout.tsx              # DeveloperProfileProvider만 제공
 │   ├── welcome/
@@ -101,7 +101,6 @@ app/
     ├── auth/setup/route.ts     # API 키 검증 + 쿠키 설정
     ├── auth/logout/route.ts    # 쿠키 일괄 만료
     ├── profile/route.ts        # 개발자 프로필 저장
-    ├── project-flow/[id]/route.tsx # AI 생성 UI 흐름 이미지 (프로젝트 OG 이미지 겸용)
     └── update-projects/route.ts # Notion 프로젝트 AI 채우기 (폴링, 1 call = 1 project)
 
 proxy.ts                        # 온보딩 리다이렉트 (Next.js 16 middleware 컨벤션)
