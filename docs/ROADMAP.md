@@ -372,6 +372,27 @@
 
 ---
 
+## Phase 14: 프로젝트 업데이트 진행 상황 바 추가 ✅ 완료
+
+> 새로고침 버튼 클릭 시 퍼센트 기반 진행 상황을 실시간으로 표시합니다.
+> 전체 대기 프로젝트 대비 완료 수를 진행률 바로 보여주고, 각 처리 단계(GitHub 수집 → Claude AI 분석 → Notion 저장)를 레이블로 표시합니다.
+
+- **Task 033: `GET /api/update-projects` 엔드포인트 추가** ✅
+  - ✅ `app/api/update-projects/route.ts` — `GET` 핸들러 추가, 대기 중인 전체 프로젝트 수 반환 (`{ pending: number }`)
+  - ✅ `POST` 응답에 `title` 필드 추가 — `analyzed.title` (한국어 프로젝트 이름)을 포함해 로그에 이름 표시
+
+- **Task 034: `UpdateProjectsButton` 진행 상황 UI 재설계** ✅
+  - ✅ `shadcn/ui Progress` 컴포넌트 설치 (`npx shadcn add progress`)
+  - ✅ 상태 모델 확장 — `total`, `processed`, `stepIndex`, `completedTitles` 추가
+  - ✅ 단계 타이머 로직 — GitHub 수집(3s) → Claude AI 분석(32s) → Notion 저장(8s) 순으로 단계 레이블 자동 전환 (`useRef` 타이머 관리, 프로젝트 완료 시 초기화 후 재시작)
+  - ✅ 팝오버 UI 재설계:
+    - 전체 진행률 바: `processed / total × 100%` + `N / M (P%)` 숫자 표시
+    - 현재 단계 레이블: GitHub(`FaGithub`) · Claude AI(`BrainCircuit`) · Notion(`Database`) 아이콘 + 단계명 + `N/3` 표시
+    - 완료된 프로젝트 목록: 처리 완료된 프로젝트 이름 순서대로 표시 (스크롤 지원)
+    - 대기 없음 케이스: "대기 중인 프로젝트가 없습니다." 메시지 표시 후 2초 뒤 닫힘
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |

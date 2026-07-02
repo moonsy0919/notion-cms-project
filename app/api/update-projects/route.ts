@@ -7,6 +7,20 @@ import { updatePageProperties, appendPageBlocks } from "@/lib/fill-notion/notion
 
 export const maxDuration = 60;
 
+/** 대기 중인 프로젝트 수를 반환합니다 */
+export async function GET() {
+  const cookieStore = await cookies();
+  const notionApiKey = cookieStore.get("notion-api-key")?.value;
+  const dbId = cookieStore.get("notion-db-id")?.value;
+
+  if (!notionApiKey || !dbId) {
+    return NextResponse.json({ error: "인증 정보가 없습니다." }, { status: 401 });
+  }
+
+  const pending = await getPendingPages(notionApiKey, dbId);
+  return NextResponse.json({ pending: pending.length });
+}
+
 /** 대기 중인 Notion 페이지 1개를 처리합니다 (폴링 방식, 1 call = 1 project) */
 export async function POST() {
   const cookieStore = await cookies();
@@ -26,6 +40,7 @@ export async function POST() {
   }
 
   const page = pending[0];
+  let projectTitle = page.githubUrl;
 
   try {
     const githubData = await fetchGithubRepoData(page.githubUrl, githubToken, {
@@ -34,6 +49,7 @@ export async function POST() {
     const analyzed = await analyzeRepo(githubData, anthropicApiKey, {
       maxTokens: 4_096,
     });
+    projectTitle = analyzed.title;
 
     await updatePageProperties(page.pageId, analyzed, notionApiKey);
     await appendPageBlocks(page.pageId, analyzed.blocks, notionApiKey);
@@ -45,6 +61,7 @@ export async function POST() {
   return NextResponse.json({
     done: pending.length <= 1,
     processed: page.githubUrl,
+    title: projectTitle,
     remaining: pending.length - 1,
   });
 }
