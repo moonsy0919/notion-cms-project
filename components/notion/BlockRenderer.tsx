@@ -67,7 +67,6 @@ export function BlockRenderer({ block }: BlockRendererProps) {
 
     case "code": {
       const text = getRichText(block.code.rich_text);
-      if (text.startsWith("// __USER_FLOW__")) return null;
       const lang = block.code.language ?? "";
       return (
         <pre>

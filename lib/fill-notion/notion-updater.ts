@@ -3,7 +3,7 @@ import type {
   BlockObjectRequest,
   LanguageRequest,
 } from "@notionhq/client/build/src/api-endpoints";
-import type { AnalyzedRepoData, NotionBlockSpec, UserFlowStep } from "./ai-analyzer";
+import type { AnalyzedRepoData, NotionBlockSpec } from "./ai-analyzer";
 
 /** 처리 대기 중인 Notion 페이지 */
 export interface PendingPage {
@@ -269,42 +269,3 @@ export async function appendPageBlocks(
   }
 }
 
-/**
- * Notion 페이지 맨 끝에 사용자 흐름 JSON 코드 블록을 추가합니다.
- * __USER_FLOW__ 마커로 식별해 이미지 생성 API에서 파싱합니다.
- */
-export async function appendUserFlowBlock(
-  pageId: string,
-  userFlow: UserFlowStep[],
-  notionApiKey: string
-): Promise<void> {
-  if (!userFlow || userFlow.length === 0) return;
-
-  const notion = new Client({ auth: notionApiKey });
-  // Notion rich_text 요소 1개당 최대 2000자 제한 → 청크 분할
-  const content = `// __USER_FLOW__\n${JSON.stringify(userFlow)}`;
-  const CHUNK = 2000;
-  const richText = [];
-  for (let i = 0; i < content.length; i += CHUNK) {
-    richText.push({ text: { content: content.slice(i, i + CHUNK) } });
-  }
-
-  try {
-    await notion.blocks.children.append({
-      block_id: pageId,
-      children: [
-        {
-          type: "code",
-          code: {
-            rich_text: richText,
-            language: "json",
-          },
-        },
-      ],
-    });
-  } catch (err) {
-    throw new Error(
-      `[Notion] 사용자 흐름 블록 추가 실패 (pageId: ${pageId}): ${(err as Error).message}`
-    );
-  }
-}

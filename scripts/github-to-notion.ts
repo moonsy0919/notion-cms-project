@@ -4,7 +4,6 @@ import {
   getPendingPages,
   updatePageProperties,
   appendPageBlocks,
-  appendUserFlowBlock,
   type PendingPage,
 } from "@/lib/fill-notion/notion-updater";
 
@@ -30,25 +29,21 @@ async function processPage(
   const { pageId, githubUrl } = page;
 
   try {
-    console.log(`  [1/5] GitHub 데이터 수집 중: ${githubUrl}`);
+    console.log(`  [1/4] GitHub 데이터 수집 중: ${githubUrl}`);
     const repoData = await fetchGithubRepoData(githubUrl, githubToken);
-    console.log(`  [1/5] 완료: ${repoData.name}`);
+    console.log(`  [1/4] 완료: ${repoData.name}`);
 
-    console.log(`  [2/5] Claude AI 분석 중...`);
+    console.log(`  [2/4] Claude AI 분석 중...`);
     const analyzed = await analyzeRepo(repoData, anthropicApiKey);
-    console.log(`  [2/5] 완료: "${analyzed.title}"`);
+    console.log(`  [2/4] 완료: "${analyzed.title}"`);
 
-    console.log(`  [3/5] Notion 속성 업데이트 중...`);
+    console.log(`  [3/4] Notion 속성 업데이트 중...`);
     await updatePageProperties(pageId, analyzed, notionApiKey);
-    console.log(`  [3/5] 완료`);
+    console.log(`  [3/4] 완료`);
 
-    console.log(`  [4/5] Notion 블록 추가 중 (${analyzed.blocks.length}개)...`);
+    console.log(`  [4/4] Notion 블록 추가 중 (${analyzed.blocks.length}개)...`);
     await appendPageBlocks(pageId, analyzed.blocks, notionApiKey);
-    console.log(`  [4/5] 완료`);
-
-    console.log(`  [5/5] 사용자 흐름 블록 추가 중 (${analyzed.userFlow.length}단계)...`);
-    await appendUserFlowBlock(pageId, analyzed.userFlow, notionApiKey);
-    console.log(`  [5/5] 완료`);
+    console.log(`  [4/4] 완료`);
 
     return { success: true };
   } catch (err) {
