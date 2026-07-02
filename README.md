@@ -17,12 +17,12 @@ API 키는 브라우저 UI에서 직접 입력하며, 서버 환경변수나 별
 
 ## 주요 기능
 
+- **Welcome 랜딩 페이지**: 9개 포트폴리오 카드 회전 애니메이션 시작 화면
 - **BYO Key 온보딩**: Notion·Anthropic·GitHub API 키를 UI에서 직접 입력, httpOnly 쿠키로 안전하게 저장
 - **GitHub → Notion 자동 채우기**: GitHub URL 입력 → Claude AI 분석 → Notion DB 속성·본문 자동 생성
 - **Notion 연동 프로젝트 목록**: 기술 스택 필터 + 키워드 검색, URL 파라미터 기반 상태 관리
-- **프로젝트 상세 페이지**: Notion 블록 재귀 렌더링 (heading, list, code, quote 등)
+- **프로젝트 상세 페이지 + UI 흐름 이미지**: Notion 블록 재귀 렌더링 + AI 생성 사용자 흐름 이미지
 - **개발자 프로필 설정**: 이름·역할·기술 스택을 입력하면 홈 화면에 즉시 반영
-- **Architecture 페이지**: 시스템 시퀀스 다이어그램(Mermaid.js) + 개발 회고
 - **다크 모드 및 반응형 레이아웃**
 
 ## 시작하기
@@ -39,13 +39,14 @@ npm install
 npm run dev
 ```
 
-[http://localhost:3000](http://localhost:3000)에 접속하면 `/setup` 온보딩 페이지로 자동 이동합니다.
+[http://localhost:3000](http://localhost:3000)에 접속하면 `/welcome` 랜딩 페이지로 자동 이동합니다.
 
 ### 3. 온보딩 흐름
 
-1. **`/setup`** — Notion API Key, Notion DB ID, Anthropic API Key, GitHub Token(선택) 입력
-2. **`/admin`** — 개발자 이름·역할·기술 스택 입력
-3. **`/`** — 포트폴리오 홈으로 이동 완료
+1. **`/welcome`** — 포트폴리오 카드 애니메이션 시작 화면, "시작하기" 클릭
+2. **`/setup`** — Notion API Key, Notion DB ID, Anthropic API Key, GitHub Token(선택) 입력
+3. **`/admin`** — 개발자 이름·역할·기술 스택 입력
+4. **`/`** — 포트폴리오 홈으로 이동 완료
 
 > API 키는 모두 브라우저 httpOnly 쿠키에만 저장됩니다. 서버 환경변수 설정이 불필요합니다.
 
@@ -82,21 +83,25 @@ app/
 ├── opengraph-image.tsx         # 정적 OG 이미지 (소셜 공유용, CDN 캐시)
 ├── setup/
 │   ├── layout.tsx              # /setup 전용 OG 메타데이터
-│   └── page.tsx                # API 키 입력 온보딩 (첫 진입점)
+│   ├── page.tsx                # API 키 입력 온보딩
+│   └── why/
+│       └── page.tsx            # "왜 API key가 필요한가요?" 설명 페이지
 ├── (main)/                     # 포트폴리오 페이지 (Header + Footer 포함)
 │   ├── layout.tsx              # DeveloperProfileProvider, Notion 아바타 주입
 │   ├── page.tsx                # 홈 (Hero + 최근 프로젝트 + About 프리뷰)
-│   ├── projects/
-│   │   ├── page.tsx            # 프로젝트 목록 (필터 + 검색)
-│   │   └── [id]/page.tsx       # 프로젝트 상세 (Notion 블록 렌더링)
-│   └── about/page.tsx          # Architecture 페이지 (Mermaid 다이어그램)
+│   └── projects/
+│       ├── page.tsx            # 프로젝트 목록 (필터 + 검색)
+│       └── [id]/page.tsx       # 프로젝트 상세 (Notion 블록 + UI 흐름 이미지)
 ├── (onboarding)/               # 온보딩 페이지 (Header·Footer 없음)
 │   ├── layout.tsx              # DeveloperProfileProvider만 제공
+│   ├── welcome/
+│   │   └── page.tsx            # 포트폴리오 카드 회전 애니메이션 랜딩 페이지
 │   └── admin/page.tsx          # 개발자 프로필 설정 (회로기판 배경 테마)
 └── api/
     ├── auth/setup/route.ts     # API 키 검증 + 쿠키 설정
     ├── auth/logout/route.ts    # 쿠키 일괄 만료
     ├── profile/route.ts        # 개발자 프로필 저장
+    ├── project-flow/[id]/route.tsx # AI 생성 UI 흐름 이미지 (프로젝트 OG 이미지 겸용)
     └── update-projects/route.ts # Notion 프로젝트 AI 채우기 (폴링, 1 call = 1 project)
 
 proxy.ts                        # 온보딩 리다이렉트 (Next.js 16 middleware 컨벤션)
@@ -123,7 +128,7 @@ public/
 2. 빌드 설정은 Next.js 자동 감지 — 별도 수정 불필요
 3. **환경변수 등록 없이** 배포 클릭
 
-배포 후 발급된 URL에 접속하면 `/setup` 온보딩 페이지로 이동합니다.
+배포 후 발급된 URL에 접속하면 `/welcome` 랜딩 페이지로 이동합니다.
 
 ## 문서
 
