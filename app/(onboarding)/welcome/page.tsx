@@ -55,9 +55,21 @@ const CARDS: CardData[] = [
     tags: ["React Native", "Expo"],
     accent: "#dc2626",
   },
+  {
+    name: "백오피스 대시보드",
+    description: "관리자 통합 플랫폼",
+    tags: ["Next.js", "Prisma"],
+    accent: "#ca8a04",
+  },
+  {
+    name: "실시간 채팅",
+    description: "WebSocket 메시징",
+    tags: ["Node.js", "Socket.io"],
+    accent: "#e11d48",
+  },
 ];
 
-const RADIUS = 320;
+const RADIUS = 340;
 
 /** 브라우저 윈도우 스타일 프로젝트 카드 */
 function ProjectCard({ card }: { card: CardData }) {
@@ -143,7 +155,7 @@ export default function WelcomePage() {
         }}
       >
         {CARDS.map((card, i) => {
-          const angle = -150 + i * 40; // -150, -110, ..., 90
+          const angle = i * (360 / CARDS.length); // 0, 40, ..., 320 (균등 360° 배치)
           const rad = (angle * Math.PI) / 180;
           const x = Math.sin(rad) * RADIUS;
           const y = -Math.cos(rad) * RADIUS;
