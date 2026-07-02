@@ -349,6 +349,11 @@
   - `scripts/github-to-notion.ts` 미수정 — 기본값 유지(20,000 / 8,192), 로컬 CLI 품질 저하 없음
   - **예상 개선**: GitHub API 호출 ~13회 → ~4회, 총 소요 시간 ~55s → ~25-30s
 
+- **Task 031: `appendUserFlowBlock` Notion 2000자 제한 수정** ✅
+  - **원인**: `JSON.stringify(userFlow, null, 2)` pretty-print로 3000~5000자 생성 → Notion `rich_text[].text.content` 최대 2000자 제한 초과 → API 오류 → 5XX 반환
+  - ✅ `lib/fill-notion/notion-updater.ts` — `JSON.stringify(userFlow)` (minified)로 변경 후 2000자 단위 청크 분할, `rich_text` 배열에 다수 요소로 저장
+  - `extractUserFlow()`는 기존에 `.join("")`으로 청크를 합치므로 파싱 측 변경 없음
+
 ---
 
 ## 기술 스택 요약
