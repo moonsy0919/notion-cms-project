@@ -356,6 +356,22 @@
 
 ---
 
+## Phase 13: UI 흐름 이미지 기능 제거 ✅ 완료
+
+> Vercel 60초 제한 및 Notion 2000자 제한으로 `/api/project-flow` 이미지 생성이 안정적으로 동작하지 않아 기능 전체를 제거합니다.
+
+- **Task 032: UI 흐름 이미지 관련 코드 전면 제거** ✅
+  - ✅ `lib/fill-notion/ai-analyzer.ts` — `UiElement`·`UserFlowStep` 인터페이스 삭제, `AnalyzedRepoData.userFlow` 필드 삭제, `ANALYSIS_TOOL` 스키마에서 `userFlow` 프로퍼티·required 항목 삭제, `buildPrompt()` userFlow 생성 지침 삭제
+  - ✅ `lib/fill-notion/notion-updater.ts` — `UserFlowStep` import 삭제, `appendUserFlowBlock()` 함수 전체 삭제
+  - ✅ `app/api/project-flow/[id]/route.tsx` — 파일 전체 삭제 (이미지 생성 API 라우트)
+  - ✅ `app/api/update-projects/route.ts` — `appendUserFlowBlock` import·호출 제거
+  - ✅ `scripts/github-to-notion.ts` — `appendUserFlowBlock` import·[5/5] 호출 제거, 단계 표시 [4/4]로 업데이트
+  - ✅ `app/(main)/projects/[id]/page.tsx` — "사용 흐름" 섹션 및 `<img>` 제거, OG 이미지를 전역 기본값으로 복원
+  - ✅ `components/notion/BlockRenderer.tsx` — `// __USER_FLOW__` 필터 조건 삭제
+  - ✅ `proxy.ts` — PUBLIC_PATHS에서 `/api/project-flow` 항목 삭제
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |
