@@ -277,6 +277,20 @@
 
 ---
 
+## Phase 9: AI 분석기 개선 ✅ 완료
+
+> 기존 AI 분석기는 README 앞 4000자 + 메타데이터만 분석했습니다.
+> GitHub API를 추가 활용해 전체 파일 구조와 가능한 한 많은 소스 코드를 수집하도록 개선합니다.
+
+- **Task 025: GitHub 파일 트리·소스 코드 수집 및 프롬프트 반영** ✅
+  - ✅ `lib/fill-notion/github.ts` — `GithubRepoData`에 `fileTree`, `sourceFiles` 필드 추가
+  - ✅ `fetchFileTree()` 신규 — `git/trees?recursive=1`로 전체 파일 경로 수집 (노이즈 제거 후 최대 200개)
+  - ✅ `fetchSourceFiles()` 신규 — 중요도 순(의존성 파일 → 설정 파일 → 진입점 → 소스) 정렬 후 토큰 예산(20000자) 내 파일 내용 순차 수집
+  - ✅ `lib/fill-notion/ai-analyzer.ts` — `buildPrompt()`에 파일 구조·소스 코드 섹션 추가, `max_tokens` 4096 → 8192 증가
+  - 소형 프로젝트: 거의 전체 코드 수집 / 대형 프로젝트: 중요도 순 선택적 수집
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |
