@@ -250,6 +250,18 @@
 
 ---
 
+## Phase 7: UX 개선 ✅ 완료
+
+> Setup 페이지 진입 시 API 키를 왜 입력해야 하는지 이해하기 어려운 문제를 해결합니다.
+> BYO Key 구조와 각 키의 역할을 설명하는 전용 페이지를 추가합니다.
+
+- **Task 023: "왜 API key가 필요한가요?" 설명 페이지 구현** ✅
+  - ✅ `app/setup/page.tsx` — CardHeader 우측 상단에 `/setup/why` 링크 추가 (`flex justify-between` 레이아웃)
+  - ✅ `app/setup/why/page.tsx` 신규 — CircuitBackground 재사용, BYO Key 구조·Notion API Key·Notion DB ID·Anthropic API Key·GitHub Token·보안 안내 6개 섹션, "← 돌아가기" 링크
+  - `proxy.ts` 미수정 — 기존 `startsWith("/setup/")` 로직으로 `/setup/why`가 이미 공개 경로로 처리됨
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |
