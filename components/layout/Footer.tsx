@@ -28,12 +28,6 @@ export function Footer() {
             >
               프로젝트
             </Link>
-            <Link
-              href="/about"
-              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-            >
-              Architecture
-            </Link>
           </nav>
         </div>
       </Container>

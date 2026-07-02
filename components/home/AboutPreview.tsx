@@ -1,9 +1,6 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { resolveAvatarSrc } from "@/lib/utils";
 import { useProfile } from "@/contexts/DeveloperProfileContext";
@@ -97,15 +94,6 @@ export function AboutPreview() {
           ))}
         </div>
 
-        {/* 소개 페이지 링크 */}
-        <div className="mt-8">
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/about">
-              포트폴리오 웹 구조 보기
-              <ArrowRight className="ml-1 h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
       </Container>
     </section>
   );
