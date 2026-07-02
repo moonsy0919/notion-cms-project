@@ -281,7 +281,13 @@ export async function appendUserFlowBlock(
   if (!userFlow || userFlow.length === 0) return;
 
   const notion = new Client({ auth: notionApiKey });
-  const content = `// __USER_FLOW__\n${JSON.stringify(userFlow, null, 2)}`;
+  // Notion rich_text 요소 1개당 최대 2000자 제한 → 청크 분할
+  const content = `// __USER_FLOW__\n${JSON.stringify(userFlow)}`;
+  const CHUNK = 2000;
+  const richText = [];
+  for (let i = 0; i < content.length; i += CHUNK) {
+    richText.push({ text: { content: content.slice(i, i + CHUNK) } });
+  }
 
   try {
     await notion.blocks.children.append({
@@ -290,7 +296,7 @@ export async function appendUserFlowBlock(
         {
           type: "code",
           code: {
-            rich_text: [{ text: { content } }],
+            rich_text: richText,
             language: "json",
           },
         },
