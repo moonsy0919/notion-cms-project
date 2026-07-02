@@ -261,11 +261,11 @@ ${sourceFilesSection}
 }
 
 /** Claude API를 호출하고 tool_use input을 반환합니다 */
-async function callClaudeApi(client: Anthropic, prompt: string): Promise<unknown> {
+async function callClaudeApi(client: Anthropic, prompt: string, maxTokens = 8_192): Promise<unknown> {
   const response = await withRetry(() =>
     client.messages.create({
       model: "claude-sonnet-4-6",
-      max_tokens: 8192,
+      max_tokens: maxTokens,
       tools: [ANALYSIS_TOOL],
       tool_choice: { type: "tool", name: "submit_analysis" },
       messages: [{ role: "user", content: prompt }],
@@ -282,13 +282,15 @@ async function callClaudeApi(client: Anthropic, prompt: string): Promise<unknown
  * GitHub 레포 데이터를 Claude로 분석하여 Notion 포트폴리오 구조화 데이터를 반환합니다.
  * @param data - fetchGithubRepoData()가 반환한 GitHub 레포 데이터
  * @param anthropicApiKey - Anthropic API 키
+ * @param options.maxTokens - Claude 응답 토큰 상한 (기본값 8192)
  */
 export async function analyzeRepo(
   data: GithubRepoData,
-  anthropicApiKey: string
+  anthropicApiKey: string,
+  options?: { maxTokens?: number }
 ): Promise<AnalyzedRepoData> {
   const client = new Anthropic({ apiKey: anthropicApiKey });
   const prompt = buildPrompt(data);
-  const raw = await callClaudeApi(client, prompt);
+  const raw = await callClaudeApi(client, prompt, options?.maxTokens);
   return validateAnalyzedData(raw);
 }

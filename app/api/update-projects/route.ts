@@ -28,8 +28,12 @@ export async function POST() {
   const page = pending[0];
 
   try {
-    const githubData = await fetchGithubRepoData(page.githubUrl, githubToken);
-    const analyzed = await analyzeRepo(githubData, anthropicApiKey);
+    const githubData = await fetchGithubRepoData(page.githubUrl, githubToken, {
+      tokenBudget: 5_000,
+    });
+    const analyzed = await analyzeRepo(githubData, anthropicApiKey, {
+      maxTokens: 4_096,
+    });
 
     await updatePageProperties(page.pageId, analyzed, notionApiKey);
     await appendPageBlocks(page.pageId, analyzed.blocks, notionApiKey);

@@ -148,9 +148,10 @@ async function fetchSourceFiles(
   owner: string,
   repo: string,
   fileTree: string[],
-  token?: string
+  token?: string,
+  tokenBudget = 20_000
 ): Promise<Record<string, string>> {
-  const TOKEN_BUDGET = 20000;
+  const TOKEN_BUDGET = tokenBudget;
   const FILE_MAX_CHARS = 3000;
   const sorted = sortByImportance(fileTree);
   const result: Record<string, string> = {};
@@ -216,7 +217,8 @@ async function fetchFirstCommitDate(
  */
 export async function fetchGithubRepoData(
   githubUrl: string,
-  githubToken?: string
+  githubToken?: string,
+  options?: { tokenBudget?: number }
 ): Promise<GithubRepoData> {
   const { owner, repo } = parseGithubUrl(githubUrl);
 
@@ -242,7 +244,7 @@ export async function fetchGithubRepoData(
   ]);
 
   const fileTree = await fetchFileTree(owner, repo, defaultBranch, githubToken);
-  const sourceFiles = await fetchSourceFiles(owner, repo, fileTree, githubToken);
+  const sourceFiles = await fetchSourceFiles(owner, repo, fileTree, githubToken, options?.tokenBudget);
 
   return {
     name: meta.name ?? repo,
