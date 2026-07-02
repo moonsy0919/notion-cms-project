@@ -329,8 +329,10 @@
 
 - **Task 029: Welcome 랜딩 페이지 구현** ✅
   - ✅ `proxy.ts` — `/welcome` PUBLIC_PATHS 추가, 미인증 리다이렉트 대상 `/setup` → `/welcome` 변경, 인증 완료 시 `/welcome` → `/` 리다이렉트 추가
-  - ✅ `app/globals.css` — `@keyframes arc-spin` (60s 360° 회전) + `@media (prefers-reduced-motion)` 정지 추가
-  - ✅ `app/(onboarding)/welcome/page.tsx` 신규 — 7개 프로젝트 카드 반원호(radius 320px) 배치, 각도 -150°~90° (40° 간격), 각 카드 접선 방향 기울기. 브라우저 윈도우 스타일(accent 바 + dots) 카드. "시작하기" CTA → `/setup`
+  - ✅ `app/(onboarding)/welcome/page.tsx` 신규 — 9개 프로젝트 카드 전체 원(radius 340px, 40° 간격 균등 360° 배치), 각 카드 접선 방향 기울기. 브라우저 윈도우 스타일(accent 바 + dots) 카드. "시작하기" CTA → `/setup`
+  - ✅ 회전 애니메이션: `requestAnimationFrame` + `useRef`로 DOM 직접 조작 (CSS `@keyframes` 미사용 — Next.js 16 + Turbopack 환경에서 inline style이 keyframe을 참조하지 못하는 문제 우회)
+  - **버그 수정**: CSS `@keyframes arc-spin` 방식 → `requestAnimationFrame` 교체 — inline style animation이 Turbopack 환경에서 동작하지 않는 문제 해결
+  - **보완**: 초기 7개 카드 240° 반원호 배치 → 9개 카드 360° 전체 원 배치로 변경 — 빈 공간 해소
 
 ---
 
