@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { RefreshCw } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -69,14 +70,24 @@ export default function SetupPage() {
     <CircuitBackground>
     <main className="flex flex-1 items-center justify-center px-4">
       <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">
-            <span className="font-mono text-primary">&lt;/&gt;</span> 포트폴리오 API KEY 설정
-          </CardTitle>
-          <CardDescription>
-            Notion과 AI 연동을 위한 API 키를 입력해주세요.<br/>
-            키는 브라우저에만 저장됩니다.
-          </CardDescription>
+        <CardHeader>
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-1">
+              <CardTitle className="text-2xl font-bold">
+                <span className="font-mono text-primary">&lt;/&gt;</span> 포트폴리오 API KEY 설정
+              </CardTitle>
+              <CardDescription>
+                Notion과 AI 연동을 위한 API 키를 입력해주세요.<br/>
+                키는 브라우저에만 저장됩니다.
+              </CardDescription>
+            </div>
+            <Link
+              href="/setup/why"
+              className="shrink-0 pt-1 text-xs text-muted-foreground underline-offset-4 hover:underline hover:text-foreground transition-colors text-right"
+            >
+              왜 API key가<br/>필요한가요?
+            </Link>
+          </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
