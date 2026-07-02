@@ -160,14 +160,6 @@
   50%       { opacity: 1;    }
 }
 
-@keyframes arc-spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .arc-rotate { animation: none !important; }
-}
 
 @layer utilities {
   .animate-cursor-blink {

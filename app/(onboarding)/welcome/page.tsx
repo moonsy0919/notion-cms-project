@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -104,17 +105,41 @@ function ProjectCard({ card }: { card: CardData }) {
 
 /** Welcome 랜딩 페이지 */
 export default function WelcomePage() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const DURATION = 60000; // 60초 = 1바퀴
+    let startTime: number | null = null;
+    let rafId: number;
+
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return;
+
+    function animate(timestamp: number) {
+      if (startTime === null) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const angle = (elapsed / DURATION) * 360;
+      if (containerRef.current) {
+        containerRef.current.style.transform = `rotate(${angle % 360}deg)`;
+      }
+      rafId = requestAnimationFrame(animate);
+    }
+
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
+  }, []);
+
   return (
     <div className="flex-1 flex flex-col bg-[#080808] overflow-hidden relative min-h-screen">
-      {/* 호(arc) 컨테이너 — 화면 하단쪽에 호 중심을 배치해 상단에 반원호가 보이게 함 */}
+      {/* 호(arc) 컨테이너 — JS requestAnimationFrame으로 회전 */}
       <div
-        className="arc-rotate absolute"
+        ref={containerRef}
+        className="absolute"
         style={{
           top: "62%",
           left: "50%",
           width: 0,
           height: 0,
-          animation: "arc-spin 60s linear infinite",
         }}
       >
         {CARDS.map((card, i) => {
