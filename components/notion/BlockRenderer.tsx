@@ -69,8 +69,11 @@ export function BlockRenderer({ block }: BlockRendererProps) {
       const text = getRichText(block.code.rich_text);
       const lang = block.code.language ?? "";
       return (
-        <pre>
-          <code className={lang ? `language-${lang}` : undefined}>
+        <pre className="rounded-lg border border-border bg-card font-mono">
+          <code
+            className={lang ? `language-${lang}` : undefined}
+            style={{ color: "var(--syntax-prop)" }}
+          >
             {text}
           </code>
         </pre>

@@ -51,7 +51,7 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
   } = project;
 
   return (
-    <Card className={cn("h-full flex flex-col", className)}>
+    <Card className={cn("h-full flex flex-col transition-colors duration-200 hover:border-accent", className)}>
       <CardHeader>
         <div className="flex flex-wrap gap-1.5">
           {status && (

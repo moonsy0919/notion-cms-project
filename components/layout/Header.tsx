@@ -44,13 +44,13 @@ export function Header() {
           {/* 로고 + 데스크톱 네비게이션 */}
           <div className="flex items-stretch gap-4">
             {/* 로고: </> 아이콘은 홈 링크, 이름은 프로필 편집 Sheet trigger */}
-            <div className="flex items-center gap-1.5 pr-2 font-semibold text-foreground">
-              <Link href="/" className="font-mono text-accent text-sm font-bold">
+            <div className="flex items-center gap-2 pr-2">
+              <Link href="/" className="font-mono text-accent text-lg font-bold tracking-tight">
                 &lt;/&gt;
               </Link>
               <Sheet open={profileOpen} onOpenChange={setProfileOpen}>
                 <SheetTrigger asChild>
-                  <button className="group flex items-center gap-1 hover:text-accent transition-colors">
+                  <button className="group flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-accent transition-colors">
                     <span>{profile.name || "개발자"}</span>
                     <Pencil className="h-3 w-3 opacity-0 group-hover:opacity-60 transition-opacity" />
                   </button>
@@ -111,9 +111,9 @@ export function Header() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-60">
-                <div className="flex items-center gap-1.5 mb-6 pt-2 font-semibold">
-                  <span className="font-mono text-accent text-sm font-bold">&lt;/&gt;</span>
-                  <span>{profile.name || "개발자"}</span>
+                <div className="flex items-center gap-2 mb-6 pt-2">
+                  <span className="font-mono text-accent text-lg font-bold tracking-tight">&lt;/&gt;</span>
+                  <span className="text-sm font-medium text-muted-foreground">{profile.name || "개발자"}</span>
                 </div>
                 <nav className="flex flex-col gap-1">
                   {navItems.map((item) => (

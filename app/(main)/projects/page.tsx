@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
+import { FolderOpen, SearchX } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { EmptyState } from "@/components/shared/EmptyState";
@@ -64,6 +65,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
 
         {projects.length === 0 ? (
           <EmptyState
+            icon={isFiltered ? SearchX : FolderOpen}
             title={isFiltered ? "검색 결과가 없습니다" : "프로젝트가 없습니다"}
             description={
               isFiltered

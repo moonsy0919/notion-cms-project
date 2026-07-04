@@ -70,10 +70,7 @@ export function AnimatedProjectsSection({ projects }: AnimatedProjectsSectionPro
                   : "none",
               }}
             >
-              <ProjectCard
-                project={project}
-                className="h-full transition-colors duration-200 hover:border-accent"
-              />
+              <ProjectCard project={project} />
             </div>
           ))}
         </div>
