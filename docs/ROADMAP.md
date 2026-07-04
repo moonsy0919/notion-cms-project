@@ -393,6 +393,40 @@
 
 ---
 
+## Phase 15: UI/UX 개선 (15-A, 15-B 완료)
+
+> 정적 분석으로 식별된 UI 개선점을 리스크 낮은 순서로 반영합니다. 디자인 시스템(색상·톤) 정리를 먼저 끝내야 이후 컴포넌트 인터랙션 통일 작업에서 재작업이 발생하지 않습니다.
+
+### Phase 15-A: 디자인 시스템 기초 정리 ✅ 완료
+
+- **Task 035: 다크모드 카드/배경 명도 대비 개선** ✅
+  - `globals.css` 다크모드 `--card`(`#111827` → `#161f32`), `--popover`·`--sidebar` 동일 값으로 통일 — 카드가 배경(`#0b1120`) 위에서 시각적으로 구분됨
+  - Playwright로 `getComputedStyle` 확인: 배경 `rgb(11,17,32)` vs 카드 `rgb(22,31,50)`
+
+- **Task 036: 코드 블록 신택스 톤 통일** ✅
+  - `BlockRenderer`의 `code` 케이스에 `bg-card`·`border-border`·`--syntax-prop` 토큰 적용 — `CodeEditorPanel`과 프로젝트 상세 페이지 코드 블록 톤 일치
+  - Tailwind Typography(`prose`)의 `pre`/`code` 기본 스타일이 `:where()`로 감싸져 0 specificity이므로 유틸리티 클래스로 정상 오버라이드됨을 확인
+
+### Phase 15-B: 컴포넌트 인터랙션 일관성 확보 ✅ 완료
+
+- **Task 037: `ProjectCard` hover 스타일 내재화** ✅
+  - 홈 섹션(`AnimatedProjectsSection`)에서만 주입되던 `hover:border-accent`를 `ProjectCard` 기본 스타일로 이동 — 목록 페이지·홈 페이지 동일 hover 반응 보장
+  - Playwright로 hover 전/후 `border-color` 확인: `rgb(30,41,59)` → `rgb(45,212,191)`(accent)
+
+- **Task 038: Header 로고/이름 시각 위계 재조정** ✅
+  - `</>` 로고를 `text-sm` → `text-lg`로 확대, 이름 버튼은 `font-semibold` → `text-sm font-medium text-muted-foreground`로 축소 — 로고가 더 명확한 브랜드 요소로 강조됨 (데스크톱·모바일 Sheet 헤더 동일 적용)
+
+- **Task 039: `EmptyState` 아이콘 적용** ✅
+  - `ProjectsPage` — 검색 결과 없음(`SearchX`)/프로젝트 없음(`FolderOpen`) 케이스에 각각 아이콘 전달
+
+- **Task 040: `ProjectFilters` 태그 과다 시 처리** ✅
+  - 기술 스택 8개 초과 시 `VISIBLE_TECH_LIMIT`로 잘라 보여주고 "+N개 더"/"접기" 토글 버튼 추가
+  - Playwright로 실제 프로젝트 데이터(15개 기술 스택)에서 "+8개 더" 버튼 노출 확인
+
+**검증**: `npm run lint`·`npm run check`·`npm run build` 모두 통과. Playwright로 다크/라이트 모드, 카드 hover, 코드 블록, 헤더, EmptyState, 필터 접기를 실제 Notion 데이터로 스크린샷 검증(콘솔 에러 0건).
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |
