@@ -427,6 +427,39 @@
 
 ---
 
+## Phase 16: Setup 페이지 API Key 카드 UI 개편 ✅ 완료
+
+> 기존 `/setup`은 PCB 회로 배경 위에 4개 필드를 한 카드에 몰아넣고 단일 "시작하기" 버튼으로 검증·저장을 한 번에 처리했습니다. Notion·Claude·GitHub를 개별 카드로 분리해 카드별 실시간 검증 피드백을 제공하도록 개편합니다.
+
+- **Task 041: `/api/auth/validate` 신규 — provider별 개별 검증 API** ✅
+  - `app/api/auth/setup/route.ts` 삭제, `app/api/auth/validate/route.ts` 신규 — `{ provider: "notion" | "claude" | "github", ... }` discriminated union body
+  - Notion: 기존 `GET /v1/users` + `POST /v1/databases/{id}/query` 검증 로직 재사용
+  - Claude: `GET https://api.anthropic.com/v1/models` (헤더 `x-api-key`, `anthropic-version: 2023-06-01`) — 토큰 비용 없이 키 유효성만 확인
+  - GitHub: `GET https://api.github.com/user` (헤더 `Authorization: token <token>`)
+  - provider별 검증 성공 시 해당 쿠키만 즉시 `httpOnly` 설정(기존 `COOKIE_OPTIONS` 재사용, 30일) — 실패 시 쿠키 미설정, `{ valid: false, error }` 400 반환
+  - `proxy.ts` `PUBLIC_PATHS`에서 `/api/auth/setup` → `/api/auth/validate` 교체
+
+- **Task 042: `ApiKeyCard` 컴포넌트 신규 — 카드별 검증 UI** ✅
+  - `components/setup/ApiKeyCard.tsx` 신규 — provider·필드·안내 링크를 props로 받는 재사용 카드
+  - 비밀번호 필드 show/hide 토글(Eye/EyeOff), 검증 버튼 로딩 스피너(Loader2)
+  - 테두리 스윕 애니메이션: `globals.css`에 `@property --border-angle` + `@keyframes border-sweep`(conic-gradient 0→360deg) 추가. 검증 완료 시 1회 회전 후 `onAnimationEnd`에서 정적 `border-green-500`(성공)/`border-destructive`(실패)로 고정
+  - 카드 우측 상단 모서리에 겹치는 상태 배지(성공: 초록 원 + CheckCircle2, 실패: 빨간 원 + AlertTriangle), 실패 시 카드 하단에 구체적 에러 메시지 표시
+
+- **Task 043: `app/setup/page.tsx` 전면 재작성** ✅
+  - `CircuitBackground`(PCB 테마) 제거 — 사이트 기본 `bg-background` 테마를 따르도록 변경(라이트/다크 모두 정상 대응 확인)
+  - "왜 API key가 필요한가요?" 링크를 페이지 우측 상단에 `fixed` 고정
+  - Notion(2필드: API Key·DB ID) · Claude(1필드: Anthropic API Key) · GitHub(1필드: Token) 3열 그리드 카드 배치
+  - 3개 provider 모두 검증 완료 시에만 "계속하기" 버튼 활성화 — 클릭 시 이미 쿠키가 설정된 상태이므로 추가 API 호출 없이 `/admin`으로 이동
+
+- **Task 044: 프로바이더별 API Key 생성 방법 안내 페이지 신규 (빈 페이지)** ✅
+  - `app/setup/guide/notion`, `/claude`, `/github` 3개 라우트 신규 — 각 카드의 `[+API Key 생성 방법]` 링크 대상. 현재는 "준비 중입니다" placeholder만 표시
+  - `proxy.ts` 수정 불필요 — 기존 `startsWith("/setup/")` 규칙으로 이미 공개 경로 처리됨
+  - `/setup/why` 페이지는 이번 범위에서 미변경(기존 `CircuitBackground` 유지)
+
+**검증**: `npm run lint`·`npm run check`·`npm run build` 모두 통과. Playwright로 다크/라이트 모드, 3개 카드 렌더링, GitHub 카드 잘못된 토큰 검증 시 빨간 테두리·경고 배지·에러 메시지, 모바일 뷰포트(375px) 스크린샷 검증(콘솔 에러 0건, 의도된 400 응답 제외).
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |

@@ -160,6 +160,25 @@
   50%       { opacity: 1;    }
 }
 
+@property --border-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes border-sweep {
+  to { --border-angle: 360deg; }
+}
+
+.animate-border-sweep {
+  animation: border-sweep 1s linear 1;
+  background: conic-gradient(
+    from var(--border-angle),
+    transparent 0%,
+    var(--sweep-color, transparent) 15%,
+    transparent 30%
+  );
+}
 
 @layer utilities {
   .animate-cursor-blink {

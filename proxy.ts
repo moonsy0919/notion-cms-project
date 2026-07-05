@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 /** 인증 없이 접근 가능한 경로 */
-const PUBLIC_PATHS = ["/welcome", "/setup", "/api/auth/setup", "/api/auth/logout", "/opengraph-image", "/robots.txt"];
+const PUBLIC_PATHS = ["/welcome", "/setup", "/api/auth/validate", "/api/auth/logout", "/opengraph-image", "/robots.txt"];
 
 export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
