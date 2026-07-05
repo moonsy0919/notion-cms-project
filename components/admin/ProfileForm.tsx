@@ -1,14 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, RefreshCw } from "lucide-react";
-import { toast } from "sonner";
 import { useProfile } from "@/contexts/DeveloperProfileContext";
 import { ProfileAvatar } from "@/components/home/ProfileAvatar";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { TagInput } from "@/components/admin/TagInput";
+import { BasicInfoFields } from "@/components/admin/BasicInfoFields";
+import { SkillsFields } from "@/components/admin/SkillsFields";
+import { useProfileFields } from "@/hooks/useProfileFields";
+import { useSaveProfile } from "@/hooks/useSaveProfile";
 import type { DeveloperProfile } from "@/types/profile";
 
 interface ProfileFormProps {
@@ -22,53 +21,19 @@ interface ProfileFormProps {
 /** 개발자 프로필 편집 폼 */
 export function ProfileForm({ initialProfile, onSuccess, onCancel }: ProfileFormProps) {
   const router = useRouter();
-  const { profile, setProfile, avatarUrl } = useProfile();
-  const [formData, setFormData] = useState<DeveloperProfile>(initialProfile);
-  const [saving, setSaving] = useState(false);
-
-  const updateField = <K extends keyof DeveloperProfile>(
-    key: K,
-    value: DeveloperProfile[K]
-  ) => {
-    setFormData((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const updateSkill = (
-    category: keyof DeveloperProfile["skills"],
-    tags: string[]
-  ) => {
-    setFormData((prev) => ({
-      ...prev,
-      skills: { ...prev.skills, [category]: tags },
-    }));
-  };
+  const { profile, avatarUrl } = useProfile();
+  const { formData, updateField, updateSkill } = useProfileFields(initialProfile);
+  const { saving, save } = useSaveProfile();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaving(true);
-    try {
-      const res = await fetch("/api/profile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      if (!res.ok) {
-        const data = await res.json() as { error?: string };
-        toast.error(data.error ?? "저장에 실패했습니다.");
-        return;
-      }
-      setProfile(formData);
-      router.refresh();
-      toast.success("프로필이 저장되었습니다.");
-      if (onSuccess) {
-        onSuccess();
-      } else {
-        router.push("/");
-      }
-    } catch {
-      toast.error("저장에 실패했습니다. 다시 시도해주세요.");
-    } finally {
-      setSaving(false);
+    const success = await save(formData);
+    if (!success) return;
+    router.refresh();
+    if (onSuccess) {
+      onSuccess();
+    } else {
+      router.push("/");
     }
   };
 
@@ -87,50 +52,7 @@ export function ProfileForm({ initialProfile, onSuccess, onCancel }: ProfileForm
       <div className="border-t pt-5 space-y-4">
         <h3 className="text-sm font-semibold">기본 정보</h3>
         <div className="grid sm:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="name">
-              이름{" "}
-              <span className="text-accent text-xs font-normal">필수</span>
-            </Label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) => updateField("name", e.target.value)}
-              placeholder="홍길동"
-              required
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="role">
-              역할{" "}
-              <span className="text-accent text-xs font-normal">필수</span>
-            </Label>
-            <Input
-              id="role"
-              value={formData.role}
-              onChange={(e) => updateField("role", e.target.value)}
-              placeholder="Developer"
-              required
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="focus">주력 기술</Label>
-            <Input
-              id="focus"
-              value={formData.focus}
-              onChange={(e) => updateField("focus", e.target.value)}
-              placeholder="Next.js & TypeScript"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="location">위치</Label>
-            <Input
-              id="location"
-              value={formData.location}
-              onChange={(e) => updateField("location", e.target.value)}
-              placeholder="서울, 대한민국"
-            />
-          </div>
+          <BasicInfoFields formData={formData} onUpdateField={updateField} />
         </div>
       </div>
 
@@ -143,30 +65,7 @@ export function ProfileForm({ initialProfile, onSuccess, onCancel }: ProfileForm
           </p>
         </div>
         <div className="space-y-3">
-          <div className="space-y-1.5">
-            <Label>Frontend</Label>
-            <TagInput
-              value={formData.skills.frontend}
-              onChange={(tags) => updateSkill("frontend", tags)}
-              placeholder="Next.js 입력 후 Enter..."
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Backend</Label>
-            <TagInput
-              value={formData.skills.backend}
-              onChange={(tags) => updateSkill("backend", tags)}
-              placeholder="Node.js 입력 후 Enter..."
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Tools</Label>
-            <TagInput
-              value={formData.skills.tools}
-              onChange={(tags) => updateSkill("tools", tags)}
-              placeholder="Git 입력 후 Enter..."
-            />
-          </div>
+          <SkillsFields formData={formData} onUpdateSkill={updateSkill} />
         </div>
       </div>
 

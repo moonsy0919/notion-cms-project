@@ -4,12 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, RefreshCw } from "lucide-react";
 import { SiNotion } from "react-icons/si";
-import { toast } from "sonner";
 import { useProfile } from "@/contexts/DeveloperProfileContext";
 import { ProfileAvatar } from "@/components/home/ProfileAvatar";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { TagInput } from "@/components/admin/TagInput";
+import { BasicInfoFields } from "@/components/admin/BasicInfoFields";
+import { SkillsFields } from "@/components/admin/SkillsFields";
+import { useProfileFields } from "@/hooks/useProfileFields";
+import { useSaveProfile } from "@/hooks/useSaveProfile";
 import { cn } from "@/lib/utils";
 import type { DeveloperProfile } from "@/types/profile";
 
@@ -27,49 +27,18 @@ interface ProfileWizardProps {
 /** 개발자 프로필 관리 2단계 위저드 (기본 정보 → 기술 스택) */
 export function ProfileWizard({ initialProfile }: ProfileWizardProps) {
   const router = useRouter();
-  const { setProfile, avatarUrl } = useProfile();
+  const { avatarUrl } = useProfile();
   const [step, setStep] = useState<StepId>(1);
-  const [formData, setFormData] = useState<DeveloperProfile>(initialProfile);
-  const [saving, setSaving] = useState(false);
-
-  const updateField = <K extends keyof DeveloperProfile>(
-    key: K,
-    value: DeveloperProfile[K]
-  ) => {
-    setFormData((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const updateSkill = (category: keyof DeveloperProfile["skills"], tags: string[]) => {
-    setFormData((prev) => ({
-      ...prev,
-      skills: { ...prev.skills, [category]: tags },
-    }));
-  };
+  const { formData, updateField, updateSkill } = useProfileFields(initialProfile);
+  const { saving, save } = useSaveProfile();
 
   const canContinue = formData.name.trim() !== "" && formData.role.trim() !== "";
 
   const handleSave = async () => {
-    setSaving(true);
-    try {
-      const res = await fetch("/api/profile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      if (!res.ok) {
-        const data = (await res.json()) as { error?: string };
-        toast.error(data.error ?? "저장에 실패했습니다.");
-        return;
-      }
-      setProfile(formData);
-      router.refresh();
-      toast.success("프로필이 저장되었습니다.");
-      router.push("/");
-    } catch {
-      toast.error("저장에 실패했습니다. 다시 시도해주세요.");
-    } finally {
-      setSaving(false);
-    }
+    const success = await save(formData);
+    if (!success) return;
+    router.refresh();
+    router.push("/");
   };
 
   return (
@@ -200,48 +169,7 @@ function BasicInfoStep({
       </div>
 
       <div className="space-y-4">
-        <div className="space-y-1.5">
-          <Label htmlFor="wizard-name">
-            이름 <span className="text-accent text-xs font-normal">필수</span>
-          </Label>
-          <Input
-            id="wizard-name"
-            value={formData.name}
-            onChange={(e) => onUpdateField("name", e.target.value)}
-            placeholder="홍길동"
-            required
-          />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="wizard-role">
-            역할 <span className="text-accent text-xs font-normal">필수</span>
-          </Label>
-          <Input
-            id="wizard-role"
-            value={formData.role}
-            onChange={(e) => onUpdateField("role", e.target.value)}
-            placeholder="Developer"
-            required
-          />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="wizard-focus">주력 기술</Label>
-          <Input
-            id="wizard-focus"
-            value={formData.focus}
-            onChange={(e) => onUpdateField("focus", e.target.value)}
-            placeholder="Next.js & TypeScript"
-          />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="wizard-location">위치</Label>
-          <Input
-            id="wizard-location"
-            value={formData.location}
-            onChange={(e) => onUpdateField("location", e.target.value)}
-            placeholder="서울, 대한민국"
-          />
-        </div>
+        <BasicInfoFields formData={formData} onUpdateField={onUpdateField} />
       </div>
 
       <button
@@ -276,30 +204,7 @@ function SkillsStep({ formData, saving, onUpdateSkill, onBack, onSave }: SkillsS
       </div>
 
       <div className="space-y-4">
-        <div className="space-y-1.5">
-          <Label>Frontend</Label>
-          <TagInput
-            value={formData.skills.frontend}
-            onChange={(tags) => onUpdateSkill("frontend", tags)}
-            placeholder="Next.js 입력 후 Enter..."
-          />
-        </div>
-        <div className="space-y-1.5">
-          <Label>Backend</Label>
-          <TagInput
-            value={formData.skills.backend}
-            onChange={(tags) => onUpdateSkill("backend", tags)}
-            placeholder="Node.js 입력 후 Enter..."
-          />
-        </div>
-        <div className="space-y-1.5">
-          <Label>Tools</Label>
-          <TagInput
-            value={formData.skills.tools}
-            onChange={(tags) => onUpdateSkill("tools", tags)}
-            placeholder="Git 입력 후 Enter..."
-          />
-        </div>
+        <SkillsFields formData={formData} onUpdateSkill={onUpdateSkill} />
       </div>
 
       <div className="grid grid-cols-2 gap-3">

@@ -749,6 +749,28 @@
 
 ---
 
+## Phase 34: 프로필 입력 폼 중복 제거 (ProfileForm ↔ ProfileWizard) ✅ 완료
+
+> 프로젝트 구조 전체 분석 중 헤더 Sheet용 `ProfileForm.tsx`와 `/admin` 온보딩용 `ProfileWizard.tsx`가 프로필 편집 상태 로직·입력 필드 마크업을 사실상 그대로 중복 구현하고 있음을 확인했습니다. 두 컴포넌트는 레이아웃(2열 grid vs 1열 스택)과 저장 후 동작(콜백 vs 강제 이동)이 달라 완전히 하나로 합칠 수는 없으므로, 상태 로직과 반복되는 필드 마크업만 공용 훅·컴포넌트로 추출하고 각자의 wrapper·헤딩·레이아웃은 그대로 유지했습니다.
+
+- **Task 082: 프로필 폼 상태 관리 훅 2종 신규** ✅
+  - `hooks/useProfileFields.ts` 신규 — `formData`/`updateField`/`updateSkill`을 반환. 두 컴포넌트의 동일한 `useState` + 갱신 로직을 훅 하나로 통합
+  - `hooks/useSaveProfile.ts` 신규 — `saving`/`save(formData): Promise<boolean>` 반환. `POST /api/profile` → 실패 시 toast.error+false, 성공 시 `setProfile`+toast.success+true, 예외 시 toast.error+false 흐름을 이동. 저장 후 이동(`onSuccess` 콜백 vs `router.push("/")`)은 훅이 관여하지 않고 반환값을 본 호출부가 직접 처리
+
+- **Task 083: 공용 필드 컴포넌트 2종 신규** ✅
+  - `components/admin/BasicInfoFields.tsx` 신규 — 이름(필수)·역할(필수)·주력 기술·위치 4개 `Label`+`Input` 블록만 포함(바깥 grid/space wrapper 없는 fragment) — 두 화면의 서로 다른 레이아웃(2열 grid vs 1열 스택)은 각 호출부가 그대로 유지
+  - `components/admin/SkillsFields.tsx` 신규 — Frontend/Backend/Tools 3개 `Label`+`TagInput` 블록만 포함 — 제목·설명 텍스트(h2 vs h3)는 각 호출부에 유지
+  - id/`htmlFor` 충돌 없음 확인: `ProfileForm`은 `(main)` Header Sheet 전용, `ProfileWizard`는 `(onboarding)` `/admin` 전용이라 두 컴포넌트가 동시에 DOM에 존재하지 않음 — 별도 `idPrefix` prop 없이 고정 id 재사용
+
+- **Task 084: `ProfileForm.tsx`·`ProfileWizard.tsx` 리팩터링** ✅
+  - 두 파일의 로컬 `useState`+`updateField`+`updateSkill`+저장 fetch 로직을 전부 제거하고 `useProfileFields`+`useSaveProfile` 호출로 교체
+  - 기존 wrapper(`grid sm:grid-cols-2 gap-4` vs `space-y-4`)·헤딩(h3 vs h2)은 그대로 두고 내부 필드 마크업만 `BasicInfoFields`/`SkillsFields`로 교체
+  - `ProfileForm`의 `handleSubmit`, `ProfileWizard`의 `handleSave`는 `save(formData)` 반환값이 `true`일 때만 각자의 후속 동작(onSuccess 콜백 또는 홈 이동) 수행하도록 축소
+
+**검증**: `npm run lint`·`npm run check`·`npm run build` 모두 통과(17개 라우트 컴파일 성공). Playwright로 `/admin` 위저드 1단계 입력→Continue→2단계 태그 3개 입력 정상 동작, 레이아웃(`space-y-4` 1열 스택) 회귀 없음 확인. 헤더 이름 클릭→프로필 편집 Sheet 오픈→레이아웃(`grid sm:grid-cols-2 gap-4`) 회귀 없음 확인, 취소 버튼 클릭 시 Sheet 정상 닫힘 확인. 콘솔 에러 0건 확인(가짜 API 키로 인한 예상된 Notion 401 로그 제외).
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |
