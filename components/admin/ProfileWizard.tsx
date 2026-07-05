@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, RefreshCw } from "lucide-react";
+import { SiNotion } from "react-icons/si";
 import { toast } from "sonner";
 import { useProfile } from "@/contexts/DeveloperProfileContext";
 import { ProfileAvatar } from "@/components/home/ProfileAvatar";
@@ -26,7 +27,7 @@ interface ProfileWizardProps {
 /** 개발자 프로필 관리 2단계 위저드 (기본 정보 → 기술 스택) */
 export function ProfileWizard({ initialProfile }: ProfileWizardProps) {
   const router = useRouter();
-  const { profile, setProfile, avatarUrl } = useProfile();
+  const { setProfile, avatarUrl } = useProfile();
   const [step, setStep] = useState<StepId>(1);
   const [formData, setFormData] = useState<DeveloperProfile>(initialProfile);
   const [saving, setSaving] = useState(false);
@@ -80,8 +81,6 @@ export function ProfileWizard({ initialProfile }: ProfileWizardProps) {
             <BasicInfoStep
               formData={formData}
               avatarUrl={avatarUrl}
-              profileName={profile.name}
-              profileRole={profile.role}
               canContinue={canContinue}
               onUpdateField={updateField}
               onContinue={() => setStep(2)}
@@ -107,6 +106,11 @@ function WizardSidebar({ step }: { step: StepId }) {
 
   return (
     <aside className="flex shrink-0 flex-col gap-6 border-b border-sidebar-border bg-sidebar px-6 py-6 md:w-72 md:border-b-0 md:border-r md:px-8 md:py-12">
+      <div className="mb-8 flex items-center gap-2">
+        <SiNotion className="h-5 w-5 text-sidebar-foreground" />
+        <span className="text-base font-semibold text-sidebar-foreground">Notion Portfolio</span>
+      </div>
+
       <div className="hidden md:flex md:flex-col">
         {STEPS.map((s, index) => {
           const state = s.id < step ? "done" : s.id === step ? "current" : "pending";
@@ -126,13 +130,13 @@ function WizardSidebar({ step }: { step: StepId }) {
               <div className={cn("pb-8", index === STEPS.length - 1 && "pb-0")}>
                 <p
                   className={cn(
-                    "text-sm font-semibold",
+                    "text-base font-semibold",
                     state === "pending" ? "text-sidebar-foreground/60" : "text-sidebar-foreground"
                   )}
                 >
                   {s.title}
                 </p>
-                <p className="text-xs text-sidebar-foreground/50">{s.description}</p>
+                <p className="text-sm text-sidebar-foreground/50">{s.description}</p>
               </div>
             </div>
           );
@@ -151,7 +155,7 @@ function WizardSidebar({ step }: { step: StepId }) {
             />
           ))}
         </div>
-        <p className="mt-2 text-xs font-medium text-sidebar-foreground/70">
+        <p className="mt-2 text-sm font-medium text-sidebar-foreground/70">
           {step}/{STEPS.length} · {activeStep.title}
         </p>
       </div>
@@ -180,8 +184,6 @@ function StepIcon({ state }: { state: "done" | "current" | "pending" }) {
 interface BasicInfoStepProps {
   formData: DeveloperProfile;
   avatarUrl: string | null;
-  profileName: string;
-  profileRole: string;
   canContinue: boolean;
   onUpdateField: <K extends keyof DeveloperProfile>(key: K, value: DeveloperProfile[K]) => void;
   onContinue: () => void;
@@ -191,20 +193,14 @@ interface BasicInfoStepProps {
 function BasicInfoStep({
   formData,
   avatarUrl,
-  profileName,
-  profileRole,
   canContinue,
   onUpdateField,
   onContinue,
 }: BasicInfoStepProps) {
   return (
     <div className="space-y-6">
-      <div className="flex flex-col items-center gap-2">
-        <ProfileAvatar src={avatarUrl ?? undefined} size={72} />
-        <div className="text-center">
-          <p className="text-sm font-semibold">{profileName || "이름 미설정"}</p>
-          <p className="text-xs text-muted-foreground">{profileRole || "역할 미설정"}</p>
-        </div>
+      <div className="flex flex-col items-center">
+        <ProfileAvatar src={avatarUrl ?? undefined} size={112} />
       </div>
 
       <div className="space-y-4">

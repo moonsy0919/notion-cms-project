@@ -669,6 +669,22 @@
 
 ---
 
+## Phase 29: Admin 위저드 사이드바 브랜드 헤더 추가 및 기본 정보 단계 아바타 단순화 ✅ 완료
+
+> Phase 28의 위저드에서 1단계 아바타 아래 이름/역할 미리보기 텍스트가 입력 전 값을 보여주는 형태라 불필요했고, 좌측 스텝 리스트 텍스트가 작아 눈에 띄지 않았습니다. 참조 이미지처럼 사이드바 최상단에 브랜드 헤더를 추가하고 스텝 리스트를 그 아래로 내립니다.
+
+- **Task 073: `ProfileWizard` 사이드바 브랜드 헤더 추가 및 텍스트 확대** ✅
+  - `components/admin/ProfileWizard.tsx` — `WizardSidebar` 최상단에 `react-icons/si`의 `SiNotion` 아이콘 + "Notion Portfolio" 텍스트 브랜드 헤더 추가(데스크톱·모바일 모두), 기존 스텝 리스트는 그 아래로 이동(`mb-8` 여백으로 구분)
+  - 스텝 제목 `text-sm` → `text-base`, 설명 `text-xs` → `text-sm`로 확대
+
+- **Task 074: 1단계(기본 정보) 아바타 단순화** ✅
+  - `BasicInfoStep` — 아바타 아래 이름/역할 미리보기 텍스트(`profileName`/`profileRole`) 블록 삭제, 더 이상 쓰이지 않는 두 prop을 `BasicInfoStepProps`·호출부에서 함께 제거
+  - `ProfileAvatar` `size` 72 → 112로 확대
+
+**검증**: `npm run lint`·`npm run check`·`npm run build` 모두 통과. Playwright로 `/admin` 접속 — 사이드바 최상단 "Notion Portfolio" 브랜드 헤더 노출 확인, 스텝 텍스트 폰트 크기 확대(`text-sm`→`text-base` 16px) 확인, 아바타 112px 확대 및 이름/역할 텍스트 미노출 확인, Continue → 2단계 전환 정상 동작 확인. 헤더 프로필 편집 Sheet 회귀 확인. 다크/라이트(localStorage 강제 전환)/모바일(375px) 스크린샷 확인, 콘솔 에러 0건 확인(가짜 API 키로 인한 예상된 Notion 400 로그 제외).
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |
