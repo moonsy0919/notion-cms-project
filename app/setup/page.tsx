@@ -3,8 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Database, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { FaGithub } from "react-icons/fa6";
+import { SiNotion, SiClaude } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import { ApiKeyCard, type ApiKeyProvider } from "@/components/setup/ApiKeyCard";
 
@@ -44,7 +45,7 @@ export default function SetupPage() {
           <ApiKeyCard
             provider="notion"
             title="Notion"
-            icon={<Database className="h-4 w-4 text-white" />}
+            icon={<SiNotion className="h-4 w-4 text-white" />}
             iconBgClassName="bg-neutral-900"
             guideHref="/setup/guide/notion"
             fields={[
@@ -62,7 +63,7 @@ export default function SetupPage() {
           <ApiKeyCard
             provider="claude"
             title="Claude"
-            icon={<Sparkles className="h-4 w-4 text-white" />}
+            icon={<SiClaude className="h-4 w-4 text-white" />}
             iconBgClassName="bg-[#c15f3c]"
             guideHref="/setup/guide/claude"
             fields={[

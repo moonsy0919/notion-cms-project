@@ -460,6 +460,21 @@
 
 ---
 
+## Phase 17: Setup 페이지 카드 비주얼 리디자인 ✅ 완료
+
+> Phase 16의 카드 UI가 제네릭 아이콘과 모서리 겹침 배지로 다소 투박했습니다. 참조 이미지(OpenAI·Claude Fable-5·Google Gemini 카드형 API 키 대시보드)를 참고해 공식 브랜드 아이콘과 인라인 상태 텍스트로 톤을 다듬습니다.
+
+- **Task 045: `ApiKeyCard` 공식 아이콘 및 상태 표시 리디자인** ✅
+  - ✅ `components/setup/ApiKeyCard.tsx` — 모서리 겹침 배지(`absolute -top-3 -right-3` 원형 CheckCircle2/AlertTriangle) 제거, `CardTitle` 아래 인라인 상태 행 추가(성공: 초록 `CheckCircle2` + "Active", 실패: 빨강 `XCircle` + "False")
+  - ✅ `[+API Key 생성 방법]` 텍스트 링크 → `CircleHelp` 아이콘 원형 버튼으로 교체(헤더 우측 상단, 참조 이미지의 `⋮` 메뉴 위치와 유사)
+  - ✅ 입력 필드를 `bg-muted/40 rounded-lg` 필박스 스타일로 통일, 카드 컨테이너 `rounded-xl` → `rounded-2xl` + `shadow-sm hover:shadow-md`, 검증 버튼 `rounded-full`로 전환
+  - ✅ 테두리 스윕 애니메이션(`animate-border-sweep`)과 정착 테두리 색상 로직은 기존 그대로 유지
+  - ✅ `app/setup/page.tsx` — Notion·Claude 아이콘을 `lucide-react` 제네릭 아이콘(Database, Sparkles)에서 `react-icons/si`의 공식 브랜드 아이콘(`SiNotion`, `SiClaude`)으로 교체. GitHub는 기존 `FaGithub` 유지(이미 공식 아이콘)
+
+**검증**: `npm run lint`·`npm run check`·`npm run build` 모두 통과. Playwright로 다크/라이트/모바일(375px) 스크린샷 확인, GitHub 카드에 잘못된 토큰 검증 시 빨간 테두리+인라인 "False" 상태(모서리 배지 없음) 확인, `/api/auth/validate` 응답을 mock한 성공 케이스에서 초록 테두리+인라인 "Active" 상태 확인(콘솔 에러 0건, 의도된 400 응답 제외).
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |
