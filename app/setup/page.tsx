@@ -1,14 +1,17 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useMediaQuery } from "usehooks-ts";
 import { ArrowRight } from "lucide-react";
 import { FaGithub } from "react-icons/fa6";
 import { SiNotion, SiClaude } from "react-icons/si";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { ApiKeyCard, type ApiKeyProvider } from "@/components/setup/ApiKeyCard";
-import { VerificationArcTracker } from "@/components/setup/VerificationArcTracker";
+import { VerificationArcTracker, type ConvergePhase } from "@/components/setup/VerificationArcTracker";
+import { FlyingDocumentIcon } from "@/components/setup/FlyingDocumentIcon";
 
 const REQUIRED_PROVIDERS: ApiKeyProvider[] = ["notion", "claude", "github"];
 
@@ -26,12 +29,61 @@ const ARC_NODES: [
 export default function SetupPage() {
   const router = useRouter();
   const [verified, setVerified] = useState<Set<ApiKeyProvider>>(new Set());
+  const [convergePhase, setConvergePhase] = useState<ConvergePhase>("idle");
+  const [buttonPulse, setButtonPulse] = useState(false);
+  const [flightRects, setFlightRects] = useState<{ start: DOMRect; end: DOMRect } | null>(null);
+  const isDesktop = useMediaQuery("(min-width: 768px)", { initializeWithValue: false });
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const mergedIconRef = useRef<HTMLDivElement>(null);
 
   function handleVerified(provider: ApiKeyProvider) {
     setVerified((prev) => new Set(prev).add(provider));
   }
 
   const allVerified = REQUIRED_PROVIDERS.every((provider) => verified.has(provider));
+
+  // 3개 카드 검증 완료 시점에 컨버전스 애니메이션 시작 (데스크톱만, 모바일은 트래커 비노출이라 바로 활성화)
+  useEffect(() => {
+    if (!allVerified || convergePhase !== "idle") return;
+    const timer = setTimeout(
+      () => setConvergePhase(isDesktop ? "sliding" : "done"),
+      isDesktop ? 0 : 400
+    );
+    return () => clearTimeout(timer);
+  }, [allVerified, convergePhase, isDesktop]);
+
+  // sliding → merged → flying 단계 자동 전이 (CSS 트랜지션/애니메이션 길이에 맞춘 타이머)
+  useEffect(() => {
+    if (convergePhase === "sliding") {
+      const timer = setTimeout(() => setConvergePhase("merged"), 500);
+      return () => clearTimeout(timer);
+    }
+    if (convergePhase === "merged") {
+      const timer = setTimeout(() => setConvergePhase("flying"), 450);
+      return () => clearTimeout(timer);
+    }
+  }, [convergePhase]);
+
+  // flying 진입 시 문서 아이콘 시작/도착 좌표 계산
+  useLayoutEffect(() => {
+    if (convergePhase !== "flying") return;
+    if (!mergedIconRef.current || !buttonRef.current) return;
+    setFlightRects({
+      start: mergedIconRef.current.getBoundingClientRect(),
+      end: buttonRef.current.getBoundingClientRect(),
+    });
+  }, [convergePhase]);
+
+  // 버튼 활성화 순간 하이라이트 펄스
+  useEffect(() => {
+    if (convergePhase !== "done") return;
+    const startTimer = setTimeout(() => setButtonPulse(true), 0);
+    const endTimer = setTimeout(() => setButtonPulse(false), 500);
+    return () => {
+      clearTimeout(startTimer);
+      clearTimeout(endTimer);
+    };
+  }, [convergePhase]);
 
   return (
     <main className="min-h-screen bg-background px-4 py-12 md:py-16">
@@ -101,19 +153,38 @@ export default function SetupPage() {
           />
         </div>
 
-        <VerificationArcTracker nodes={ARC_NODES} verified={verified} />
+        <VerificationArcTracker
+          ref={mergedIconRef}
+          nodes={ARC_NODES}
+          verified={verified}
+          convergePhase={convergePhase}
+        />
 
         <div className="mt-4 flex justify-center md:mt-10">
           <Button
+            ref={buttonRef}
             type="button"
-            disabled={!allVerified}
+            disabled={convergePhase !== "done"}
             onClick={() => router.push("/admin")}
+            className={cn(
+              "transition-shadow duration-300",
+              buttonPulse && "ring-2 ring-green-500 ring-offset-2 ring-offset-background"
+            )}
           >
             계속하기
             <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
       </div>
+
+      {convergePhase === "flying" && flightRects && (
+        <FlyingDocumentIcon
+          startRect={flightRects.start}
+          endRect={flightRects.end}
+          iconBgClassName="bg-[#c15f3c]"
+          onArrived={() => setConvergePhase("done")}
+        />
+      )}
     </main>
   );
 }

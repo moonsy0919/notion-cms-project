@@ -180,6 +180,16 @@
   );
 }
 
+@keyframes document-merge-pop {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  60%  { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.animate-document-merge {
+  animation: document-merge-pop 400ms ease-out 1;
+}
+
 @layer utilities {
   .animate-cursor-blink {
     animation: cursor-blink 1s step-end infinite;

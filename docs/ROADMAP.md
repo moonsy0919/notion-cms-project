@@ -494,6 +494,33 @@
 
 ---
 
+## Phase 19: Setup 페이지 검증 완료 컨버전스 애니메이션 추가 ✅ 완료
+
+> Phase 18의 아크 트래커는 3개 모두 검증되면 정적으로 멈춰 있고 "계속하기" 버튼은 즉시 활성화됐습니다. 3개 아이콘이 Claude 아이콘 위치로 슬라이드하며 겹쳐져 "문서 뭉치" 아이콘을 생성하고, 그 아이콘이 버튼으로 날아들어가며 버튼이 활성화되는 연출을 추가합니다(사용자가 "풀 슬라이드 컨버전스" 방식 선택).
+
+- **Task 048: 컨버전스 애니메이션 상태 머신 추가 (`app/setup/page.tsx`)** ✅
+  - ✅ `convergePhase: "idle" | "sliding" | "merged" | "flying" | "done"` state 추가, `allVerified`가 `false → true` 전환되는 시점을 `useEffect`로 감지해 전이 시작
+  - ✅ `usehooks-ts`의 `useMediaQuery("(min-width: 768px)", { initializeWithValue: false })`로 데스크톱 여부 판별 — 모바일은 트래커 비노출이므로 슬라이드·병합·비행 연출 없이 400ms 딜레이 후 바로 `"done"` 전이
+  - ✅ "계속하기" 버튼 `disabled`를 `!allVerified` → `convergePhase !== "done"`으로 교체, `buttonRef` 추가
+
+- **Task 049: `VerificationArcTracker` — 슬라이드 컨버전스 + 문서 아이콘 병합 연출** ✅
+  - ✅ `convergePhase` prop 추가 — `"sliding"` 진입 시 Notion·GitHub 노드의 `left`를 50%(Claude 위치)로 변경해 `transition-[left] duration-500` 슬라이드, 동시에 아크 SVG 전체 `opacity-0` 페이드아웃
+  - ✅ `"merged"`(`merged`·`flying`·`done` 통합 판정) 진입 시 3개 아이콘 대신 Claude 위치에 `lucide-react`의 `Files` 아이콘 기반 문서 뭉치 배지 렌더링, `globals.css`에 `@keyframes document-merge-pop`(scale 0.5→1.15→1) 추가해 pop-in 애니메이션 적용
+  - ✅ `forwardRef`로 문서 뭉치 배지 DOM ref 노출 — 부모가 `getBoundingClientRect()`로 비행 시작 좌표 계산에 사용
+
+- **Task 050: `FlyingDocumentIcon` 컴포넌트 신규 — 문서 아이콘 → 버튼 비행 애니메이션** ✅
+  - ✅ `components/setup/FlyingDocumentIcon.tsx` 신규 — `fixed` 포지션 오버레이가 트래커의 문서 아이콘 위치에서 시작해 `requestAnimationFrame` 이후 `transform: translate() scale()` 값을 버튼 좌표 기준으로 갱신, `transition-all duration-[600ms]`로 비행 애니메이션 처리
+  - ✅ 도착 시 `opacity-0`으로 페이드, `onTransitionEnd`에서 `onArrived()` 콜백 호출 → `convergePhase`를 `"done"`으로 전이
+
+- **Task 051: 계속하기 버튼 활성화 하이라이트 + 전체 타이밍 연결** ✅
+  - ✅ `convergePhase` 전이 타이밍: `sliding`(500ms) → `merged`(450ms) → `flying` → 비행 완료 시 `done`
+  - ✅ 버튼 활성화 순간 `ring-2 ring-green-500` 하이라이트 펄스(500ms) 적용, 모바일도 동일한 펄스로 최소 피드백 유지
+  - **버그 수정**: `react-hooks/set-state-in-effect` ESLint 오류 — effect 본문에서 동기 `setState` 직접 호출 대신 `setTimeout` 콜백 내부로 이동(0ms 포함)해 해결
+
+**검증**: `npm run lint`·`npm run check`·`npm run build` 모두 통과. Playwright로 Notion→GitHub→Claude 순서로 검증 시(마지막 카드가 Claude가 아니어도) 3번째 검증 완료 즉시 Notion·GitHub 아이콘이 Claude 위치로 슬라이드하며 겹쳐지고 문서 아이콘이 pop-in된 후 버튼으로 날아가 사라짐과 동시에 버튼이 초록 하이라이트와 함께 활성화됨을 스크린샷으로 확인. 모바일(375px)에서 트래커 비노출 상태로 버튼이 정상 활성화되는지 확인, 다크/라이트 모드 대비 확인(콘솔 에러 0건).
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |
