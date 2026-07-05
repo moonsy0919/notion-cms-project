@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "re
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMediaQuery } from "usehooks-ts";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, KeyRound } from "lucide-react";
 import { FaGithub } from "react-icons/fa6";
 import { SiNotion, SiClaude } from "react-icons/si";
 import { Button } from "@/components/ui/button";
@@ -96,8 +96,8 @@ export default function SetupPage() {
 
       <div className="mx-auto max-w-6xl">
         <div className="mb-10 space-y-2 text-center">
-          <h1 className="font-mono text-2xl font-bold">
-            <span className="text-primary">&lt;/&gt;</span> API Key 설정
+          <h1 className="flex items-center justify-center gap-2 font-mono text-2xl font-bold">
+            <KeyRound className="h-6 w-6 text-primary" /> API Key 설정
           </h1>
           <p className="text-sm text-muted-foreground">
             Notion·Claude·GitHub 키를 각각 입력하고 검증해주세요. 키는 브라우저에만 저장됩니다.

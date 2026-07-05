@@ -545,6 +545,19 @@
 
 ---
 
+## Phase 21: Setup 페이지 타이틀 아이콘 교체 ✅ 완료
+
+> `/setup` 페이지 타이틀의 `</>` 표기는 사이트 전역 브랜드 로고(`Header.tsx`)에서 가져온 것으로, "API Key 설정"이라는 문맥과 의미적으로 맞지 않아 API 키를 상징하는 아이콘으로 교체합니다.
+
+- **Task 055: `app/setup/page.tsx` 타이틀의 `</>` → `KeyRound` 아이콘 교체** ✅
+  - ✅ `lucide-react`의 `KeyRound`(둥근 열쇠) 아이콘으로 교체 — 새 아이콘 라이브러리·이미지 에셋 추가 없이 기존 의존성 재사용
+  - ✅ `<h1>`을 `flex items-center justify-center gap-2`로 조정해 아이콘과 텍스트 정렬, 기존 `text-primary` 색상 톤 유지
+  - `ApiKeyCard.tsx`·`Header.tsx`의 `</>` 표기는 브랜드 로고이므로 미변경
+
+**검증**: `npm run lint`·`npm run check`·`npm run build` 모두 통과. Playwright로 데스크톱(다크/라이트)·모바일(375px)에서 `KeyRound` 아이콘이 "API Key 설정" 텍스트와 정렬되어 렌더링됨을 확인(콘솔 에러 0건).
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |
