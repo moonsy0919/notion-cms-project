@@ -27,6 +27,7 @@ export const VerificationArcTracker = forwardRef<HTMLDivElement, VerificationArc
     const thirdFilled = verified.has(third.provider);
     const converging = convergePhase !== "idle";
     const merged = convergePhase !== "idle" && convergePhase !== "sliding";
+    const badgeVisible = convergePhase === "merged";
 
     return (
       <div className="relative mt-2 hidden h-24 md:block">
@@ -68,11 +69,18 @@ export const VerificationArcTracker = forwardRef<HTMLDivElement, VerificationArc
           <div
             ref={mergedIconRef}
             className={cn(
-              "absolute top-[61%] left-1/2 flex h-10 w-10 items-center justify-center rounded-full border-2 border-green-500 animate-document-merge",
-              second.iconBgClassName
+              "absolute top-[61%] left-1/2 h-10 w-10 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-300",
+              badgeVisible ? "opacity-100" : "opacity-0"
             )}
           >
-            <Files className="h-4 w-4 text-white" />
+            <div
+              className={cn(
+                "flex h-10 w-10 items-center justify-center rounded-full border-2 border-green-500 animate-document-merge",
+                second.iconBgClassName
+              )}
+            >
+              <Files className="h-4 w-4 text-white" />
+            </div>
           </div>
         ) : (
           nodes.map((node, index) => {
@@ -81,7 +89,7 @@ export const VerificationArcTracker = forwardRef<HTMLDivElement, VerificationArc
             return (
               <div
                 key={node.provider}
-                className="absolute top-[61%] -translate-x-1/2 -translate-y-1/2 transition-[left] duration-500 ease-in-out"
+                className="absolute top-[61%] -translate-x-1/2 -translate-y-1/2 transition-[left] duration-700 ease-in-out"
                 style={{ left }}
               >
                 <div

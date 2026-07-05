@@ -47,7 +47,7 @@ export default function SetupPage() {
     if (!allVerified || convergePhase !== "idle") return;
     const timer = setTimeout(
       () => setConvergePhase(isDesktop ? "sliding" : "done"),
-      isDesktop ? 0 : 400
+      isDesktop ? 0 : 600
     );
     return () => clearTimeout(timer);
   }, [allVerified, convergePhase, isDesktop]);
@@ -55,11 +55,11 @@ export default function SetupPage() {
   // sliding → merged → flying 단계 자동 전이 (CSS 트랜지션/애니메이션 길이에 맞춘 타이머)
   useEffect(() => {
     if (convergePhase === "sliding") {
-      const timer = setTimeout(() => setConvergePhase("merged"), 500);
+      const timer = setTimeout(() => setConvergePhase("merged"), 700);
       return () => clearTimeout(timer);
     }
     if (convergePhase === "merged") {
-      const timer = setTimeout(() => setConvergePhase("flying"), 450);
+      const timer = setTimeout(() => setConvergePhase("flying"), 900);
       return () => clearTimeout(timer);
     }
   }, [convergePhase]);
@@ -78,7 +78,7 @@ export default function SetupPage() {
   useEffect(() => {
     if (convergePhase !== "done") return;
     const startTimer = setTimeout(() => setButtonPulse(true), 0);
-    const endTimer = setTimeout(() => setButtonPulse(false), 500);
+    const endTimer = setTimeout(() => setButtonPulse(false), 600);
     return () => {
       clearTimeout(startTimer);
       clearTimeout(endTimer);

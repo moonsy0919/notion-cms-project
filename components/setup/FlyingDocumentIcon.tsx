@@ -32,7 +32,7 @@ export function FlyingDocumentIcon({
   return (
     <div
       onTransitionEnd={onArrived}
-      className={`pointer-events-none fixed z-50 flex items-center justify-center rounded-full border-2 border-green-500 transition-all duration-[600ms] ease-in ${iconBgClassName}`}
+      className={`pointer-events-none fixed z-50 flex items-center justify-center rounded-full border-2 border-green-500 transition-all duration-[1000ms] ease-in ${iconBgClassName}`}
       style={{
         left: startRect.left,
         top: startRect.top,

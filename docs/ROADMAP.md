@@ -521,6 +521,30 @@
 
 ---
 
+## Phase 20: 컨버전스 애니메이션 버그 수정 및 타이밍 조정 ✅ 완료
+
+> Phase 19 배포 후 실사용 확인 결과, 병합된 문서 아이콘이 버튼으로 "날아갈" 때 엉뚱한 위치에서 출발하고 트래커 자리에 아이콘이 사라지지 않고 남아있는 버그, 그리고 애니메이션 전체 속도가 너무 빨라 인지하기 어려운 문제가 발견되어 수정합니다.
+
+- **Task 052: `document-merge-pop` 애니메이션 fill-mode 버그 수정** ✅
+  - **원인**: `app/globals.css`의 `.animate-document-merge`에 `animation-fill-mode`가 지정되지 않아(기본값 `none`), 400ms 애니메이션 종료 즉시 keyframe의 최종 `transform: translate(-50%,-50%) scale(1)` 값이 `transform: none`으로 리셋됨 → 문서 배지의 실제 `getBoundingClientRect()` 좌표가 시각적 위치에서 엘리먼트 절반 크기만큼 어긋남 → 비행 애니메이션이 이 어긋난 좌표를 시작점으로 사용
+  - ✅ `animation: document-merge-pop 600ms ease-out 1 forwards;`로 수정해 종료 후에도 최종 transform 값 유지
+
+- **Task 053: 병합 배지 구조를 아우터(위치·페이드)+이너(팝 애니메이션)로 분리** ✅
+  - **원인**: `forwards` 적용 후 CSS Animation이 `opacity`도 계속 점유해(CSS 캐스케이드상 애니메이션이 일반 클래스보다 우선순위 높음), `convergePhase`에 따른 `opacity-0`/`opacity-100` Tailwind 클래스 토글이 무시되어 트래커에 아이콘이 영구적으로 남는 문제 발생(Playwright로 `getComputedStyle(el).opacity`가 항상 `1`로 유지됨을 확인)
+  - ✅ `components/setup/VerificationArcTracker.tsx` — 아우터 `div`(정적 `-translate-x-1/2 -translate-y-1/2` 배치, `ref` 부착, `convergePhase === "merged"`일 때만 `opacity-100`)와 이너 `div`(원형 배지+`animate-document-merge`)로 분리
+  - ✅ `app/globals.css` — `document-merge-pop` keyframe에서 `translate`·`opacity`를 제거하고 `scale`만 애니메이션 — 위치·가시성은 애니메이션과 완전히 분리되어 아우터의 일반 클래스 토글이 정상 동작
+  - Playwright로 `flying`→`done` 전환 후 아우터 `opacity`가 `0`으로 정확히 전환됨을 재확인
+
+- **Task 054: 애니메이션 전체 타이밍 슬로우다운** ✅
+  - ✅ `app/setup/page.tsx` — 슬라이드→병합 타이머 500ms→700ms, 병합→비행 타이머 450ms→900ms, 모바일 분기 딜레이 400ms→600ms, 버튼 하이라이트 펄스 500ms→600ms
+  - ✅ `components/setup/VerificationArcTracker.tsx` — 슬라이드 `transition-[left]` 500ms→700ms(위 타이머와 동기화)
+  - ✅ `app/globals.css` — `document-merge-pop` 재생 시간 400ms→600ms
+  - ✅ `components/setup/FlyingDocumentIcon.tsx` — 비행 `transition-all` 600ms→1000ms
+
+**검증**: `npm run lint`·`npm run check`·`npm run build` 모두 통과. Playwright로 병합 배지의 `getBoundingClientRect()`를 병합 유지 구간과 비행 시작 구간에서 각각 측정해 좌표 어긋남이 사라졌음을 확인, 아우터 `opacity`가 `done` 단계에서 `0`으로 정확히 전환됨을 확인(잔상 없음), 스크린샷으로 병합→축소·하강→소멸→버튼 활성화 흐름이 자연스럽게 이어짐을 확인. GitHub→Notion→Claude 등 검증 순서를 바꿔도 동일 재현, 모바일(375px)·라이트 모드에서도 정상 동작 확인(콘솔 에러 0건).
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |
