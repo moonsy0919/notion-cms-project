@@ -626,6 +626,22 @@
 
 ---
 
+## Phase 27: GitHub Token 생성 가이드 페이지 구현 ✅ 완료
+
+> Task 044에서 `/setup/guide/github`를 "준비 중입니다" placeholder로만 만들어뒀습니다. Notion·Claude 가이드와 동일한 톤·구조로 GitHub 로그인부터 Personal Access Token(classic) 발급 및 보관까지 실제 절차를 담아 완성합니다.
+
+- **Task 067: 스크린샷 저장** ✅
+  - 사용자 제공 스크린샷 4장(프로필 드롭다운 → Settings, Developer settings, Personal access tokens → Tokens (classic), Generate new token → Generate new token (classic))을 `public/guide/github/01-settings.png` ~ `04-generate-classic.png`로 저장
+
+- **Task 068: `app/setup/guide/github/page.tsx` 전면 재작성** ✅
+  - placeholder 제거, Notion·Claude 가이드와 동일한 레이아웃(제목/설명 → `GuideStep` 목록 → 하단 안내 문구 + "API Key 설정하러 가기" 버튼)으로 7단계 구성: GitHub 접속·로그인 → 프로필 아이콘 → Settings(스크린샷) → Developer settings(스크린샷) → Personal access tokens/Tokens (classic)(스크린샷) → Generate new token (classic)(스크린샷) → 이름·기간·`repo`/`public_repo` 스코프 선택 후 생성 → 발급된 토큰 저장(중요 배지, 한 번만 표시되므로 즉시 복사·보관 안내)
+  - 기존에 검증된 `components/setup/GuideStep.tsx`를 세 번째로 재사용 — 추가 추출·변경 불필요
+  - `proxy.ts` 미수정 — 기존 `PUBLIC_PATHS`의 `/guide`·`/setup` 규칙으로 이미 공개 경로 처리됨
+
+**검증**: `npm run lint`·`npm run check`·`npm run build` 모두 통과. Playwright로 `/setup/guide/github` 7단계·스크린샷 4장 정상 렌더링 확인(`github.com`·`repo`/`public_repo`·"중요" 텍스트 포함 확인), 다크/라이트/모바일(375px) 스크린샷 확인(콘솔 에러 0건).
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |
