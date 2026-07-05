@@ -106,9 +106,9 @@ function WizardSidebar({ step }: { step: StepId }) {
 
   return (
     <aside className="flex shrink-0 flex-col gap-6 border-b border-sidebar-border bg-sidebar px-6 py-6 md:w-72 md:border-b-0 md:border-r md:px-8 md:py-12">
-      <div className="mb-8 flex items-center gap-2">
-        <SiNotion className="h-6 w-6 text-sidebar-foreground" />
-        <span className="text-2xl font-bold text-sidebar-foreground">Notion Portfolio</span>
+      <div className="mb-8 flex items-start gap-2">
+        <SiNotion className="h-8 w-8 shrink-0 text-sidebar-foreground" />
+        <span className="text-5xl leading-[0.95] font-bold text-sidebar-foreground">Notion Portfolio</span>
       </div>
 
       <div className="hidden md:flex md:flex-col md:items-center">
@@ -119,13 +119,13 @@ function WizardSidebar({ step }: { step: StepId }) {
               <StepIcon state={state} />
               <p
                 className={cn(
-                  "mt-3 text-lg font-semibold",
+                  "mt-3 text-base font-semibold",
                   state === "pending" ? "text-sidebar-foreground/60" : "text-sidebar-foreground"
                 )}
               >
                 {s.title}
               </p>
-              <p className="mt-1 text-base text-sidebar-foreground/50">{s.description}</p>
+              <p className="mt-1 text-sm text-sidebar-foreground/50">{s.description}</p>
               {index < STEPS.length - 1 && (
                 <div
                   className={cn(

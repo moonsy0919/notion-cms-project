@@ -702,6 +702,23 @@
 
 ---
 
+## Phase 31: Admin 위저드 브랜드 헤더 좌상단 초대형화 + 스텝 리스트 크기 롤백 ✅ 완료
+
+> Phase 30의 "Notion Portfolio" 브랜드 헤더(`text-2xl`)가 참조 이미지 기준으로 아직 존재감이 부족했고, 반대로 스텝 리스트(`text-lg`/`text-base`)는 과하게 커졌습니다. 브랜드 헤더는 "Portfolio"의 마지막 글자가 사이드바 경계에 닿을 정도로 초대형화하고, 스텝 리스트는 Phase 29 크기로 롤백합니다.
+
+- **Task 077: `WizardSidebar` 브랜드 헤더 초대형화 + 좌상단 고정** ✅
+  - `components/admin/ProfileWizard.tsx` — 컨테이너 `flex items-center gap-2` → `flex items-start gap-2`(텍스트가 "Notion"/"Portfolio" 두 줄로 자연 줄바꿈될 때 아이콘이 첫 줄 상단에 정렬되도록, 좌측 정렬 유지로 좌상단 고정)
+  - `<span>` 텍스트 `text-2xl font-bold` → `text-5xl leading-[0.95] font-bold`, 아이콘 `h-6 w-6` → `h-8 w-8`(`shrink-0` 추가)
+  - Playwright로 `Range.getClientRects()` 측정 — "Portfolio" 줄 우측 끝(253.27px)이 사이드바 콘텐츠 영역 우측 경계(256px)에서 2.73px 이내로 근접함을 확인(별도 미세조정 없이 `text-5xl` 단일 시도로 목표 오차 범위 충족)
+
+- **Task 078: 스텝 리스트 크기 롤백 (Phase 30 → Phase 29)** ✅
+  - 스텝 제목 `text-lg font-semibold` → `text-base font-semibold`, 설명 `text-base` → `text-sm`으로 축소(Phase 29 크기로 복원)
+  - Phase 30의 `flex flex-col items-center text-center`(아이콘-상단·텍스트-하단 세로 중앙 정렬) 레이아웃 구조는 그대로 유지 — "기본 정보" 블록은 계속 사이드바 폭 기준 중앙에 위치
+
+**검증**: `npm run lint`·`npm run check`·`npm run build` 모두 통과. Playwright로 `/admin` 접속 — "Notion Portfolio"가 좌상단(`left: 72px, top: 48px`)에 위치하고 가운데로 쏠리지 않음을 확인, "기본 정보" 스텝 제목 폰트 크기 16px(`text-base`)·설명 14px(`text-sm`)로 축소됐음을 확인, "기본 정보" 블록 중심좌표가 사이드바 중심과 0.5px 이내로 일치(중앙 정렬 유지)함을 확인, Continue → 2단계 전환 정상 동작 확인. 헤더 프로필 편집 Sheet 회귀 확인. 다크/라이트/모바일(375px) 스크린샷 확인, 콘솔 에러 0건 확인(가짜 API 키로 인한 예상된 Notion 400 로그 제외).
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |
