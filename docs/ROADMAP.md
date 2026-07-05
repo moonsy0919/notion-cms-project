@@ -771,6 +771,20 @@
 
 ---
 
+## Phase 35: setup·admin 페이지 다크/라이트 모드 토글 추가 ✅ 완료
+
+> 메인 앱은 `Header.tsx`에 `ThemeToggle`이 있어 테마 전환이 가능하지만, `(onboarding)` 라우트 그룹(`/setup`, `/admin`)은 Header가 없어 온보딩 중에는 테마를 바꿀 방법이 없었습니다. 두 페이지 모두 이미 CSS 변수 기반 테마 토큰으로 작성되어 라이트 모드 렌더링 자체는 지원하고 있어 버튼만 추가하면 됐습니다. `welcome` 페이지는 배경·카드 색상이 전부 하드코딩된 다크 전용 랜딩 디자인이라(색상 전면 교체가 별도 작업 규모) 사용자 확인 후 이번 범위에서 제외했습니다.
+
+- **Task 085: `app/setup/page.tsx`에 `ThemeToggle` 추가** ✅
+  - 기존 `components/shared/ThemeToggle.tsx`(변경 없이 재사용) — 기존 우측 상단 "왜 API key가 필요한가요?" 링크와 겹치지 않도록 좌측 상단(`fixed top-4 left-4 md:top-6 md:left-6 z-50`)에 배치
+
+- **Task 086: `components/admin/ProfileWizard.tsx`에 `ThemeToggle` 추가** ✅
+  - 최상위 wrapper(`WizardSidebar`가 아닌 `ProfileWizard` 반환 루트)에 `fixed top-4 right-4 z-50`으로 배치 — 1단계/2단계 스텝 전환과 무관하게 항상 노출
+
+**검증**: `npm run lint`·`npm run check`·`npm run build` 모두 통과(17개 라우트 컴파일 성공). Playwright로 `/setup` 데스크톱·모바일(375px)에서 좌측 상단 버튼 클릭 시 다크→라이트 전환 확인, 우측 상단 기존 링크와 겹침 없음(`getBoundingClientRect()`로 좌표 비교) 확인. `/admin`에서 우측 상단 버튼 클릭 시 다크→라이트 전환 확인, 1단계→2단계(Continue) 전환 후에도 버튼 유지 확인, 모바일(375px)에서 브랜드 헤더와 겹치지 않음 확인. 콘솔 에러 0건 확인.
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |

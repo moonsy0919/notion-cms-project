@@ -8,6 +8,7 @@ import { ArrowRight, KeyRound } from "lucide-react";
 import { FaGithub } from "react-icons/fa6";
 import { SiNotion, SiClaude } from "react-icons/si";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { cn } from "@/lib/utils";
 import { ApiKeyCard, type ApiKeyProvider } from "@/components/setup/ApiKeyCard";
 import { VerificationArcTracker, type ConvergePhase } from "@/components/setup/VerificationArcTracker";
@@ -87,6 +88,10 @@ export default function SetupPage() {
 
   return (
     <main className="min-h-screen bg-background px-4 py-12 md:py-16">
+      <div className="fixed top-4 left-4 z-50 md:top-6 md:left-6">
+        <ThemeToggle />
+      </div>
+
       <Link
         href="/setup/why"
         className="fixed top-4 right-4 z-50 text-xs text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline md:top-6 md:right-6"

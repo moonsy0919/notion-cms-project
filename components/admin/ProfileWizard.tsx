@@ -8,6 +8,7 @@ import { useProfile } from "@/contexts/DeveloperProfileContext";
 import { ProfileAvatar } from "@/components/home/ProfileAvatar";
 import { BasicInfoFields } from "@/components/admin/BasicInfoFields";
 import { SkillsFields } from "@/components/admin/SkillsFields";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { useProfileFields } from "@/hooks/useProfileFields";
 import { useSaveProfile } from "@/hooks/useSaveProfile";
 import { cn } from "@/lib/utils";
@@ -43,6 +44,10 @@ export function ProfileWizard({ initialProfile }: ProfileWizardProps) {
 
   return (
     <div className="flex min-h-screen flex-col md:flex-row">
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
+
       <WizardSidebar step={step} />
       <div className="flex flex-1 items-center justify-center px-4 py-10 md:py-0">
         <div className="w-full max-w-md">
