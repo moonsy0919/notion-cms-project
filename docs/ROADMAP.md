@@ -607,6 +607,25 @@
 
 ---
 
+## Phase 26: Claude API Key 생성 가이드 페이지 구현 ✅ 완료
+
+> Task 044에서 `/setup/guide/claude`를 "준비 중입니다" placeholder로만 만들어뒀습니다. Notion 가이드(Phase 24)와 동일한 톤·구조로 Claude Console 접속부터 API Key 생성 및 보관까지 실제 절차를 담아 완성합니다.
+
+- **Task 064: 가이드 공용 컴포넌트 추출 (`GuideStep`, `ExternalLinkText`)** ✅
+  - `components/setup/GuideStep.tsx` 신규 — Notion 가이드 페이지에 로컬로 정의돼 있던 `GuideStep`·`ExternalLinkText`를 이동. Claude 가이드가 두 번째 사용처가 되면서 실제 중복 제거로 추출 시점이 적절해짐
+  - `app/setup/guide/notion/page.tsx` — 로컬 정의 삭제 후 `@/components/setup/GuideStep`에서 import하도록 교체(렌더링 결과 동일, 회귀 없음 확인)
+
+- **Task 065: 스크린샷 저장** ✅
+  - 사용자 제공 스크린샷(Claude Console 좌측 사이드바 API 키 메뉴, 500×600)을 `public/guide/claude/01-api-key-menu.png`로 저장
+
+- **Task 066: `app/setup/guide/claude/page.tsx` 전면 재작성** ✅
+  - placeholder 제거, Notion 가이드와 동일한 레이아웃(제목/설명 → `GuideStep` 목록 → 하단 안내 문구 + "API Key 설정하러 가기" 버튼)으로 5단계 구성: Claude Console 접속·로그인 → API 키 메뉴 클릭(스크린샷) → + 키 생성 → API Key 이름 입력·생성 → API Key 저장(중요 배지, `sk-···` 키는 다시 확인 불가하므로 즉시 복사·보관 안내)
+  - `proxy.ts` 미수정 — 기존 `PUBLIC_PATHS`의 `/guide`·`/setup` 규칙으로 이미 공개 경로 처리됨
+
+**검증**: `npm run lint`·`npm run check`·`npm run build` 모두 통과. Playwright로 `/setup/guide/claude` 5단계·스크린샷 1장 정상 렌더링 확인(`sk-`·`console.anthropic.com` 텍스트 포함 확인), `/setup/guide/notion`도 함께 재확인해 컴포넌트 추출 후 이미지 7장·레이아웃 회귀 없음 확인, 다크/모바일(375px) 스크린샷 확인(콘솔 에러 0건).
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |
