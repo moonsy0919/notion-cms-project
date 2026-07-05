@@ -475,6 +475,25 @@
 
 ---
 
+## Phase 18: Setup 페이지 검증 아크 트래커 추가 ✅ 완료
+
+> Phase 16·17에서 카드별 개별 검증 UI와 비주얼 톤은 완성되었지만, 3개 카드를 모두 채웠는지 한눈에 보여주는 전체 진행 상황 표시가 없었습니다. 참조 이미지(반원형 아크 라인이 진행됨에 따라 초록색으로 채워지는 "Live Tracking" 스타일)를 참고해 3개 카드 하단에 걸친 공유 아크 트래커를 추가합니다.
+
+- **Task 046: `VerificationArcTracker` 컴포넌트 신규** ✅
+  - ✅ `components/setup/VerificationArcTracker.tsx` 신규 — Notion·Claude·GitHub 3개 노드를 잇는 반원형(완만한 상향 아치) SVG 아크 트래커
+  - ✅ 채움 규칙(개별성 보장): 노드 3개는 좌→우로 Notion(1)→Claude(2)→GitHub(3) 고정. 선분 2개는 각각 자신이 이어지는 뒤쪽 노드에 귀속 — `Notion↔Claude` 선분은 Claude 소속, `Claude↔GitHub` 선분은 GitHub 소속. 노드/선분의 채움 여부는 오직 해당 provider의 `verified` 포함 여부에만 의존하며 다른 provider의 검증 여부·순서와 무관
+  - ✅ 각 선분마다 회색 점선 path(기본) + 초록 실선 path(검증 시)를 겹쳐 그리고, 초록 path는 `pathLength` + `stroke-dasharray`/`stroke-dashoffset` 트랜지션으로 "그려지는" 애니메이션 처리
+  - ✅ 노드는 원형 배지로 표현, 기본 회색 테두리 → 검증 시 초록 테두리로 `transition-colors`
+  - ✅ 데스크톱 3열 그리드 폭 기준 16.67%/50%/83.33% 지점에 노드 배치, 모바일에서는 `hidden md:block`으로 숨김 처리(카드 자체의 Active/False 상태로 충분히 피드백 제공)
+
+- **Task 047: `app/setup/page.tsx`에 트래커 연결** ✅
+  - ✅ 기존 `verified` state(`handleVerified`로 갱신)를 그대로 재사용, 새 state 추가 없음
+  - ✅ 3장의 `ApiKeyCard`에 이미 존재하는 아이콘/배경색을 재사용하는 `ARC_NODES` 배열을 선언, 카드 그리드 바로 아래·"계속하기" 버튼 위에 `<VerificationArcTracker>` 삽입
+
+**검증**: `npm run lint`·`npm run check`·`npm run build` 모두 통과. Playwright로 GitHub 카드만 먼저 검증 시 GitHub 노드+Claude↔GitHub 선분만 초록 전환(Notion·Notion↔Claude는 회색 유지) 확인, 이어서 Notion·Claude 순으로 검증하며 각 노드/선분이 순서 무관 독립적으로 채워짐을 확인, 3개 모두 완료 시 전체 아크가 초록으로 이어짐을 확인. 다크/라이트 모드 대비 확인, 모바일(375px)에서 트래커 숨김 및 카드 레이아웃 정상 확인(콘솔 에러 0건).
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |

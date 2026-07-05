@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
@@ -8,8 +8,19 @@ import { FaGithub } from "react-icons/fa6";
 import { SiNotion, SiClaude } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import { ApiKeyCard, type ApiKeyProvider } from "@/components/setup/ApiKeyCard";
+import { VerificationArcTracker } from "@/components/setup/VerificationArcTracker";
 
 const REQUIRED_PROVIDERS: ApiKeyProvider[] = ["notion", "claude", "github"];
+
+const ARC_NODES: [
+  { provider: ApiKeyProvider; icon: ReactNode; iconBgClassName: string },
+  { provider: ApiKeyProvider; icon: ReactNode; iconBgClassName: string },
+  { provider: ApiKeyProvider; icon: ReactNode; iconBgClassName: string },
+] = [
+  { provider: "notion", icon: <SiNotion className="h-4 w-4 text-white" />, iconBgClassName: "bg-neutral-900" },
+  { provider: "claude", icon: <SiClaude className="h-4 w-4 text-white" />, iconBgClassName: "bg-[#c15f3c]" },
+  { provider: "github", icon: <FaGithub className="h-4 w-4 text-white" />, iconBgClassName: "bg-neutral-800" },
+];
 
 /** API 키 입력 페이지 — Notion·Claude·GitHub 카드별 개별 검증 + 즉시 쿠키 저장 */
 export default function SetupPage() {
@@ -90,7 +101,9 @@ export default function SetupPage() {
           />
         </div>
 
-        <div className="mt-10 flex justify-center">
+        <VerificationArcTracker nodes={ARC_NODES} verified={verified} />
+
+        <div className="mt-4 flex justify-center md:mt-10">
           <Button
             type="button"
             disabled={!allVerified}
