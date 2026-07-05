@@ -107,37 +107,33 @@ function WizardSidebar({ step }: { step: StepId }) {
   return (
     <aside className="flex shrink-0 flex-col gap-6 border-b border-sidebar-border bg-sidebar px-6 py-6 md:w-72 md:border-b-0 md:border-r md:px-8 md:py-12">
       <div className="mb-8 flex items-center gap-2">
-        <SiNotion className="h-5 w-5 text-sidebar-foreground" />
-        <span className="text-base font-semibold text-sidebar-foreground">Notion Portfolio</span>
+        <SiNotion className="h-6 w-6 text-sidebar-foreground" />
+        <span className="text-2xl font-bold text-sidebar-foreground">Notion Portfolio</span>
       </div>
 
-      <div className="hidden md:flex md:flex-col">
+      <div className="hidden md:flex md:flex-col md:items-center">
         {STEPS.map((s, index) => {
           const state = s.id < step ? "done" : s.id === step ? "current" : "pending";
           return (
-            <div key={s.id} className="flex gap-3">
-              <div className="flex flex-col items-center">
-                <StepIcon state={state} />
-                {index < STEPS.length - 1 && (
-                  <div
-                    className={cn(
-                      "my-1 w-px flex-1",
-                      state === "done" ? "bg-sidebar-primary" : "bg-sidebar-border"
-                    )}
-                  />
+            <div key={s.id} className="flex flex-col items-center text-center">
+              <StepIcon state={state} />
+              <p
+                className={cn(
+                  "mt-3 text-lg font-semibold",
+                  state === "pending" ? "text-sidebar-foreground/60" : "text-sidebar-foreground"
                 )}
-              </div>
-              <div className={cn("pb-8", index === STEPS.length - 1 && "pb-0")}>
-                <p
+              >
+                {s.title}
+              </p>
+              <p className="mt-1 text-base text-sidebar-foreground/50">{s.description}</p>
+              {index < STEPS.length - 1 && (
+                <div
                   className={cn(
-                    "text-base font-semibold",
-                    state === "pending" ? "text-sidebar-foreground/60" : "text-sidebar-foreground"
+                    "my-4 h-6 w-px",
+                    state === "done" ? "bg-sidebar-primary" : "bg-sidebar-border"
                   )}
-                >
-                  {s.title}
-                </p>
-                <p className="text-sm text-sidebar-foreground/50">{s.description}</p>
-              </div>
+                />
+              )}
             </div>
           );
         })}

@@ -685,6 +685,23 @@
 
 ---
 
+## Phase 30: Admin 위저드 사이드바 브랜드 헤더 확대 및 스텝 리스트 중앙 정렬 ✅ 완료
+
+> Phase 29의 "Notion Portfolio" 브랜드 헤더가 본문 텍스트 수준(`text-base`)이라 존재감이 약했고, "기본 정보"/"기술 스택" 스텝 리스트가 사이드바 좌측에 붙어있어 어색했습니다. 참조 이미지 기준으로 브랜드 헤더를 사이트 `<h1>`과 동일한 "제목1" 톤으로 확실히 키우고, 스텝 리스트를 사이드바 중앙으로 재배치합니다.
+
+- **Task 075: `WizardSidebar` 브랜드 헤더 확대** ✅
+  - `components/admin/ProfileWizard.tsx` — `SiNotion` 아이콘 `h-5 w-5` → `h-6 w-6`, `"Notion Portfolio"` 텍스트 `text-base font-semibold` → `text-2xl font-bold`로 확대 — `app/setup/page.tsx`의 `<h1>` 톤(`text-2xl font-bold` + `h-6 w-6` 아이콘)과 통일
+
+- **Task 076: 스텝 리스트 중앙 정렬 + 크기 재확대 (데스크톱)** ✅
+  - **원인**: 단순히 컨테이너에 `items-center`만 추가하면 스텝 행(아이콘+텍스트)이 설명 텍스트 줄바꿈으로 인해 이미 사이드바 폭 대부분을 차지해 시각적으로 중앙 정렬 효과가 없음(DOM상 중심좌표 차이 0.5px에 불과)
+  - ✅ 아이콘-좌·텍스트-우 가로 배치를 아이콘-상단·텍스트-하단 세로 배치로 재구성(`flex flex-col items-center text-center`) — 아이콘 아래 제목, 그 아래 설명이 모두 가운데 정렬되고 연결선은 각 스텝 블록 하단에 배치
+  - 스텝 제목 `text-base` → `text-lg`, 설명 `text-sm` → `text-base`로 재확대(Phase 29 대비 한 단계 더)
+  - 모바일 상단 축약 진행바(`md:hidden`)는 변경 범위 밖 — 기존 그대로 유지
+
+**검증**: `npm run lint`·`npm run check`·`npm run build` 모두 통과. Playwright로 `/admin` 접속 — "Notion Portfolio" 폰트 크기 24px(`text-2xl`) 확인, "기본 정보" 스텝 제목 폰트 크기 18px(`text-lg`) 확인, 스크린샷으로 아이콘·제목·설명이 사이드바 중앙에 세로로 정렬됨을 시각 확인(Phase 29의 좌측 정렬 대비 명확히 구분), Continue → 2단계 전환 및 체크/진행중 상태 전환 정상 동작 확인. 헤더 프로필 편집 Sheet 회귀 확인. 다크/라이트/모바일(375px, 브랜드 헤더만 확대 적용·진행바는 기존과 동일) 스크린샷 확인, 콘솔 에러 0건 확인(가짜 API 키로 인한 예상된 Notion 400 로그 제외).
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |
