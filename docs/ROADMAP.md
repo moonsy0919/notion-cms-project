@@ -573,6 +573,23 @@
 
 ---
 
+## Phase 24: Notion API Key 생성 가이드 페이지 구현 ✅ 완료
+
+> Task 044에서 `/setup/guide/notion`을 "준비 중입니다" placeholder로만 만들어뒀습니다. Notion 데스크톱 앱 설치부터 액세스 토큰·데이터베이스 ID 확보까지 실제 절차와 스크린샷을 담아 완성합니다. Claude·GitHub 가이드는 이번 범위에서 제외.
+
+- **Task 060: 가이드 스크린샷을 `public/guide/notion/`으로 정리** ✅
+  - 사용자 제공 스크린샷 8장을 순서를 나타내는 파일명으로 `public/guide/notion/`에 저장(`01-add-page.png` ~ `08-share-copy-link.png`)
+
+- **Task 061: `app/setup/guide/notion/page.tsx` 전면 재작성** ✅
+  - `GuideStep` 재사용 컴포넌트 신규 작성(번호 배지 + 제목 + 설명 + 선택적 스크린샷 `next/image`) — `WhyPage`의 `InfoSection` 패턴 재사용
+  - Notion 데스크톱 앱 다운로드 → 로그인 → 워크스페이스 생성 → 페이지 추가 → 데이터베이스 생성 → 속성 입력 → Integration 생성 → 액세스 토큰 저장 → 연결 활성화 → 데이터베이스 ID 저장까지 11단계로 구성, 액세스 토큰·데이터베이스 ID 저장 단계에는 "중요" 강조 배지 표시
+  - 외부 링크(notion.com/ko/desktop, notion.so/my-integrations)는 `target="_blank"`로 새 탭 오픈
+  - **버그 수정**: `public/guide/notion/*.png` 정적 이미지가 `proxy.ts`의 `PUBLIC_PATHS`에 없어 미인증 사용자(가이드 페이지의 실제 대상)에게 `/welcome`으로 307 리다이렉트되어 이미지가 전부 깨짐 → `PUBLIC_PATHS`에 `/guide` 추가로 해결
+
+**검증**: `npm run lint`·`npm run check`·`npm run build` 모두 통과. Playwright로 `/setup/guide/notion`에서 11단계·이미지 8장 정상 렌더링(스크롤 후 `naturalWidth` 확인, 콘솔 에러 0건), 다크/라이트/모바일(375px) 스크린샷 확인, `/setup` → 가이드 아이콘 클릭 → 가이드 페이지 → 돌아가기 흐름 확인.
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |
