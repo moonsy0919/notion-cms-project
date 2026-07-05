@@ -49,7 +49,7 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${jetbrainsMono.variable} h-full antialiased bg-[#080808]`}
+      className={`${jetbrainsMono.variable} h-full antialiased bg-background`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">

@@ -155,11 +155,6 @@
   to   { clip-path: inset(0 0%   0 0); }
 }
 
-@keyframes glowPulse {
-  0%, 100% { opacity: 0.15; }
-  50%       { opacity: 1;    }
-}
-
 @property --border-angle {
   syntax: '<angle>';
   inherits: false;

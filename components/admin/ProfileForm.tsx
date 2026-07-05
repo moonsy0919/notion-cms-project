@@ -2,76 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { X, Check, RefreshCw } from "lucide-react";
+import { Check, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useProfile } from "@/contexts/DeveloperProfileContext";
 import { ProfileAvatar } from "@/components/home/ProfileAvatar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
+import { TagInput } from "@/components/admin/TagInput";
 import type { DeveloperProfile } from "@/types/profile";
-
-/** 태그 입력 — Enter 또는 쉼표로 추가, X로 제거 */
-function TagInput({
-  value,
-  onChange,
-  placeholder,
-}: {
-  value: string[];
-  onChange: (tags: string[]) => void;
-  placeholder?: string;
-}) {
-  const [inputText, setInputText] = useState("");
-
-  const addTag = () => {
-    const trimmed = inputText.trim().replace(/,+$/, "");
-    if (trimmed && !value.includes(trimmed)) {
-      onChange([...value, trimmed]);
-    }
-    setInputText("");
-  };
-
-  const removeTag = (tag: string) => {
-    onChange(value.filter((t) => t !== tag));
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" || e.key === ",") {
-      e.preventDefault();
-      addTag();
-    } else if (e.key === "Backspace" && !inputText && value.length > 0) {
-      removeTag(value[value.length - 1]);
-    }
-  };
-
-  return (
-    <div className="space-y-2">
-      {value.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {value.map((tag) => (
-            <Badge key={tag} variant="secondary" className="gap-1 pr-1.5">
-              {tag}
-              <button
-                type="button"
-                onClick={() => removeTag(tag)}
-                className="rounded-full hover:bg-muted-foreground/20 p-0.5"
-              >
-                <X className="h-2.5 w-2.5" />
-              </button>
-            </Badge>
-          ))}
-        </div>
-      )}
-      <Input
-        value={inputText}
-        onChange={(e) => setInputText(e.target.value)}
-        onKeyDown={handleKeyDown}
-        onBlur={addTag}
-        placeholder={placeholder}
-      />
-    </div>
-  );
-}
 
 interface ProfileFormProps {
   initialProfile: DeveloperProfile;

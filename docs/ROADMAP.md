@@ -642,6 +642,33 @@
 
 ---
 
+## Phase 28: Admin 페이지 2단계 위저드 재설계 + CircuitBackground 전면 제거 ✅ 완료
+
+> `/admin` 페이지는 `CircuitBackground`(PCB 회로 SVG 배경) + 단일 플랫 폼(`ProfileForm`)으로 구성되어 있었습니다. Untitled UI 스타일 참조 이미지를 참고해 좌측 스텝 리스트 + 우측 단계별 입력 필드로 구성된 2단계 위저드로 전면 재설계하고, `CircuitBackground` 관련 코드를 프로젝트 전체에서 삭제합니다.
+
+- **Task 069: `TagInput` 공용 컴포넌트 추출** ✅
+  - `components/admin/TagInput.tsx` 신규 — `ProfileForm.tsx`의 로컬 `TagInput` 함수를 그대로 이동
+  - `ProfileForm.tsx` — 로컬 정의 삭제 후 `@/components/admin/TagInput`에서 import(Header Sheet 재사용처 동작 동일 확인)
+
+- **Task 070: `ProfileWizard` 컴포넌트 신규 구현** ✅
+  - `components/admin/ProfileWizard.tsx` 신규 — 좌측 2단계 스텝 리스트("기본 정보"→"기술 스택", 완료/진행중/대기 상태를 `--sidebar-primary`/`--sidebar-border` 토큰으로 표현) + 우측 단계별 콘텐츠
+  - 1단계: 아바타 프리뷰 + 이름/역할(필수)/주력 기술/위치 입력 + **Continue**(이름·역할 미입력 시 비활성화, API 호출 없이 로컬 상태만 전이)
+  - 2단계: Frontend/Backend/Tools `TagInput` 3개 + **저장**(`POST /api/profile`) + **이전** 버튼
+  - 모바일(md 미만): 좌측 세로 스텝 리스트 대신 상단 축약 진행바("1/2 · 기본 정보") + 전체 폭 콘텐츠로 반응형 처리
+
+- **Task 071: `app/(onboarding)/admin/page.tsx` 단순화** ✅
+  - `CircuitBackground`·`Container`·`PageHeader`·`bg-card` 불투명 wrapper(PCB 선 비침 방지용이었던 Task 019-D 워크어라운드) 제거
+  - `<ProfileWizard initialProfile={initialProfile} />` 단일 렌더로 교체
+
+- **Task 072: CircuitBackground 프로젝트 전체 삭제** ✅
+  - `app/setup/why/page.tsx` — `CircuitBackground` 제거, `/setup/guide/*`와 동일한 `<main className="min-h-screen bg-background px-4 py-12">` + `mx-auto max-w-2xl` 레이아웃으로 교체(`InfoSection` 콘텐츠 유지, `Card` 래핑 제거)
+  - `components/ui/circuit-background.tsx` 파일 삭제, `app/globals.css`의 `@keyframes glowPulse`(전용 애니메이션) 삭제
+  - **추가 수정**: `app/layout.tsx`의 `<html>` `bg-[#080808]` 하드코딩(Task 019-D에서 PCB 배경과의 오버스크롤 시각적 연속성을 위해 추가됐던 코드) — `CircuitBackground` 완전 제거로 더 이상 근거가 없어졌고, 라이트 모드에서 오버스크롤 시 검은 배경이 노출되는 회귀가 발생하므로 테마 대응 `bg-background` 토큰으로 교체
+
+**검증**: `npm run lint`·`npm run check`·`npm run build` 모두 통과. Playwright로 `/admin` 접속 — 1단계 필드 입력 후 Continue 클릭 시 2단계(기술 스택)로 전환, 스텝 리스트의 체크/진행중 상태 전환 확인. 헤더 프로필 편집 Sheet(`ProfileForm` 재사용처) 정상 동작 회귀 확인. `/setup/why` 플레인 배경 렌더링 확인. 다크/라이트(localStorage 강제 전환)/모바일(375px) 스크린샷 확인, 콘솔 에러 0건 확인(가짜 API 키로 인한 예상된 Notion 401/400 로그 제외).
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |
