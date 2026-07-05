@@ -719,6 +719,23 @@
 
 ---
 
+## Phase 32: Admin 위저드 브랜드 헤더 한 줄 정리 + 스텝 리스트 간격 확대 ✅ 완료
+
+> Phase 31의 초대형 2줄("Notion"/"Portfolio") 브랜드 헤더 실사용 확인 결과, 사용자가 직접 `text-2xl`로 축소를 시도했으나 2줄 레이아웃 전용으로 추가했던 `items-start`·`leading-[0.95]`·확대된 아이콘(`h-8 w-8`)이 1줄 렌더링에는 어울리지 않게 남아있었습니다. 브랜드 헤더를 한 줄로 자연스럽게 정리하고, 스텝 리스트는 더 아래로 내립니다.
+
+- **Task 079: `WizardSidebar` 브랜드 헤더 한 줄 정리** ✅
+  - `components/admin/ProfileWizard.tsx` — 컨테이너 `items-start` → `items-center`(1줄 텍스트에 맞는 세로 중앙 정렬로 복귀)
+  - 아이콘 `h-8 w-8` → `h-7 w-7`(`text-2xl` 텍스트와 비율이 맞도록 축소)
+  - `<span>`에서 2줄 전용이었던 `leading-[0.95]` 제거, 폭이 좁아져도 줄바꿈되지 않도록 `whitespace-nowrap` 추가
+  - Playwright `Range.getClientRects()`로 `lineCount: 1` 확인(항상 한 줄 렌더링 보장)
+
+- **Task 080: 스텝 리스트 간격 확대** ✅
+  - 브랜드 헤더 컨테이너 하단 여백 `mb-8` → `mb-20`으로 확대 — "기본 정보"/"기술 스택" 스텝 리스트가 브랜드 헤더로부터 더 아래로 내려가 배치됨
+
+**검증**: `npm run lint`·`npm run check`·`npm run build` 모두 통과. Playwright로 `/admin` 접속 — "Notion Portfolio" `Range.getClientRects()` 결과 `lineCount: 1`(한 줄 렌더링) 확인, 스크린샷으로 아이콘·텍스트 수직 정렬 및 스텝 리스트가 이전보다 아래로 이동했음을 시각 확인, "기본 정보" 폰트 크기(16px/14px)·중앙 정렬(사이드바 중심 대비 0.5px 이내) 유지 확인, Continue → 2단계 전환 정상 동작 확인. 헤더 프로필 편집 Sheet 회귀 확인. 다크/라이트/모바일(375px) 스크린샷 확인, 콘솔 에러 0건 확인(가짜 API 키로 인한 예상된 Notion 400 로그 제외).
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |

@@ -106,9 +106,9 @@ function WizardSidebar({ step }: { step: StepId }) {
 
   return (
     <aside className="flex shrink-0 flex-col gap-6 border-b border-sidebar-border bg-sidebar px-6 py-6 md:w-72 md:border-b-0 md:border-r md:px-8 md:py-12">
-      <div className="mb-8 flex items-start gap-2">
-        <SiNotion className="h-8 w-8 shrink-0 text-sidebar-foreground" />
-        <span className="text-5xl leading-[0.95] font-bold text-sidebar-foreground">Notion Portfolio</span>
+      <div className="mb-20 flex items-center gap-2">
+        <SiNotion className="h-7 w-7 shrink-0 text-sidebar-foreground" />
+        <span className="text-2xl font-bold whitespace-nowrap text-sidebar-foreground">Notion Portfolio</span>
       </div>
 
       <div className="hidden md:flex md:flex-col md:items-center">
