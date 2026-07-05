@@ -590,6 +590,23 @@
 
 ---
 
+## Phase 25: Notion 가이드 페이지 이미지 렌더링 버그 수정 ✅ 완료
+
+> Phase 24 배포 후 실사용 확인 결과, 가이드 이미지 오른쪽에 카드색 여백이 남고 6번(속성 입력) 이미지가 너무 작아 잘 보이지 않는 문제가 발견되어 수정합니다.
+
+- **Task 062: `GuideStep` 이미지 wrapper 오른쪽 여백 버그 수정** ✅
+  - **원인**: 이미지 wrapper `div`(`bg-card` 배경)가 블록 요소라 열 전체 폭(~600px)만큼 항상 늘어나는데, 내부 `<Image>`는 `max-w-md`(448px)로 캡핑되어 있어 열 폭이 448px보다 넓은 화면에서 이미지 오른쪽에 `bg-card` 배경이 그대로 남아 "흰 여백"처럼 보임(세로로 긴 스크린샷에서 특히 두드러짐)
+  - ✅ wrapper를 `inline-block`(shrink-to-fit)으로 변경, `<Image>`의 `max-w-md`를 제거하고 `h-auto w-auto max-w-full`로 교체 — wrapper 크기가 항상 이미지 실제 렌더링 크기와 정확히 일치하도록 수정
+
+- **Task 063: 6번(속성 입력) 이미지 확대 처리** ✅
+  - **원인**: `03-properties.png`(1568×34)는 가로가 세로의 46배가 넘는 스크린샷이라 열 폭에 맞춰 축소하면 높이가 13px 안팎으로 줄어 텍스트가 보이지 않음
+  - ✅ `GuideStepProps`의 `image`에 `wide?: boolean` 옵션 추가 — `wide: true`일 때 wrapper에 `overflow-x-auto`, `<Image>`에 고정 높이(`h-14`) + `w-auto max-w-none` 적용해 세로 높이 기준으로 확대(56px)하고 넘치는 가로 폭은 스크롤 처리
+  - `03-properties.png`를 사용하는 6번 `GuideStep`에만 `wide: true` 적용, 나머지 7장은 영향 없음
+
+**검증**: `npm run lint`·`npm run check`·`npm run build` 모두 통과. Playwright로 8장 스크린샷의 wrapper·이미지 `getBoundingClientRect()`를 비교해 폭 차이가 border 두께(2px)뿐임을 확인(오른쪽 여백 해소), 6번 이미지가 56px 높이로 렌더링되어 이전 대비 눈에 띄게 커짐을 확인, 다크/모바일(375px) 스크린샷 확인(콘솔 에러 0건).
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |

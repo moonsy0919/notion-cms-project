@@ -7,7 +7,7 @@ interface GuideStepProps {
   step: number;
   title: string;
   important?: boolean;
-  image?: { src: string; width: number; height: number };
+  image?: { src: string; width: number; height: number; wide?: boolean };
   children: React.ReactNode;
 }
 
@@ -28,16 +28,28 @@ function GuideStep({ step, title, important, image, children }: GuideStepProps) 
           )}
         </div>
         <div className="text-sm leading-relaxed text-muted-foreground">{children}</div>
-        {image && (
-          <div className="mt-3 overflow-hidden rounded-lg border bg-card">
+        {image && image.wide ? (
+          <div className="mt-3 overflow-x-auto rounded-lg border bg-card">
             <Image
               src={image.src}
               alt={title}
               width={image.width}
               height={image.height}
-              className="w-full max-w-md"
+              className="h-14 w-auto max-w-none"
             />
           </div>
+        ) : (
+          image && (
+            <div className="mt-3 inline-block overflow-hidden rounded-lg border bg-card">
+              <Image
+                src={image.src}
+                alt={title}
+                width={image.width}
+                height={image.height}
+                className="h-auto w-auto max-w-full"
+              />
+            </div>
+          )
         )}
       </div>
     </div>
@@ -115,7 +127,7 @@ export default function NotionGuidePage() {
           <GuideStep
             step={6}
             title="속성 입력"
-            image={{ src: "/guide/notion/03-properties.png", width: 1568, height: 34 }}
+            image={{ src: "/guide/notion/03-properties.png", width: 1568, height: 34, wide: true }}
           >
             <p className="mb-2">생성된 페이지에서 각각의 속성들을 다음과 같이 입력해주세요.</p>
             <ul className="list-inside list-disc space-y-0.5">
@@ -196,7 +208,7 @@ export default function NotionGuidePage() {
         <div className="flex justify-center">
           <Button asChild>
             <Link href="/setup">
-              Setup으로 돌아가기
+              API Key 설정하러 가기
               <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
