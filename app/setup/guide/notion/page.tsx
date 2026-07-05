@@ -7,7 +7,7 @@ interface GuideStepProps {
   step: number;
   title: string;
   important?: boolean;
-  image?: { src: string; width: number; height: number; wide?: boolean };
+  image?: { src: string; width: number; height: number };
   children: React.ReactNode;
 }
 
@@ -28,28 +28,16 @@ function GuideStep({ step, title, important, image, children }: GuideStepProps) 
           )}
         </div>
         <div className="text-sm leading-relaxed text-muted-foreground">{children}</div>
-        {image && image.wide ? (
-          <div className="mt-3 overflow-x-auto rounded-lg border bg-card">
+        {image && (
+          <div className="mt-3 inline-block overflow-hidden rounded-lg border bg-card">
             <Image
               src={image.src}
               alt={title}
               width={image.width}
               height={image.height}
-              className="h-14 w-auto max-w-none"
+              className="h-auto w-auto max-w-full"
             />
           </div>
-        ) : (
-          image && (
-            <div className="mt-3 inline-block overflow-hidden rounded-lg border bg-card">
-              <Image
-                src={image.src}
-                alt={title}
-                width={image.width}
-                height={image.height}
-                className="h-auto w-auto max-w-full"
-              />
-            </div>
-          )
         )}
       </div>
     </div>
@@ -124,11 +112,7 @@ export default function NotionGuidePage() {
             검색한 후, <strong className="text-foreground">전체 페이지</strong>를 선택해주세요.
           </GuideStep>
 
-          <GuideStep
-            step={6}
-            title="속성 입력"
-            image={{ src: "/guide/notion/03-properties.png", width: 1568, height: 34, wide: true }}
-          >
+          <GuideStep step={6} title="속성 입력">
             <p className="mb-2">생성된 페이지에서 각각의 속성들을 다음과 같이 입력해주세요.</p>
             <ul className="list-inside list-disc space-y-0.5">
               <li>Title</li>
