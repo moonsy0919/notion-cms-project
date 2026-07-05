@@ -558,6 +558,21 @@
 
 ---
 
+## Phase 22: 사이트 전역 `</>` 로고 아이콘 통일 ✅ 완료
+
+> Phase 21에서 `/setup` 타이틀만 교체했으나, 프로젝트 전체를 조사한 결과 동일한 `</>` 로고가 `Header.tsx`(데스크톱·모바일)와 `opengraph-image.tsx`(OG 공유 이미지)에도 쓰이고 있어 전부 `KeyRound` 아이콘으로 통일합니다. (`setup/layout.tsx`·`ApiKeyCard.tsx`·`ProfileForm.tsx`·`BlockRenderer.tsx`의 `</>`는 React Fragment 문법일 뿐 로고와 무관해 제외)
+
+- **Task 056: `components/layout/Header.tsx` 데스크톱·모바일 로고 교체** ✅
+  - ✅ 데스크톱 로고(`<Link href="/">` 내부) — `&lt;/&gt;` 텍스트를 `<KeyRound className="h-5 w-5" />`로 교체, `text-accent` 색상·Link 클릭 동작 유지
+  - ✅ 모바일 Sheet 상단 로고 — 동일하게 `KeyRound` 아이콘으로 교체
+
+- **Task 057: `app/opengraph-image.tsx` OG 이미지 로고 교체** ✅
+  - ✅ `next/og`의 Satori 렌더러가 `forwardRef` 기반 lucide-react 컴포넌트를 안정적으로 처리하지 못할 수 있어, `key-round` 아이콘의 실제 SVG 좌표(`path`+`circle`)를 순수 `<svg>` 태그로 하드코딩 — 기존 로고 색상(`#2a9d8f`) 유지
+
+**검증**: `npm run lint`·`npm run check`·`npm run build` 모두 통과. Playwright로 홈 페이지 데스크톱(다크/라이트)·모바일(375px, 햄버거 메뉴) 헤더 로고가 `KeyRound`로 표시되고 Link 클릭 시 정상 이동함을 확인, `/opengraph-image` 접속해 OG 이미지에 아이콘이 깨짐 없이 렌더링됨을 스크린샷으로 확인(콘솔 에러 0건, 테스트용 가짜 API 키로 인한 예상된 401 로그 제외).
+
+---
+
 ## 기술 스택 요약
 
 | 구분 | 기술 |

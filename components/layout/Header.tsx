@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, LogOut, Pencil } from "lucide-react";
+import { Menu, LogOut, Pencil, KeyRound } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { UpdateProjectsButton } from "@/components/shared/UpdateProjectsButton";
@@ -45,8 +45,8 @@ export function Header() {
           <div className="flex items-stretch gap-4">
             {/* 로고: </> 아이콘은 홈 링크, 이름은 프로필 편집 Sheet trigger */}
             <div className="flex items-center gap-2 pr-2">
-              <Link href="/" className="font-mono text-accent text-lg font-bold tracking-tight">
-                &lt;/&gt;
+              <Link href="/" className="flex items-center text-accent">
+                <KeyRound className="h-5 w-5" />
               </Link>
               <Sheet open={profileOpen} onOpenChange={setProfileOpen}>
                 <SheetTrigger asChild>
@@ -112,7 +112,7 @@ export function Header() {
               </SheetTrigger>
               <SheetContent side="right" className="w-60">
                 <div className="flex items-center gap-2 mb-6 pt-2">
-                  <span className="font-mono text-accent text-lg font-bold tracking-tight">&lt;/&gt;</span>
+                  <KeyRound className="h-5 w-5 text-accent" />
                   <span className="text-sm font-medium text-muted-foreground">{profile.name || "개발자"}</span>
                 </div>
                 <nav className="flex flex-col gap-1">

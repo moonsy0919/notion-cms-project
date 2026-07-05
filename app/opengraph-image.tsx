@@ -81,9 +81,20 @@ export default function Image() {
         <div style={{ display: "flex", flexDirection: "column" }}>
           {/* 상단 로고 */}
           <div style={{ display: "flex", alignItems: "center", marginBottom: "32px" }}>
-            <span style={{ color: "#2a9d8f", fontSize: "22px", marginRight: "10px", display: "flex" }}>
-              {"</>"}
-            </span>
+            <svg
+              width="26"
+              height="26"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#2a9d8f"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ marginRight: "10px" }}
+            >
+              <path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z" />
+              <circle cx="16.5" cy="7.5" r=".5" fill="#2a9d8f" />
+            </svg>
             <span style={{ color: "#555", fontSize: "16px", display: "flex" }}>
               notion-cms-project
             </span>
